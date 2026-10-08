@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Photo 1 -->
+  <path
+      android:fillColor="#FF6B8B"
+      android:pathData="M6,12h24c2.2,0 4,1.8 4,4v20c0,2.2 -1.8,4 -4,4H6c-2.2,0 -4,-1.8 -4,-4V16c0,-2.2 1.8,-4 4,-4z"/>
+  <!-- Photo 2 rotated feel -->
+  <path
+      android:fillColor="#FFA5BA"
+      android:pathData="M16,6h24c2.2,0 4,1.8 4,4v20c0,2.2 -1.8,4 -4,4H16c-2.2,0 -4,-1.8 -4,-4V10c0,-2.2 1.8,-4 4,-4z"/>
+  <!-- Star / sparkle -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M28,14l2,4 4,2 -4,2 -2,4 -2,-4 -4,-2 4,-2z"/>
+</vector>

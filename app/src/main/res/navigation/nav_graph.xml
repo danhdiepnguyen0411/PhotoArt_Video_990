@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <!-- Splash Screen -->
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.phortart_video_990.ui.screen.splash.SplashFragment"
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_languageFragment"
+            app:destination="@id/languageFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_introFragment"
+            app:destination="@id/introFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Language Screen -->
+    <fragment
+        android:id="@+id/languageFragment"
+        android:name="com.example.phortart_video_990.ui.screen.language.LanguageFragment"
+        android:label="LanguageFragment"
+        tools:layout="@layout/fragment_language">
+        <action
+            android:id="@+id/action_languageFragment_to_introFragment"
+            app:destination="@id/introFragment"
+            app:popUpTo="@id/languageFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_languageFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/languageFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Intro (1, 2, 3, 4) Screen -->
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.example.phortart_video_990.ui.screen.intro.IntroFragment"
+        android:label="IntroFragment"
+        tools:layout="@layout/fragment_intro">
+        <action
+            android:id="@+id/action_introFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/introFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Main Screen (BottomNav: Home, History, Setting) -->
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.phortart_video_990.ui.screen.main.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_memoriesFragment"
+            app:destination="@id/memoriesFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_restoreFragment"
+            app:destination="@id/restoreFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_enhanceFragment"
+            app:destination="@id/enhanceFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_upscaleFragment"
+            app:destination="@id/upscaleFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_languageFragment"
+            app:destination="@id/languageFragment" />
+    </fragment>
+
+    <!-- 5 Feature Screens -->
+    <fragment
+        android:id="@+id/memoriesFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.memories.MemoriesFragment"
+        android:label="MemoriesFragment"
+        tools:layout="@layout/fragment_memories" />
+
+    <fragment
+        android:id="@+id/restoreFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreFragment"
+        android:label="RestoreFragment"
+        tools:layout="@layout/fragment_restore" />
+
+    <fragment
+        android:id="@+id/enhanceFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceFragment"
+        android:label="EnhanceFragment"
+        tools:layout="@layout/fragment_enhance" />
+
+    <fragment
+        android:id="@+id/musicFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.music.MusicFragment"
+        android:label="MusicFragment"
+        tools:layout="@layout/fragment_music" />
+
+    <fragment
+        android:id="@+id/upscaleFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.upscale.UpscaleFragment"
+        android:label="UpscaleFragment"
+        tools:layout="@layout/fragment_upscale" />
+
+</navigation>

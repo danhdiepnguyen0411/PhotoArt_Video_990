@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">PhortArt Video</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_title">AI Photo\nRestore With Music</string>
+    <string name="splash_subtitle">Make memories live again</string>
+    <string name="splash_loading">Loading %1$d%%...</string>
+
+    <!-- Language Screen -->
+    <string name="language_title">Select Language</string>
+    <string name="language_choose_desc">Please select your preferred language to get started</string>
+    <string name="btn_confirm">Confirm</string>
+
+    <!-- Intro / Onboarding -->
+    <string name="btn_next">Next</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_get_started">Get Started</string>
+    
+    <string name="intro_1_title">Gom kỷ niệm</string>
+    <string name="intro_1_desc">Tập hợp những khoảnh khắc quý giá thành câu chuyện sống động.</string>
+    
+    <string name="intro_2_title">Khôi phục ảnh cũ</string>
+    <string name="intro_2_desc">Phục dựng màu sắc và chi tiết ảnh cũ trở nên chân thực và sắc nét.</string>
+    
+    <string name="intro_3_title">Làm nét chuyên nghiệp</string>
+    <string name="intro_3_desc">Nâng cao độ phân giải với công nghệ AI tiên tiến.</string>
+    
+    <string name="intro_4_title">Ghép nhạc &amp; Nâng cấp ảnh</string>
+    <string name="intro_4_desc">Thổi hồn vào bức ảnh với giai điệu cảm xúc và chuyển động mượt mà.</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_setting">Setting</string>
+
+    <!-- Home Screen -->
+    <string name="home_ai_tools_title">Công cụ AI ✨</string>
+    <string name="home_ai_tools_subtitle">Khám phá các tính năng xử lý ảnh &amp; video thông minh</string>
+
+    <!-- 5 Functions -->
+    <string name="func_01_memories">Gom kỷ niệm</string>
+    <string name="func_02_restore">Khôi phục ảnh</string>
+    <string name="func_03_enhance">Làm nét</string>
+    <string name="func_04_music">Ghép nhạc</string>
+    <string name="func_05_upscale">Nâng cấp ảnh</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_description">Tính năng đang trong quá trình phát triển hoàn thiện.</string>
+    <string name="btn_back">Quay lại</string>
+
+    <!-- History -->
+    <string name="history_title">Lịch sử</string>
+    <string name="history_empty_title">Chưa có bản lưu nào</string>
+    <string name="history_empty_desc">Các tác phẩm bạn tạo sẽ được lưu giữ tại đây.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="setting_language">Ngôn ngữ</string>
+    <string name="setting_privacy">Chính sách bảo mật</string>
+    <string name="setting_terms">Điều khoản sử dụng</string>
+    <string name="setting_app_version">Phiên bản</string>
+</resources>

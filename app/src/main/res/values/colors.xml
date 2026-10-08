@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="purple_primary">#6366F1</color>
+    <color name="purple_dark">#4338CA</color>
+    <color name="purple_light">#EEF2FF</color>
+    
+    <color name="pink_accent">#EC4899</color>
+    <color name="pink_soft">#FDF2F8</color>
+    
+    <color name="blue_accent">#38BDF8</color>
+    <color name="blue_soft">#F0F9FF</color>
+
+    <color name="orange_accent">#FB923C</color>
+    <color name="orange_soft">#FFF7ED</color>
+
+    <color name="green_accent">#34D399</color>
+    <color name="green_soft">#ECFDF5</color>
+
+    <!-- Badges for 5 functions -->
+    <color name="badge_01">#FF6384</color>
+    <color name="badge_02">#36A2EB</color>
+    <color name="badge_03">#4BC0C0</color>
+    <color name="badge_04">#FF9F40</color>
+    <color name="badge_05">#A78BFA</color>
+
+    <color name="screen_bg">#F8FAFC</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#E2E8F0</color>
+    
+    <color name="text_primary">#1E293B</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="divider">#F1F5F9</color>
+</resources>

@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Rounded music tile -->
+  <path
+      android:fillColor="#FB923C"
+      android:pathData="M10,8h28c3.3,0 6,2.7 6,6v20c0,3.3 -2.7,6 -6,6H10c-3.3,0 -6,-2.7 -6,-6V14c0,-3.3 2.7,-6 6,-6z"/>
+  <!-- Music note -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M20,32c-2.2,0 -4,-1.8 -4,-4s1.8,-4 4,-4c1.1,0 2.1,0.5 2.8,1.2V16l10,-2v11c-0.8,-0.6 -1.8,-1 -2.8,-1 -2.2,0 -4,1.8 -4,4s1.8,4 4,4c2.2,0 3.8,-1.7 4,-3.8V13.2L22.8,16.2V28.2c-0.8,-0.7 -1.8,-1.2 -2.8,-1.2z"/>
+</vector>

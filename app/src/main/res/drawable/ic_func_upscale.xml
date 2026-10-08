@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Picture frame -->
+  <path
+      android:fillColor="#A78BFA"
+      android:pathData="M8,10h26c2.2,0 4,1.8 4,4v20c0,2.2 -1.8,4 -4,4H8c-2.2,0 -4,-1.8 -4,-4V14c0,-2.2 1.8,-4 4,-4z"/>
+  <!-- Mountain inside -->
+  <path
+      android:fillColor="#DDD6FE"
+      android:pathData="M11,30l6,-8 5,6 4,-4 7,8H11z"/>
+  <!-- Upscale arrow -->
+  <path
+      android:fillColor="#7C3AED"
+      android:pathData="M38,32v-8h-8l3.3,3.3 -7.3,7.3 2.8,2.8 7.3,-7.3L38,32z"/>
+</vector>

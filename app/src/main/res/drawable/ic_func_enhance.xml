@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Picture frame -->
+  <path
+      android:fillColor="#34D399"
+      android:pathData="M8,10h26c2.2,0 4,1.8 4,4v20c0,2.2 -1.8,4 -4,4H8c-2.2,0 -4,-1.8 -4,-4V14c0,-2.2 1.8,-4 4,-4z"/>
+  <!-- Mountain inside -->
+  <path
+      android:fillColor="#A7F3D0"
+      android:pathData="M11,30l6,-8 5,6 4,-4 7,8H11z"/>
+  <!-- Magic wand / pencil -->
+  <path
+      android:fillColor="#059669"
+      android:pathData="M38,24l6,6 -12,12 -6,-6z"/>
+  <!-- Wand tip -->
+  <path
+      android:fillColor="#FBBF24"
+      android:pathData="M26,36l-3,7 7,-3z"/>
+</vector>
