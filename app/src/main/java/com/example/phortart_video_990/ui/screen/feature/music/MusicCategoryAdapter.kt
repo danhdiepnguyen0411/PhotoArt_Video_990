@@ -1,26 +1,26 @@
-package com.example.phortart_video_990.ui.screen.template
+package com.example.phortart_video_990.ui.screen.feature.music
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.data.model.CategoryModel
-import com.example.phortart_video_990.databinding.ItemTemplateCategoryChipBinding
+import com.example.phortart_video_990.databinding.ItemMusicCategoryChipBinding
 
-class CategoryAdapter(
+class MusicCategoryAdapter(
     private var categories: List<CategoryModel>,
     private var selectedCategoryCode: String,
     private val onCategoryClick: (CategoryModel) -> Unit
-) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
+) : RecyclerView.Adapter<MusicCategoryAdapter.MusicCategoryViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = ItemTemplateCategoryChipBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicCategoryViewHolder {
+        val binding = ItemMusicCategoryChipBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return CategoryViewHolder(binding)
+        return MusicCategoryViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MusicCategoryViewHolder, position: Int) {
         holder.bind(categories[position])
     }
 
@@ -32,28 +32,32 @@ class CategoryAdapter(
     }
 
     fun setSelected(catCode: String) {
-        val prevIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+        val prevIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
         selectedCategoryCode = catCode
-        val nextIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+        val nextIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
 
         if (prevIndex != -1) notifyItemChanged(prevIndex)
         if (nextIndex != -1) notifyItemChanged(nextIndex)
     }
 
-    inner class CategoryViewHolder(private val binding: ItemTemplateCategoryChipBinding) :
+    inner class MusicCategoryViewHolder(private val binding: ItemMusicCategoryChipBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: CategoryModel) {
+            val context = binding.root.context
             binding.tvCategoryName.text = category.displayName
+
             val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
                     (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))
 
             if (isSelected) {
-                binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_selected)
-                binding.tvCategoryName.setTextColor(binding.root.context.getColor(R.color.white))
+                binding.llCategoryChip.setBackgroundResource(R.drawable.bg_category_chip_selected)
+                binding.tvCategoryName.setTextColor(context.getColor(R.color.white))
+                binding.ivMusicChipIcon.setColorFilter(context.getColor(R.color.white))
             } else {
-                binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_unselected)
-                binding.tvCategoryName.setTextColor(binding.root.context.getColor(R.color.muted))
+                binding.llCategoryChip.setBackgroundResource(R.drawable.bg_category_chip_unselected)
+                binding.tvCategoryName.setTextColor(context.getColor(R.color.muted))
+                binding.ivMusicChipIcon.setColorFilter(context.getColor(R.color.muted))
             }
 
             binding.root.setOnClickListener {
