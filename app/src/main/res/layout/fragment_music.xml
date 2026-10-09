@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_bg">
@@ -10,7 +11,7 @@
         android:id="@+id/llTopBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -23,7 +24,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/btn_back"
             android:padding="8dp"
-            android:src="@drawable/ic_arrow_back" />
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/navy" />
 
         <TextView
             android:id="@+id/tvTopTitle"
@@ -31,48 +33,100 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/func_04_music"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/navy"
             android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 
-    <!-- Center Feature Content -->
+    <!-- Subtitle / Hint -->
+    <TextView
+        android:id="@+id/tvMusicHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="4dp"
+        android:text="Chọn thể loại và bài hát phù hợp cho video của bạn"
+        android:textColor="@color/muted"
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@+id/llTopBar" />
+
+    <!-- Music Categories RecyclerView (Horizontal Filter Chips) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMusicCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/tvMusicHint"
+        tools:listitem="@layout/item_music_category_chip" />
+
+    <!-- Music Tracks RecyclerView (Vertical List) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMusicTracks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvMusicCategories"
+        tools:listitem="@layout/item_music_track" />
+
+    <!-- Loading Indicator -->
+    <ProgressBar
+        android:id="@+id/pbLoading"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvMusicCategories" />
+
+    <!-- Empty State -->
     <LinearLayout
+        android:id="@+id/llEmptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="32dp"
+        android:padding="24dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llTopBar">
+        app:layout_constraintTop_toBottomOf="@+id/rvMusicCategories">
 
         <ImageView
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-            android:contentDescription="@string/func_04_music"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0.6"
+            android:contentDescription="Empty"
             android:src="@drawable/ic_func_music" />
 
         <TextView
-            android:id="@+id/tvFunctionName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/func_04_music"
-            android:textColor="@color/text_primary"
-            android:textSize="22sp"
+            android:layout_marginTop="12dp"
+            android:text="Chưa có bài hát trong danh mục này"
+            android:textColor="@color/navy"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="@string/placeholder_description"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            android:layout_marginTop="4dp"
+            android:text="Vui lòng thử chọn danh mục khác"
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
 
     </LinearLayout>
 
