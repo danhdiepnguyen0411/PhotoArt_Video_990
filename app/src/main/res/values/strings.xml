@@ -93,13 +93,19 @@
     <!-- Settings Screen -->
     <string name="settings_title">Cài đặt</string>
     <string name="settings_iap_title">Nâng cấp Premium</string>
-    <string name="settings_iap_desc">Mở khóa toàn bộ công cụ AI và trải nghiệm tốt hơn.</string>
+    <string name="settings_iap_desc">Mở khóa toàn bộ công cụ AI và trải nghiệm\ntốt hơn.</string>
     <string name="settings_iap_btn">Nâng cấp ngay</string>
     <string name="settings_group_options">Tùy chọn</string>
     <string name="setting_language">Ngôn ngữ</string>
     <string name="setting_notification">Thông báo</string>
     <string name="setting_notification_desc">Quản lý thông báo của bạn</string>
+    <string name="settings_group_support">Hỗ trợ</string>
     <string name="setting_rate">Đánh giá ứng dụng</string>
+    <string name="setting_rate_desc">Chia sẻ cảm nhận của bạn</string>
+    <string name="setting_privacy_title">Chính sách quyền riêng tư</string>
+    <string name="setting_privacy_desc">Xem chính sách bảo mật</string>
+    <string name="setting_about">Về ứng dụng</string>
+    <string name="setting_about_version">Phiên bản 1.0.0</string>
     <string name="setting_share">Chia sẻ với bạn bè</string>
     <string name="setting_privacy">Chính sách bảo mật</string>
     <string name="setting_terms">Điều khoản sử dụng</string>
