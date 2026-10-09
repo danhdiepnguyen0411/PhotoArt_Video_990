@@ -1,102 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="3dp"
-    app:strokeWidth="0dp">
+    android:background="@color/banner_bg_fallback">
+
+    <ImageView
+        android:id="@+id/ivBannerBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="Banner"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/banner_1" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/ivBannerBg"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:contentDescription="Banner"
-            tools:src="@drawable/banner_1" />
-
-        <!-- Dark Gradient Overlay for readability -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#33000000" />
-
-        <!-- Chip -->
-        <TextView
-            android:id="@+id/tvBannerChip"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/llBannerContent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_banner_chip"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:textColor="@color/white"
-            android:textSize="11sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:paddingTop="18dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="AI Photo &amp; Video" />
+            app:layout_constraintWidth_percent="0.62">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/tvBannerTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:lineSpacingExtra="2dp"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvBannerChip"
-            tools:text="Biến ảnh của bạn thành những khoảnh khắc tuyệt vời" />
+            <!-- Chip: AI Photo & Video -->
+            <TextView
+                android:id="@+id/tvBannerChip"
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"
+                android:background="@drawable/bg_banner_chip"
+                android:drawableStart="@drawable/ic_sparkle_chip"
+                android:drawablePadding="5dp"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="9dp"
+                android:textColor="@color/banner_chip_text"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                tools:text="AI Photo &amp; Video" />
 
-        <!-- Description -->
-        <TextView
-            android:id="@+id/tvBannerDesc"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:textColor="#E0FFFFFF"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvBannerTitle"
-            tools:text="Tạo video sống động, ảnh nghệ thuật chỉ trong vài giây." />
+            <!-- Title: Part 1 -->
+            <TextView
+                android:id="@+id/tvBannerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-black"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:lineSpacingMultiplier="1.15"
+                android:textColor="#17327C"
+                android:textSize="25sp"
+                tools:text="Biến ảnh của bạn&#10;thành những" />
 
-        <!-- Action Button -->
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnBannerAction"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="14dp"
-            android:background="@drawable/bg_banner_btn"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawableTint="@color/navy"
-            android:gravity="center"
-            android:paddingHorizontal="14dp"
-            android:text="Thử ngay"
-            android:textAllCaps="false"
-            android:textColor="@color/navy"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <!-- Highlight Title (Gradient royal blue to purple) -->
+            <TextView
+                android:id="@+id/tvBannerHighlight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:fontFamily="sans-serif-black"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:lineSpacingMultiplier="1.15"
+                android:textColor="@color/banner_grad_start"
+                android:textSize="25sp"
+                tools:text="khoảnh khắc&#10;tuyệt vời" />
+
+            <!-- Description -->
+            <TextView
+                android:id="@+id/tvBannerDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.35"
+                android:maxLines="3"
+                android:textColor="#7A8CB5"
+                android:textSize="12.5sp"
+                tools:text="Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây." />
+
+            <!-- Action Button -->
+            <TextView
+                android:id="@+id/btnBannerAction"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_banner_btn"
+                android:clickable="true"
+                android:drawableEnd="@drawable/ic_arrow_right_btn"
+                android:drawablePadding="8dp"
+                android:elevation="6dp"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="24dp"
+                android:paddingEnd="20dp"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                tools:targetApi="p"
+                android:outlineAmbientShadowColor="#606464EB"
+                android:outlineSpotShadowColor="#706464EB"
+                tools:text="Thử ngay" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</FrameLayout>
