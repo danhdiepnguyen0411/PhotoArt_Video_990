@@ -22,19 +22,23 @@
             android:contentDescription="Media"
             tools:src="@drawable/history_1" />
 
-        <!-- Badge pill at bottom left -->
+        <!-- Badge pill at bottom left with marquee support for long text -->
         <LinearLayout
             android:id="@+id/llMediaBadge"
             android:layout_width="wrap_content"
             android:layout_height="26dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/bg_media_badge_capsule"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="10dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
                 android:id="@+id/ivBadgeIcon"
@@ -50,6 +54,12 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-bold"
                 android:includeFontPadding="false"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true"
                 android:textColor="#1B2A6B"
                 android:textSize="12sp"
                 android:textStyle="bold"

@@ -90,7 +90,11 @@
         android:id="@+id/memoriesFragment"
         android:name="com.example.phortart_video_990.ui.screen.feature.memories.MemoriesFragment"
         android:label="MemoriesFragment"
-        tools:layout="@layout/fragment_memories" />
+        tools:layout="@layout/fragment_memories">
+        <action
+            android:id="@+id/action_memoriesFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/restoreFragment"
