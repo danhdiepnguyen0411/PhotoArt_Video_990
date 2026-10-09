@@ -6,16 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.example.phortart_video_990.R
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
 import com.example.phortart_video_990.databinding.ItemHomeMediaCardBinding
 
 class HomeMediaAdapter(
-    private val items: List<HomeMediaItemModel>,
+    private var items: List<HomeMediaItemModel>,
     private val onItemClick: (HomeMediaItemModel) -> Unit
 ) : RecyclerView.Adapter<HomeMediaAdapter.MediaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
-        val binding = ItemHomeMediaCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemHomeMediaCardBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
         return MediaViewHolder(binding)
     }
 
@@ -25,12 +29,29 @@ class HomeMediaAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    fun submitList(newList: List<HomeMediaItemModel>) {
+        items = newList
+        notifyDataSetChanged()
+    }
+
     inner class MediaViewHolder(private val binding: ItemHomeMediaCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HomeMediaItemModel) {
-            binding.ivMediaThumb.setImageResource(item.imageRes)
+            val source: Any? = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null } ?: if (item.imageRes != 0) item.imageRes else null
+
+            if (source != null) {
+                binding.ivMediaThumb.load(source) {
+                    crossfade(true)
+                    placeholder(R.drawable.bg_card_white)
+                    error(R.drawable.bg_card_white)
+                }
+            } else {
+                binding.ivMediaThumb.setImageResource(R.drawable.bg_card_white)
+            }
+
             binding.tvMediaBadge.text = item.label
+            binding.tvMediaBadge.isSelected = true
 
             if (item.iconRes != 0) {
                 binding.ivBadgeIcon.visibility = View.VISIBLE

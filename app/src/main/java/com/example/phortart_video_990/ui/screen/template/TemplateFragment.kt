@@ -20,14 +20,13 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var templateAdapter: TemplateAdapter
 
-    private val categoryList = listOf(
-        "Tất cả", "Hot", "Nhảy múa", "Anime", "Hiệu ứng", "Chân dung", "Ảo ảnh"
-    )
-
     override fun initView() {
-        // Setup Category Filter RecyclerView
-        categoryAdapter = CategoryAdapter(categoryList, viewModel.selectedCategory.value) { selectedCat ->
-            viewModel.selectCategory(selectedCat)
+        // Setup Dynamic Category Filter RecyclerView
+        categoryAdapter = CategoryAdapter(
+            categories = viewModel.categories.value,
+            selectedCategoryCode = viewModel.selectedCategoryCode.value
+        ) { selectedCategory ->
+            viewModel.selectCategory(selectedCategory)
         }
         binding.rvTemplateCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -56,14 +55,30 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
+                    viewModel.categories.collect { categories ->
+                        categoryAdapter.submitList(categories)
+                    }
+                }
+                launch {
+                    viewModel.selectedCategoryCode.collect { code ->
+                        categoryAdapter.setSelected(code)
+                    }
+                }
+                launch {
                     viewModel.templates.collect { list ->
                         templateAdapter.submitList(list)
-                        binding.llEmptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                        val isLoading = viewModel.isLoading.value
+                        binding.llEmptyState.visibility = if (list.isEmpty() && !isLoading) View.VISIBLE else View.GONE
                     }
                 }
                 launch {
                     viewModel.isLoading.collect { loading ->
                         binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
+                        if (loading) {
+                            binding.llEmptyState.visibility = View.GONE
+                        } else {
+                            binding.llEmptyState.visibility = if (viewModel.templates.value.isEmpty()) View.VISIBLE else View.GONE
+                        }
                     }
                 }
             }

@@ -41,6 +41,10 @@ class PreferencesManager(context: Context) {
         get() = prefs.getString(KEY_LANGUAGE_NAME, "English") ?: "English"
         set(value) = prefs.edit().putString(KEY_LANGUAGE_NAME, value).apply()
 
+    var historyJson: String?
+        get() = prefs.getString("user_history_json", null)
+        set(value) = prefs.edit().putString("user_history_json", value).apply()
+
     fun saveLanguage(code: String, name: String) {
         prefs.edit()
             .putString(KEY_LANGUAGE_CODE, code)

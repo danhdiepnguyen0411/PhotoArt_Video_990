@@ -34,12 +34,13 @@ class TemplateAdapter(
 
         fun bind(item: TemplateModel) {
             binding.tvTemplateTitle.text = item.title
+            binding.tvTemplateTitle.isSelected = true
             binding.tvDuration.text = item.duration
             binding.tvViews.text = item.views
             binding.tvSource.text = item.source
 
-            // Load from remote API URL or fallback to local drawable resource using Coil
-            val imageSource = item.imageUrl ?: item.localImageRes ?: R.drawable.template_trendy
+            // Load from remote API URL using Coil
+            val imageSource = item.safeImageUrl ?: item.localImageRes ?: R.drawable.template_trendy
             binding.ivTemplateThumb.load(imageSource) {
                 crossfade(true)
                 placeholder(R.drawable.template_trendy)

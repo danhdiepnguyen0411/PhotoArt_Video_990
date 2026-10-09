@@ -5,6 +5,8 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -12,13 +14,23 @@ import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.data.model.BannerItemModel
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
+import com.example.phortart_video_990.data.repository.HistoryRepository
+import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentHomeBinding
 import com.example.phortart_video_990.ui.screen.main.MainFragment
+import kotlinx.coroutines.launch
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
     private val autoScrollHandler = Handler(Looper.getMainLooper())
     private var autoScrollRunnable: Runnable? = null
+
+    private val templateRepository = TemplateRepository()
+    private val historyRepository by lazy { HistoryRepository(requireContext()) }
+
+    private lateinit var recentHistoryAdapter: HomeMediaAdapter
+    private lateinit var suggestionAdapter: HomeMediaAdapter
+    private lateinit var hotTemplateAdapter: HomeMediaAdapter
 
     private val bannerList by lazy {
         listOf(
@@ -52,43 +64,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         )
     }
 
-    private val historyList by lazy {
-        listOf(
-            HomeMediaItemModel(R.drawable.history_1, "Video", "", R.drawable.ic_badge_play),
-            HomeMediaItemModel(R.drawable.history_2, "Ảnh", "", R.drawable.ic_badge_image),
-            HomeMediaItemModel(R.drawable.history_3, "Ảnh", "", R.drawable.ic_badge_image),
-            HomeMediaItemModel(R.drawable.history_4, "Ảnh", "", R.drawable.ic_badge_image),
-            HomeMediaItemModel(R.drawable.history_5, "Ảnh", "", R.drawable.ic_badge_image)
-        )
-    }
-
-    private val suggestionList by lazy {
-        listOf(
-            HomeMediaItemModel(R.drawable.suggestion_ai_effect, "AI Effect", "", R.drawable.ic_badge_wand),
-            HomeMediaItemModel(R.drawable.suggestion_ai_style, "AI Style", "", R.drawable.ic_badge_palette),
-            HomeMediaItemModel(R.drawable.suggestion_ai_dance, "AI Dance", "", R.drawable.ic_badge_dance),
-            HomeMediaItemModel(R.drawable.suggestion_ai_fantasy, "AI Fantasy", "", R.drawable.ic_badge_wand),
-            HomeMediaItemModel(R.drawable.suggestion_ai_portrait, "AI Portrait", "", R.drawable.ic_badge_image)
-        )
-    }
-
-    private val templateList by lazy {
-        val flameColor = Color.parseColor("#FF7A2F")
-        listOf(
-            HomeMediaItemModel(R.drawable.template_selfie, "Selfie", "", R.drawable.ic_badge_flame, flameColor),
-            HomeMediaItemModel(R.drawable.template_fantasy, "Fantasy", "", R.drawable.ic_badge_flame, flameColor),
-            HomeMediaItemModel(R.drawable.template_trendy, "Trendy", "", R.drawable.ic_badge_flame, flameColor),
-            HomeMediaItemModel(R.drawable.template_cinematic, "Cinematic", "", R.drawable.ic_badge_flame, flameColor),
-            HomeMediaItemModel(R.drawable.template_vintage, "Vintage", "", R.drawable.ic_badge_flame, flameColor)
-        )
-    }
-
     override fun initView() {
         setupHeader()
         setupBanners()
         setupRecentHistory()
         setupSuggestions()
         setupHotTemplates()
+        loadApiTemplates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadRecentHistory()
     }
 
     private fun setupHeader() {
@@ -202,26 +189,79 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupRecentHistory() {
-        binding.rvRecentHistory.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvRecentHistory.adapter = HomeMediaAdapter(historyList) {
+        recentHistoryAdapter = HomeMediaAdapter(emptyList()) {
             (parentFragment as? MainFragment)?.selectTab(2)
         }
+        binding.rvRecentHistory.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvRecentHistory.adapter = recentHistoryAdapter
+        loadRecentHistory()
+    }
+
+    private fun loadRecentHistory() {
+        val historyItems = historyRepository.getHistoryList()
+        val mediaItems = historyItems.map { item ->
+            HomeMediaItemModel(
+                label = item.title,
+                category = item.type,
+                imageUrl = item.imageUrl,
+                imageUri = item.imageUri,
+                iconRes = R.drawable.ic_badge_image
+            )
+        }
+        recentHistoryAdapter.submitList(mediaItems)
+        binding.llRecentHistorySection.visibility = if (mediaItems.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun setupSuggestions() {
-        binding.rvSuggestions.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvSuggestions.adapter = HomeMediaAdapter(suggestionList) {
+        suggestionAdapter = HomeMediaAdapter(emptyList()) {
             (parentFragment as? MainFragment)?.selectTab(1)
         }
+        binding.rvSuggestions.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvSuggestions.adapter = suggestionAdapter
     }
 
     private fun setupHotTemplates() {
+        hotTemplateAdapter = HomeMediaAdapter(emptyList()) {
+            (parentFragment as? MainFragment)?.selectTab(1)
+        }
         binding.rvHotTemplates.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvHotTemplates.adapter = HomeMediaAdapter(templateList) {
-            (parentFragment as? MainFragment)?.selectTab(1)
+        binding.rvHotTemplates.adapter = hotTemplateAdapter
+    }
+
+    private fun loadApiTemplates() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val templates = templateRepository.getTemplates()
+                if (templates.isNotEmpty()) {
+                    val flameColor = Color.parseColor("#FF7A2F")
+                    val hotList = templates.take(8).map {
+                        HomeMediaItemModel(
+                            label = it.title,
+                            category = it.category,
+                            imageUrl = it.safeImageUrl,
+                            iconRes = R.drawable.ic_flame,
+                            iconTint = flameColor
+                        )
+                    }
+                    hotTemplateAdapter.submitList(hotList)
+
+                    val remaining = if (templates.size > 8) templates.drop(8) else templates
+                    val suggestionList = remaining.take(8).map {
+                        HomeMediaItemModel(
+                            label = it.title,
+                            category = it.category,
+                            imageUrl = it.safeImageUrl,
+                            iconRes = R.drawable.ic_star_section
+                        )
+                    }
+                    suggestionAdapter.submitList(suggestionList)
+                }
+            } catch (e: Exception) {
+                // If API fails, lists remain empty (no fake data)
+            }
         }
     }
 
@@ -231,6 +271,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             "video" -> navController.navigate(R.id.action_mainFragment_to_memoriesFragment)
             "prompt" -> navController.navigate(R.id.action_mainFragment_to_enhanceFragment)
             "restore" -> navController.navigate(R.id.action_mainFragment_to_restoreFragment)
+            "music" -> navController.navigate(R.id.action_mainFragment_to_musicFragment)
         }
     }
 

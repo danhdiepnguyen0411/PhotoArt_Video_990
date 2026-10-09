@@ -4,16 +4,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.databinding.ItemTemplateCategoryChipBinding
 
 class CategoryAdapter(
-    private val categories: List<String>,
-    private var selectedCategory: String,
-    private val onCategoryClick: (String) -> Unit
+    private var categories: List<CategoryModel>,
+    private var selectedCategoryCode: String,
+    private val onCategoryClick: (CategoryModel) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = ItemTemplateCategoryChipBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemTemplateCategoryChipBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
         return CategoryViewHolder(binding)
     }
 
@@ -23,20 +26,27 @@ class CategoryAdapter(
 
     override fun getItemCount(): Int = categories.size
 
-    fun setSelected(cat: String) {
-        val prev = categories.indexOf(selectedCategory)
-        selectedCategory = cat
-        val next = categories.indexOf(selectedCategory)
-        if (prev != -1) notifyItemChanged(prev)
-        if (next != -1) notifyItemChanged(next)
+    fun submitList(newList: List<CategoryModel>) {
+        categories = newList
+        notifyDataSetChanged()
+    }
+
+    fun setSelected(catCode: String) {
+        val prevIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+        selectedCategoryCode = catCode
+        val nextIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+
+        if (prevIndex != -1) notifyItemChanged(prevIndex)
+        if (nextIndex != -1) notifyItemChanged(nextIndex)
     }
 
     inner class CategoryViewHolder(private val binding: ItemTemplateCategoryChipBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(category: String) {
-            binding.tvCategoryName.text = category
-            val isSelected = category == selectedCategory
+        fun bind(category: CategoryModel) {
+            binding.tvCategoryName.text = category.displayName
+            val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
+                    (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))
 
             if (isSelected) {
                 binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_selected)
@@ -47,8 +57,8 @@ class CategoryAdapter(
             }
 
             binding.root.setOnClickListener {
-                if (category != selectedCategory) {
-                    setSelected(category)
+                if (!category.code.equals(selectedCategoryCode, ignoreCase = true)) {
+                    setSelected(category.code)
                     onCategoryClick(category)
                 }
             }
