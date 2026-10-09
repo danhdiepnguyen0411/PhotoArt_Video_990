@@ -1,62 +1,110 @@
 <resources>
-    <string name="app_name">PhortArt Video</string>
+    <string name="app_name">Photo AI</string>
 
     <!-- Splash Screen -->
-    <string name="splash_title">AI Photo\nRestore With Music</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Make memories live again</string>
-    <string name="splash_loading">Loading %1$d%%...</string>
+    <string name="splash_loading">Đang tải %1$d%%...</string>
 
     <!-- Language Screen -->
-    <string name="language_title">Select Language</string>
-    <string name="language_choose_desc">Please select your preferred language to get started</string>
-    <string name="btn_confirm">Confirm</string>
+    <string name="language_title">Chọn ngôn ngữ</string>
+    <string name="language_choose_desc">Vui lòng chọn ngôn ngữ bạn muốn sử dụng trong ứng dụng.</string>
+    <string name="btn_confirm">Tiếp tục</string>
+    <string name="btn_save_changes">Lưu thay đổi</string>
 
     <!-- Intro / Onboarding -->
-    <string name="btn_next">Next</string>
-    <string name="btn_skip">Skip</string>
-    <string name="btn_get_started">Get Started</string>
+    <string name="btn_next">Tiếp tục</string>
+    <string name="btn_skip">Bỏ qua</string>
+    <string name="btn_get_started">Bắt đầu ngay</string>
     
-    <string name="intro_1_title">Gom kỷ niệm</string>
-    <string name="intro_1_desc">Tập hợp những khoảnh khắc quý giá thành câu chuyện sống động.</string>
+    <string name="intro_1_title">Gom ảnh,\ntạo video</string>
+    <string name="intro_1_desc">Biến những khoảnh khắc yêu thích thành video sống động chỉ trong vài giây.</string>
     
-    <string name="intro_2_title">Khôi phục ảnh cũ</string>
-    <string name="intro_2_desc">Phục dựng màu sắc và chi tiết ảnh cũ trở nên chân thực và sắc nét.</string>
+    <string name="intro_2_title">Tạo ảnh bằng\nprompt AI</string>
+    <string name="intro_2_desc">Mô tả điều bạn tưởng tượng, AI sẽ biến nó thành hình ảnh tuyệt đẹp.</string>
     
-    <string name="intro_3_title">Làm nét chuyên nghiệp</string>
-    <string name="intro_3_desc">Nâng cao độ phân giải với công nghệ AI tiên tiến.</string>
-    
-    <string name="intro_4_title">Ghép nhạc &amp; Nâng cấp ảnh</string>
-    <string name="intro_4_desc">Thổi hồn vào bức ảnh với giai điệu cảm xúc và chuyển động mượt mà.</string>
+    <string name="intro_3_title">Hồi sinh những\nbức ảnh cũ</string>
+    <string name="intro_3_desc">Khôi phục ảnh mờ, ảnh cũ và giữ lại những kỷ niệm đáng nhớ.</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_home">Home</string>
-    <string name="nav_history">History</string>
-    <string name="nav_setting">Setting</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_template">Template</string>
+    <string name="nav_history">Lịch sử</string>
+    <string name="nav_setting">Cài đặt</string>
 
     <!-- Home Screen -->
-    <string name="home_ai_tools_title">Công cụ AI ✨</string>
-    <string name="home_ai_tools_subtitle">Khám phá các tính năng xử lý ảnh &amp; video thông minh</string>
+    <string name="home_brand_title">Photo AI</string>
+    <string name="home_see_all">Xem tất cả</string>
+    <string name="home_recent_history">Lịch sử gần đây</string>
+    <string name="home_suggestions">Gợi ý chủ đề cho bạn</string>
+    <string name="home_hot_templates">Template hot</string>
 
-    <!-- 5 Functions -->
-    <string name="func_01_memories">Gom kỷ niệm</string>
-    <string name="func_02_restore">Khôi phục ảnh</string>
-    <string name="func_03_enhance">Làm nét</string>
+    <!-- 3 Core Features -->
+    <string name="feature_video_title">Gom ảnh\ntạo video</string>
+    <string name="feature_prompt_title">Tạo ảnh bằng\nprompt AI</string>
+    <string name="feature_restore_title">Hồi sinh\nảnh cũ</string>
+
+    <!-- Legacy compatibility function names -->
+    <string name="func_01_memories">Gom ảnh tạo video</string>
+    <string name="func_02_restore">Hồi sinh ảnh cũ</string>
+    <string name="func_03_enhance">Tạo ảnh prompt AI</string>
     <string name="func_04_music">Ghép nhạc</string>
     <string name="func_05_upscale">Nâng cấp ảnh</string>
 
-    <!-- Placeholders -->
-    <string name="placeholder_description">Tính năng đang trong quá trình phát triển hoàn thiện.</string>
-    <string name="btn_back">Quay lại</string>
+    <!-- Banners -->
+    <string name="banner_1_chip">AI Photo &amp; Video</string>
+    <string name="banner_1_title">Biến ảnh của bạn thành những</string>
+    <string name="banner_1_highlight">khoảnh khắc tuyệt vời</string>
+    <string name="banner_1_desc">Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây.</string>
+    <string name="banner_1_btn">Thử ngay</string>
 
-    <!-- History -->
+    <string name="banner_2_chip">AI Prompt</string>
+    <string name="banner_2_title">Chỉ cần mô tả, AI sẽ vẽ nên</string>
+    <string name="banner_2_highlight">bức ảnh trong mơ</string>
+    <string name="banner_2_desc">Nhập ý tưởng của bạn và nhận ngay hình ảnh nghệ thuật độc đáo.</string>
+    <string name="banner_2_btn">Tạo ngay</string>
+
+    <string name="banner_3_chip">Khôi phục ảnh</string>
+    <string name="banner_3_title">Hồi sinh những bức ảnh cũ</string>
+    <string name="banner_3_highlight">như mới tinh khôi</string>
+    <string name="banner_3_desc">Làm nét, xoá vết xước và phục hồi màu sắc chỉ với một chạm.</string>
+    <string name="banner_3_btn">Khôi phục ngay</string>
+
+    <!-- Template Screen -->
+    <string name="template_title">Template ✨</string>
+    <string name="template_cat_all">Tất cả</string>
+    <string name="template_cat_hot">Hot</string>
+    <string name="template_cat_dance">Nhảy múa</string>
+    <string name="template_cat_anime">Anime</string>
+    <string name="template_cat_effect">Hiệu ứng</string>
+    <string name="template_cat_portrait">Chân dung</string>
+    <string name="template_cat_fantasy">Ảo ảnh</string>
+
+    <!-- History Screen -->
     <string name="history_title">Lịch sử</string>
+    <string name="history_subtitle">Xem lại những bức ảnh bạn đã chỉnh sửa và lưu giữ tại đây.</string>
+    <string name="history_tab_all">Tất cả</string>
+    <string name="history_tab_video">Tạo video</string>
+    <string name="history_tab_prompt">Prompt AI</string>
+    <string name="history_tab_restore">Khôi phục</string>
     <string name="history_empty_title">Chưa có bản lưu nào</string>
     <string name="history_empty_desc">Các tác phẩm bạn tạo sẽ được lưu giữ tại đây.</string>
 
-    <!-- Settings -->
+    <!-- Settings Screen -->
     <string name="settings_title">Cài đặt</string>
+    <string name="settings_iap_title">Nâng cấp Premium</string>
+    <string name="settings_iap_desc">Mở khóa toàn bộ công cụ AI và trải nghiệm tốt hơn.</string>
+    <string name="settings_iap_btn">Nâng cấp ngay</string>
+    <string name="settings_group_options">Tùy chọn</string>
     <string name="setting_language">Ngôn ngữ</string>
+    <string name="setting_notification">Thông báo</string>
+    <string name="setting_notification_desc">Quản lý thông báo của bạn</string>
+    <string name="setting_rate">Đánh giá ứng dụng</string>
+    <string name="setting_share">Chia sẻ với bạn bè</string>
     <string name="setting_privacy">Chính sách bảo mật</string>
     <string name="setting_terms">Điều khoản sử dụng</string>
-    <string name="setting_app_version">Phiên bản</string>
+    <string name="setting_app_version">Phiên bản ứng dụng</string>
+
+    <string name="btn_back">Quay lại</string>
+    <string name="placeholder_description">Tính năng đang được hoàn thiện.</string>
 </resources>

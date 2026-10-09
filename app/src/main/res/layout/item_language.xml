@@ -7,43 +7,61 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:background="@drawable/bg_item_language"
-    android:padding="16dp">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp">
 
+    <!-- Language Flag (Emoji or Icon) -->
     <TextView
         android:id="@+id/tvLanguageFlag"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:gravity="center"
-        android:textSize="22sp"
+        android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="🇺🇸" />
+        tools:text="🇻🇳" />
 
-    <TextView
-        android:id="@+id/tvLanguageName"
+    <!-- Name & Subtitle -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ivCheck"
+        app:layout_constraintEnd_toStartOf="@+id/ivRadio"
         app:layout_constraintStart_toEndOf="@+id/tvLanguageFlag"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="English" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/tvLanguageName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/navy"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Tiếng Việt" />
+
+        <TextView
+            android:id="@+id/tvLanguageSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/muted"
+            android:textSize="12sp"
+            tools:text="Vietnamese" />
+    </LinearLayout>
+
+    <!-- Radio Button Indicator -->
     <ImageView
-        android:id="@+id/ivCheck"
+        android:id="@+id/ivRadio"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        android:contentDescription="Selected"
-        android:src="@drawable/ic_check"
-        android:visibility="gone"
+        android:contentDescription="Selection"
+        android:src="@drawable/bg_radio_unselected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

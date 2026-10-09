@@ -4,35 +4,59 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
 
-    <color name="purple_primary">#6366F1</color>
-    <color name="purple_dark">#4338CA</color>
-    <color name="purple_light">#EEF2FF</color>
-    
-    <color name="pink_accent">#EC4899</color>
-    <color name="pink_soft">#FDF2F8</color>
-    
-    <color name="blue_accent">#38BDF8</color>
-    <color name="blue_soft">#F0F9FF</color>
+    <!-- Photo AI Brand Palette -->
+    <color name="navy">#193980</color>
+    <color name="navy_dark">#0F224D</color>
+    <color name="muted">#7188B5</color>
+    <color name="soft">#8296BC</color>
+    <color name="line">#387896CD</color>
 
+    <color name="grad_blue">#36C7F3</color>
+    <color name="grad_royal">#4B91EE</color>
+    <color name="grad_violet">#7664E8</color>
+    <color name="grad_pink">#D45BD8</color>
+
+    <color name="btn_grad_start">#49A9F9</color>
+    <color name="btn_grad_mid">#7B8CF5</color>
+    <color name="btn_grad_end">#B87BF1</color>
+
+    <!-- Feature Card Tones -->
+    <color name="tone_violet_start">#7C68F2</color>
+    <color name="tone_violet_end">#6450E6</color>
+    <color name="tone_blue_start">#3B82F6</color>
+    <color name="tone_blue_end">#2563EB</color>
+    <color name="tone_mint_start">#10B981</color>
+    <color name="tone_mint_end">#059669</color>
+
+    <!-- PRO Gold -->
+    <color name="pro_gold_start">#FFA000</color>
+    <color name="pro_gold_end">#FF6D00</color>
+
+    <!-- Semantic UI -->
+    <color name="screen_bg">#F4F7FC</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#E2EAFD</color>
+    <color name="text_primary">#193980</color>
+    <color name="text_secondary">#7188B5</color>
+    <color name="text_muted">#8296BC</color>
+    <color name="divider">#E8EFFC</color>
+
+    <!-- Compatibility aliases -->
+    <color name="purple_primary">#7664E8</color>
+    <color name="purple_dark">#193980</color>
+    <color name="purple_light">#EEF4FF</color>
+    <color name="pink_accent">#D45BD8</color>
+    <color name="pink_soft">#FDF2F8</color>
+    <color name="blue_accent">#49A9F9</color>
+    <color name="blue_soft">#F0F7FF</color>
     <color name="orange_accent">#FB923C</color>
     <color name="orange_soft">#FFF7ED</color>
-
-    <color name="green_accent">#34D399</color>
+    <color name="green_accent">#10B981</color>
     <color name="green_soft">#ECFDF5</color>
 
-    <!-- Badges for 5 functions -->
-    <color name="badge_01">#FF6384</color>
-    <color name="badge_02">#36A2EB</color>
-    <color name="badge_03">#4BC0C0</color>
-    <color name="badge_04">#FF9F40</color>
-    <color name="badge_05">#A78BFA</color>
-
-    <color name="screen_bg">#F8FAFC</color>
-    <color name="card_bg">#FFFFFF</color>
-    <color name="card_stroke">#E2E8F0</color>
-    
-    <color name="text_primary">#1E293B</color>
-    <color name="text_secondary">#64748B</color>
-    <color name="text_muted">#94A3B8</color>
-    <color name="divider">#F1F5F9</color>
+    <color name="badge_01">#7664E8</color>
+    <color name="badge_02">#36C7F3</color>
+    <color name="badge_03">#10B981</color>
+    <color name="badge_04">#FB923C</color>
+    <color name="badge_05">#D45BD8</color>
 </resources>

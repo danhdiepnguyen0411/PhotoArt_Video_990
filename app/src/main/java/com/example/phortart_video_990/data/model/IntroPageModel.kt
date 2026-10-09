@@ -7,5 +7,6 @@ data class IntroPageModel(
     val title: String,
     val description: String,
     @param:DrawableRes val iconRes: Int,
-    @param:DrawableRes val badgeBgRes: Int
+    @param:DrawableRes val illustrationRes: Int,
+    val buttonText: String
 )

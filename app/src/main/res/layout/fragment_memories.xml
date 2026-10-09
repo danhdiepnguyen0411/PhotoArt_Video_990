@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_bg">
@@ -10,7 +11,7 @@
         android:id="@+id/llTopBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -23,57 +24,170 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/btn_back"
             android:padding="8dp"
-            android:src="@drawable/ic_arrow_back" />
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/navy" />
 
         <TextView
             android:id="@+id/tvTopTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/func_01_memories"
-            android:textColor="@color/text_primary"
+            android:text="@string/feature_video_title"
+            android:textColor="@color/navy"
             android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 
-    <!-- Center Feature Content -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingHorizontal="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnCreateVideo"
         app:layout_constraintTop_toBottomOf="@+id/llTopBar">
 
-        <ImageView
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-            android:contentDescription="@string/func_01_memories"
-            android:src="@drawable/ic_func_memories" />
-
-        <TextView
-            android:id="@+id/tvFunctionName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/func_01_memories"
-            android:textColor="@color/text_primary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="@string/placeholder_description"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            <!-- Feature Illustration Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="3dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
 
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/ivFeatureArt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Feature Art"
+                    android:src="@drawable/feature_create_video" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvFunctionName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/feature_video_title"
+                android:textColor="@color/navy"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="Biến những khoảnh khắc yêu thích thành video sống động chỉ trong vài giây."
+                android:textColor="@color/muted"
+                android:textSize="14sp" />
+
+            <!-- Gallery Picker Grid Preview -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Chọn ảnh từ thư viện"
+                android:textColor="@color/navy"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <GridLayout
+                android:id="@+id/glPhotos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:columnCount="3">
+
+                <!-- 6 Photo items -->
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/history_1"
+                    android:contentDescription="Photo 1" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/history_2"
+                    android:contentDescription="Photo 2" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/history_3"
+                    android:contentDescription="Photo 3" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/history_4"
+                    android:contentDescription="Photo 4" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/history_5"
+                    android:contentDescription="Photo 5" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/suggestion_ai_dance"
+                    android:contentDescription="Photo 6" />
+
+            </GridLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Create Video Action Button -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreateVideo"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/bg_btn_primary"
+        android:drawableEnd="@drawable/ic_arrow_right"
+        android:paddingHorizontal="24dp"
+        android:text="Tạo video ngay"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

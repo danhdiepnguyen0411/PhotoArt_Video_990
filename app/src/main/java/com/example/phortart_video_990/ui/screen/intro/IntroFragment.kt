@@ -19,29 +19,25 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
                 stepNumber = "01",
                 title = getString(R.string.intro_1_title),
                 description = getString(R.string.intro_1_desc),
-                iconRes = R.drawable.ic_func_memories,
-                badgeBgRes = R.drawable.bg_badge_01
+                iconRes = R.drawable.icon_intro_1,
+                illustrationRes = R.drawable.intro_illustration_create_video,
+                buttonText = getString(R.string.btn_next)
             ),
             IntroPageModel(
                 stepNumber = "02",
                 title = getString(R.string.intro_2_title),
                 description = getString(R.string.intro_2_desc),
-                iconRes = R.drawable.ic_func_restore,
-                badgeBgRes = R.drawable.bg_badge_02
+                iconRes = R.drawable.icon_intro_2,
+                illustrationRes = R.drawable.intro_illustration_ai_prompt,
+                buttonText = getString(R.string.btn_next)
             ),
             IntroPageModel(
                 stepNumber = "03",
                 title = getString(R.string.intro_3_title),
                 description = getString(R.string.intro_3_desc),
-                iconRes = R.drawable.ic_func_enhance,
-                badgeBgRes = R.drawable.bg_badge_03
-            ),
-            IntroPageModel(
-                stepNumber = "04",
-                title = getString(R.string.intro_4_title),
-                description = getString(R.string.intro_4_desc),
-                iconRes = R.drawable.ic_func_music,
-                badgeBgRes = R.drawable.bg_badge_04
+                iconRes = R.drawable.icon_intro_3,
+                illustrationRes = R.drawable.intro_illustration_restore_photo,
+                buttonText = getString(R.string.btn_get_started)
             )
         )
     }
@@ -101,10 +97,10 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
         }
     }
 
-    private fun updateIndicators(selectedIndex: Int) {
+    private fun updateIndicators(position: Int) {
         for (i in 0 until binding.llIndicators.childCount) {
-            val dot = binding.llIndicators.getChildAt(i) as ImageView
-            if (i == selectedIndex) {
+            val dot = binding.llIndicators.getChildAt(i) as? ImageView ?: continue
+            if (i == position) {
                 dot.setImageResource(R.drawable.bg_indicator_active)
             } else {
                 dot.setImageResource(R.drawable.bg_indicator_inactive)

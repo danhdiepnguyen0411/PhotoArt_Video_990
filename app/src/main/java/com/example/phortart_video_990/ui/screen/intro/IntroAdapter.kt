@@ -26,10 +26,9 @@ class IntroAdapter(
 
         fun bind(page: IntroPageModel) {
             binding.ivIntroIcon.setImageResource(page.iconRes)
-            binding.tvIntroStepBadge.text = page.stepNumber
-            binding.tvIntroStepBadge.setBackgroundResource(page.badgeBgRes)
             binding.tvIntroTitle.text = page.title
             binding.tvIntroDesc.text = page.description
+            binding.ivIntroIllustration.setImageResource(page.illustrationRes)
         }
     }
 }

@@ -2,8 +2,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_splash_gradient">
+    android:layout_height="match_parent">
+
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/ivSplashBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/splash_background"
+        android:contentDescription="@null" />
 
     <!-- Center Content: Logo, Title, Subtitle -->
     <LinearLayout
@@ -21,31 +29,30 @@
 
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="92dp"
+            android:layout_height="92dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_splash_logo" />
+            android:src="@drawable/photo_ai_logo" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="20dp"
             android:gravity="center"
-            android:lineSpacingExtra="4dp"
             android:text="@string/splash_title"
-            android:textColor="#1E1B4B"
-            android:textSize="26sp"
+            android:textColor="@color/navy"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:gravity="center"
             android:text="@string/splash_subtitle"
-            android:textColor="#475569"
+            android:textColor="@color/muted"
             android:textSize="15sp" />
     </LinearLayout>
 
@@ -54,10 +61,10 @@
         android:id="@+id/llBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="56dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="48dp"
+        android:paddingHorizontal="56dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -66,7 +73,7 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="12dp"
+            android:layout_height="8dp"
             android:max="100"
             android:progress="0"
             android:progressDrawable="@drawable/bg_splash_progress" />
@@ -77,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/splash_loading"
-            android:textColor="#334155"
+            android:textColor="@color/muted"
             android:textSize="13sp" />
     </LinearLayout>
 

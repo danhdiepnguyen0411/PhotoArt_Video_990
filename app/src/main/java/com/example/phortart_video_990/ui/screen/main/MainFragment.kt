@@ -25,16 +25,31 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
                     binding.vpMainTabs.setCurrentItem(0, false)
                     true
                 }
-                R.id.nav_history -> {
+                R.id.nav_template -> {
                     binding.vpMainTabs.setCurrentItem(1, false)
                     true
                 }
-                R.id.nav_setting -> {
+                R.id.nav_history -> {
                     binding.vpMainTabs.setCurrentItem(2, false)
+                    true
+                }
+                R.id.nav_setting -> {
+                    binding.vpMainTabs.setCurrentItem(3, false)
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    fun selectTab(index: Int) {
+        val itemId = when (index) {
+            0 -> R.id.nav_home
+            1 -> R.id.nav_template
+            2 -> R.id.nav_history
+            3 -> R.id.nav_setting
+            else -> R.id.nav_home
+        }
+        binding.bottomNavigationView.selectedItemId = itemId
     }
 }

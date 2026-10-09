@@ -1,7 +1,6 @@
 package com.example.phortart_video_990.ui.screen.language
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phortart_video_990.R
@@ -42,18 +41,19 @@ class LanguageAdapter(
         fun bind(item: LanguageModel, isSelected: Boolean) {
             binding.tvLanguageFlag.text = item.flag
             binding.tvLanguageName.text = item.name
+            binding.tvLanguageSub.text = item.subName
 
             if (isSelected) {
                 binding.cardLanguage.setBackgroundResource(R.drawable.bg_item_language_selected)
-                binding.ivCheck.visibility = View.VISIBLE
+                binding.ivRadio.setImageResource(R.drawable.bg_radio_selected)
             } else {
                 binding.cardLanguage.setBackgroundResource(R.drawable.bg_item_language)
-                binding.ivCheck.visibility = View.GONE
+                binding.ivRadio.setImageResource(R.drawable.bg_radio_unselected)
             }
 
             binding.root.setOnClickListener {
                 val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION) {
+                if (pos != RecyclerView.NO_POSITION && pos != selectedPosition) {
                     val previousPosition = selectedPosition
                     selectedPosition = pos
                     items[previousPosition].isSelected = false
