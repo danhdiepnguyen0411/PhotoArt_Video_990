@@ -1,17 +1,26 @@
 package com.example.phortart_video_990.ui.screen.main
 
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
-import com.example.phortart_video_990.core.utils.SystemBarInsetsHelper
 import com.example.phortart_video_990.databinding.FragmentMainBinding
 
 class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::inflate) {
 
     override fun initView() {
-        SystemBarInsetsHelper.applyBottomInset(
-            rootView = binding.root,
-            marginViews = listOf(binding.cardBottomNav)
-        )
+        // Prevent BottomNavigationView from adding internal bottom padding that squashes icons and text
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigationView) { _, insets ->
+            insets
+        }
+
+        // Apply bottom insets as padding ONLY to cardBottomNav container so background extends to edge
+        // while bottomNavigationView height remains intact at 64dp
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            binding.cardBottomNav.setPadding(0, 0, 0, navBarInset)
+            insets
+        }
 
         val adapter = MainPagerAdapter(this)
         binding.vpMainTabs.adapter = adapter
