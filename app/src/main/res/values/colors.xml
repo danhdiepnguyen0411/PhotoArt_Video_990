@@ -12,6 +12,16 @@
     <color name="soft">#8296BC</color>
     <color name="line">#387896CD</color>
 
+    <!-- Banner DS Palette -->
+    <color name="banner_navy">#17327C</color>
+    <color name="banner_desc">#7A8CB5</color>
+    <color name="banner_chip_text">#4A4FC8</color>
+    <color name="banner_chip_icon">#6A5CF0</color>
+    <color name="banner_grad_start">#4A8CF2</color>
+    <color name="banner_grad_mid">#7A63EE</color>
+    <color name="banner_grad_end">#9A5CF0</color>
+    <color name="banner_bg_fallback">#E7F0FF</color>
+
     <color name="grad_blue">#36C7F3</color>
     <color name="grad_royal">#4B91EE</color>
     <color name="grad_violet">#7664E8</color>

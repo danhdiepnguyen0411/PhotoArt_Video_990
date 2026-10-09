@@ -53,20 +53,20 @@
 
     <!-- Banners -->
     <string name="banner_1_chip">AI Photo &amp; Video</string>
-    <string name="banner_1_title">Biến ảnh của bạn thành những</string>
-    <string name="banner_1_highlight">khoảnh khắc tuyệt vời</string>
+    <string name="banner_1_title">Biến ảnh của bạn\nthành những</string>
+    <string name="banner_1_highlight">khoảnh khắc\ntuyệt vời</string>
     <string name="banner_1_desc">Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây.</string>
     <string name="banner_1_btn">Thử ngay</string>
 
     <string name="banner_2_chip">AI Prompt</string>
-    <string name="banner_2_title">Chỉ cần mô tả, AI sẽ vẽ nên</string>
-    <string name="banner_2_highlight">bức ảnh trong mơ</string>
+    <string name="banner_2_title">Chỉ cần mô tả,\nAI sẽ vẽ nên</string>
+    <string name="banner_2_highlight">bức ảnh\ntrong mơ</string>
     <string name="banner_2_desc">Nhập ý tưởng của bạn và nhận ngay hình ảnh nghệ thuật độc đáo.</string>
     <string name="banner_2_btn">Tạo ngay</string>
 
     <string name="banner_3_chip">Khôi phục ảnh</string>
-    <string name="banner_3_title">Hồi sinh những bức ảnh cũ</string>
-    <string name="banner_3_highlight">như mới tinh khôi</string>
+    <string name="banner_3_title">Hồi sinh những\nbức ảnh cũ</string>
+    <string name="banner_3_highlight">như mới\ntinh khôi</string>
     <string name="banner_3_desc">Làm nét, xoá vết xước và phục hồi màu sắc chỉ với một chạm.</string>
     <string name="banner_3_btn">Khôi phục ngay</string>
 

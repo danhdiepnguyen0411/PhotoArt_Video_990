@@ -1,6 +1,9 @@
 package com.example.phortart_video_990.ui.screen.home
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
@@ -28,6 +31,19 @@ class HomeMediaAdapter(
         fun bind(item: HomeMediaItemModel) {
             binding.ivMediaThumb.setImageResource(item.imageRes)
             binding.tvMediaBadge.text = item.label
+
+            if (item.iconRes != 0) {
+                binding.ivBadgeIcon.visibility = View.VISIBLE
+                binding.ivBadgeIcon.setImageResource(item.iconRes)
+                if (item.iconTint != null) {
+                    binding.ivBadgeIcon.imageTintList = ColorStateList.valueOf(item.iconTint)
+                } else {
+                    binding.ivBadgeIcon.imageTintList = ColorStateList.valueOf(Color.parseColor("#1B2A6B"))
+                }
+            } else {
+                binding.ivBadgeIcon.visibility = View.GONE
+            }
+
             binding.root.setOnClickListener {
                 onItemClick(item)
             }
