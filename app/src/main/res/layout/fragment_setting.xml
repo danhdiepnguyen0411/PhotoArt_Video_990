@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_bg"
+    android:background="@color/white"
     android:fillViewport="true">
 
     <LinearLayout
@@ -20,25 +20,26 @@
             android:id="@+id/tvSettingHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
             android:text="@string/settings_title"
-            android:textColor="@color/navy"
-            android:textSize="22sp"
+            android:textColor="#3879F6"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
-        <!-- IAP Banner Card with icon_setting_iap & icon_setting_iap_2 -->
+        <!-- IAP Banner Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cardIapBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_iap_banner"
-            android:padding="16dp">
+            android:padding="14dp">
 
-            <!-- Left Art Crown -->
+            <!-- Left Crown Art -->
             <ImageView
                 android:id="@+id/ivIapCrown"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:contentDescription="Crown"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_setting_iap"
@@ -51,8 +52,8 @@
                 android:id="@+id/llIapInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/ivIapFloating"
@@ -64,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_iap_title"
-                    android:textColor="@color/navy"
+                    android:textColor="#162858"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -72,33 +73,31 @@
                     android:id="@+id/tvIapDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="3dp"
                     android:text="@string/settings_iap_desc"
-                    android:textColor="@color/muted"
+                    android:textColor="#7188B5"
                     android:textSize="12sp" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnIapUpgrade"
                     android:layout_width="wrap_content"
-                    android:layout_height="34dp"
+                    android:layout_height="32dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_btn_primary"
-                    android:drawableEnd="@drawable/ic_arrow_right"
-                    android:drawableTint="@color/white"
+                    android:background="@drawable/bg_btn_setting_iap"
                     android:gravity="center"
                     android:paddingHorizontal="14dp"
-                    android:text="@string/settings_iap_btn"
+                    android:text="Nâng cấp ngay →"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Right Art Floating -->
+            <!-- Right Floating Art -->
             <ImageView
                 android:id="@+id/ivIapFloating"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:contentDescription="Star"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_setting_iap_2"
@@ -112,21 +111,21 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/settings_group_options"
-            android:textColor="@color/muted"
-            android:textSize="13sp"
+            android:textColor="#576E8E"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/card_bg"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="1dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E5EDFA"
+            app:strokeWidth="1.2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -141,14 +140,22 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Language"
-                        android:src="@drawable/ic_globe" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_setting_icon_blue">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Language"
+                            android:src="@drawable/ic_globe"
+                            app:tint="#3879F6" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -161,7 +168,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/setting_language"
-                            android:textColor="@color/navy"
+                            android:textColor="#162858"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -170,7 +177,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textColor="@color/muted"
+                            android:textColor="#889DB8"
                             android:textSize="12sp"
                             tools:text="Tiếng Việt" />
                     </LinearLayout>
@@ -179,30 +186,40 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
-                        android:src="@drawable/ic_arrow_right"
-                        app:tint="@color/muted" />
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#A0B4D2" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginStart="52dp"
-                    android:background="@color/divider" />
+                    android:layout_marginStart="68dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="#F0F4FA" />
 
                 <!-- Notification Option -->
                 <LinearLayout
+                    android:id="@+id/rowNotification"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Notification"
-                        android:src="@drawable/ic_bell" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_setting_icon_pink">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Notification"
+                            android:src="@drawable/ic_bell"
+                            app:tint="#F43F5E" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -215,7 +232,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/setting_notification"
-                            android:textColor="@color/navy"
+                            android:textColor="#162858"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -224,7 +241,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="@string/setting_notification_desc"
-                            android:textColor="@color/muted"
+                            android:textColor="#889DB8"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -233,32 +250,32 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        app:thumbTint="@color/purple_primary"
-                        app:trackTint="@color/line" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector" />
                 </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Group 2: Thông tin & Hỗ trợ -->
+        <!-- Group 2: Hỗ trợ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
-            android:text="Thông tin &amp; Hỗ trợ"
-            android:textColor="@color/muted"
-            android:textSize="13sp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/settings_group_support"
+            android:textColor="#576E8E"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/card_bg"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="1dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E5EDFA"
+            app:strokeWidth="1.2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -273,79 +290,61 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Rate"
-                        android:src="@drawable/ic_star_line" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_setting_icon_green">
 
-                    <TextView
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Rate"
+                            android:src="@drawable/ic_star_line"
+                            app:tint="#10B981" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:text="@string/setting_rate"
-                        android:textColor="@color/navy"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/setting_rate"
+                            android:textColor="#162858"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/setting_rate_desc"
+                            android:textColor="#889DB8"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
-                        android:src="@drawable/ic_arrow_right"
-                        app:tint="@color/muted" />
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#A0B4D2" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginStart="52dp"
-                    android:background="@color/divider" />
-
-                <!-- Share App -->
-                <LinearLayout
-                    android:id="@+id/rowShareApp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Share"
-                        android:src="@drawable/ic_share_line" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:text="@string/setting_share"
-                        android:textColor="@color/navy"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription="Arrow"
-                        android:src="@drawable/ic_arrow_right"
-                        app:tint="@color/muted" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="52dp"
-                    android:background="@color/divider" />
+                    android:layout_marginStart="68dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="#F0F4FA" />
 
                 <!-- Privacy Policy -->
                 <LinearLayout
@@ -355,70 +354,117 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Privacy"
-                        android:src="@drawable/ic_shield_line" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_setting_icon_purple">
 
-                    <TextView
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Privacy"
+                            android:src="@drawable/ic_shield_line"
+                            app:tint="#6366F1" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:text="@string/setting_privacy"
-                        android:textColor="@color/navy"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/setting_privacy_title"
+                            android:textColor="#162858"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/setting_privacy_desc"
+                            android:textColor="#889DB8"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
-                        android:src="@drawable/ic_arrow_right"
-                        app:tint="@color/muted" />
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#A0B4D2" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginStart="52dp"
-                    android:background="@color/divider" />
+                    android:layout_marginStart="68dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="#F0F4FA" />
 
-                <!-- App Version -->
+                <!-- App Version / About -->
                 <LinearLayout
+                    android:id="@+id/rowAboutApp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Version"
-                        android:src="@drawable/ic_info_circle" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_setting_icon_magenta">
 
-                    <TextView
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="About"
+                            android:src="@drawable/ic_info_circle"
+                            app:tint="#D946EF" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:text="@string/setting_app_version"
-                        android:textColor="@color/navy"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="v1.0.0"
-                        android:textColor="@color/muted"
-                        android:textSize="13sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/setting_about"
+                            android:textColor="#162858"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/setting_about_version"
+                            android:textColor="#889DB8"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="Arrow"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#A0B4D2" />
                 </LinearLayout>
 
             </LinearLayout>
