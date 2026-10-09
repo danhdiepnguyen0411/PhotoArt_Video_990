@@ -1,14 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#33FFFFFF">
+    android:color="#4DFFFFFF">
     <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="26dp" />
-            <gradient
-                android:angle="0"
-                android:startColor="#49A9F9"
-                android:centerColor="#7B8CF5"
-                android:endColor="#B87BF1" />
-        </shape>
+        <layer-list>
+            <!-- Layer 1: Outermost soft blurred glow rim (viền mờ ngoài cùng) -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="28dp" />
+                    <solid android:color="#00000000" />
+                    <stroke
+                        android:width="4.5dp"
+                        android:color="#25FFFFFF" />
+                </shape>
+            </item>
+
+            <!-- Layer 2: Middle diffused glow rim (viền mờ trung gian) -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="28dp" />
+                    <solid android:color="#00000000" />
+                    <stroke
+                        android:width="3.2dp"
+                        android:color="#50FFFFFF" />
+                </shape>
+            </item>
+
+            <!-- Layer 3: Inner bright glow rim (viền sáng trong) -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="28dp" />
+                    <solid android:color="#00000000" />
+                    <stroke
+                        android:width="2.0dp"
+                        android:color="#90FFFFFF" />
+                </shape>
+            </item>
+
+            <!-- Layer 4: Button Body with Gradient & fine core rim -->
+            <item
+                android:top="1dp"
+                android:bottom="1dp"
+                android:left="1dp"
+                android:right="1dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="27dp" />
+                    <gradient
+                        android:angle="0"
+                        android:startColor="#4ABDF8"
+                        android:centerColor="#7E88F5"
+                        android:endColor="#C473EC" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#CCFFFFFF" />
+                </shape>
+            </item>
+
+            <!-- Layer 5: Top glossy glass highlight reflection -->
+            <item
+                android:top="2dp"
+                android:left="4dp"
+                android:right="4dp"
+                android:bottom="26dp">
+                <shape android:shape="rectangle">
+                    <corners
+                        android:topLeftRadius="25dp"
+                        android:topRightRadius="25dp"
+                        android:bottomLeftRadius="8dp"
+                        android:bottomRightRadius="8dp" />
+                    <gradient
+                        android:angle="270"
+                        android:startColor="#45FFFFFF"
+                        android:endColor="#00FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
     </item>
 </ripple>

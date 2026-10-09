@@ -13,7 +13,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
     override fun initView() {
         binding.progressBar.progress = 0
-        binding.tvLoading.text = getString(R.string.splash_loading, 0)
     }
 
     override fun initData() {
@@ -25,7 +24,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
             var progress = 0
             while (progress <= 100) {
                 binding.progressBar.progress = progress
-                binding.tvLoading.text = getString(R.string.splash_loading, progress)
                 delay(25L)
                 progress += 2
             }
