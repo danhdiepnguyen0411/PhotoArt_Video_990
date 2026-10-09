@@ -1,69 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:paddingHorizontal="24dp"
-    android:paddingTop="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Top Icon Badge Card -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Top Icon: enlarged to 68x54dp, lowered to marginTop 92dp in cloud pocket -->
+    <ImageView
+        android:id="@+id/ivIntroIcon"
         android:layout_width="68dp"
-        android:layout_height="68dp"
-        app:cardBackgroundColor="@color/card_bg"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="3dp"
-        app:strokeColor="@color/card_stroke"
-        app:strokeWidth="1dp">
+        android:layout_height="54dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="92dp"
+        android:contentDescription="Intro Icon"
+        android:scaleType="fitStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/icon_intro_1" />
 
-        <ImageView
-            android:id="@+id/ivIntroIcon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="12dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="Intro Icon"
-            tools:src="@drawable/icon_intro_1" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Title -->
+    <!-- Title: royal navy #13388C, 35sp, heavy bold, compact line height -->
     <TextView
         android:id="@+id/tvIntroTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:lineSpacingExtra="3dp"
-        android:textColor="@color/navy"
-        android:textSize="26sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="14dp"
+        android:fontFamily="sans-serif-black"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="0.94"
+        android:textColor="#13388C"
+        android:textSize="35sp"
         android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivIntroIcon"
         tools:text="Gom ảnh,\ntạo video" />
 
-    <!-- Description -->
+    <!-- Description: soft slate blue #6C84B0, 14.5sp, exact 3 lines -->
     <TextView
         android:id="@+id/tvIntroDesc"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:lineSpacingExtra="3dp"
-        android:paddingHorizontal="16dp"
-        android:textColor="@color/muted"
-        android:textSize="14sp"
-        tools:text="Biến những khoảnh khắc yêu thích thành video sống động chỉ trong vài giây." />
+        android:layout_marginEnd="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="3.5dp"
+        android:textColor="#6C84B0"
+        android:textSize="14.5sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvIntroTitle"
+        tools:text="Biến những khoảnh khắc yêu thích\nthành video sống động chỉ trong vài\ngiây." />
 
-    <!-- Illustration Art -->
+    <!-- Illustration Art: expanded between description and bottom -->
     <ImageView
         android:id="@+id/ivIntroIllustration"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="0dp"
         android:contentDescription="Illustration"
         android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvIntroDesc"
         tools:src="@drawable/intro_illustration_create_video" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

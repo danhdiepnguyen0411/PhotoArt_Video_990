@@ -18,13 +18,13 @@
     <string name="btn_get_started">Bắt đầu ngay</string>
     
     <string name="intro_1_title">Gom ảnh,\ntạo video</string>
-    <string name="intro_1_desc">Biến những khoảnh khắc yêu thích thành video sống động chỉ trong vài giây.</string>
+    <string name="intro_1_desc">Biến những khoảnh khắc yêu thích\nthành video sống động chỉ trong vài\ngiây.</string>
     
     <string name="intro_2_title">Tạo ảnh bằng\nprompt AI</string>
-    <string name="intro_2_desc">Mô tả điều bạn tưởng tượng, AI sẽ biến nó thành hình ảnh tuyệt đẹp.</string>
+    <string name="intro_2_desc">Mô tả điều bạn tưởng tượng,\nAI sẽ biến nó thành hình ảnh tuyệt đẹp.</string>
     
     <string name="intro_3_title">Hồi sinh những\nbức ảnh cũ</string>
-    <string name="intro_3_desc">Khôi phục ảnh mờ, ảnh cũ và giữ lại những kỷ niệm đáng nhớ.</string>
+    <string name="intro_3_desc">Khôi phục ảnh mờ, ảnh cũ\nvà giữ lại những kỷ niệm đáng nhớ.</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_home">Trang chủ</string>
