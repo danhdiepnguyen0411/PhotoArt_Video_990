@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Photo AI</string>
+    <string name="shortcut_uninstall">Uninstall</string>
+    <string name="shortcut_uninstall_desc">Uninstall Photo AI</string>
 
     <!-- Splash Screen -->
     <string name="splash_title">Photo AI</string>
@@ -113,4 +115,54 @@
 
     <string name="btn_back">Quay lại</string>
     <string name="placeholder_description">Tính năng đang được hoàn thiện.</string>
+
+    <!-- Popups Strings -->
+    <string name="enable_notifications_title">Bật thông báo</string>
+    <string name="enable_notifications_desc">Nhận thông báo khi tác phẩm AI tạo xong và cập nhật các phong cách ảnh &amp; video mới nhất.</string>
+    <string name="btn_go_to_settings">Cài đặt</string>
+    <string name="btn_cancel">Hủy</string>
+
+    <string name="save_success_title">Lưu thành công</string>
+    <string name="save_success_desc">Tác phẩm của bạn đã được lưu vào bộ sưu tập thiết bị.</string>
+    <string name="btn_done">Hoàn tất</string>
+
+    <string name="restore_error_title">Khôi phục ảnh không thành công</string>
+    <string name="restore_error_desc">Đã xảy ra lỗi trong quá trình xử lý ảnh. Vui lòng kiểm tra lại ảnh hoặc thử lại sau.</string>
+    <string name="btn_try_again">Thử lại</string>
+
+    <string name="ai_gen_error_title">Tạo ảnh AI không thành công</string>
+    <string name="ai_gen_error_desc">Hệ thống đang bận hoặc prompt chưa phù hợp. Vui lòng thử lại với prompt khác.</string>
+
+    <string name="no_internet_title">Mất kết nối Internet</string>
+    <string name="no_internet_desc">Vui lòng kiểm tra kết nối mạng của bạn để tiếp tục sử dụng các tính năng AI.</string>
+    <string name="btn_dismiss">Đóng</string>
+
+    <string name="exit_title">Thoát ứng dụng</string>
+    <string name="exit_desc">Bạn có chắc chắn muốn thoát khỏi ứng dụng không?</string>
+    <string name="btn_exit">Thoát</string>
+
+    <!-- Rate App -->
+    <string name="rate_title">Đánh giá ứng dụng</string>
+    <string name="rate_subtitle">Bạn cảm thấy trải nghiệm tạo ảnh với Photo AI như thế nào?</string>
+    <string name="btn_rate_submit">Gửi đánh giá</string>
+    <string name="btn_rate_not_now">Để sau</string>
+
+    <!-- Uninstall Survey -->
+    <string name="uninstall_step1_title">Bạn gặp vấn đề gì khi sử dụng Photo AI?</string>
+    <string name="uninstall_card1_title">Không thể lưu hoặc chất lượng ảnh chưa tốt</string>
+    <string name="uninstall_card1_desc">Thử lại với các chế độ AI khác hoặc xem mẹo tạo ảnh đẹp</string>
+    <string name="uninstall_card2_title">Khám phá các phong cách AI mới</string>
+    <string name="uninstall_card2_desc">Hàng trăm mẫu template ảnh và video sống động đang chờ bạn</string>
+    <string name="uninstall_btn_try_again">Thử lại</string>
+    <string name="uninstall_btn_explore">Khám phá ngay</string>
+    <string name="uninstall_btn_dont_uninstall">Không muốn gỡ cài đặt</string>
+    <string name="uninstall_btn_still_uninstall">Vẫn muốn gỡ cài đặt</string>
+    <string name="uninstall_step2_title">Tại sao bạn muốn gỡ cài đặt?</string>
+    <string name="uninstall_opt_1">Ứng dụng phản hồi chậm hoặc bị đơ</string>
+    <string name="uninstall_opt_2">Lỗi không tạo được ảnh hoặc khôi phục ảnh</string>
+    <string name="uninstall_opt_3">Thiếu tính năng hoặc phong cách AI tôi cần</string>
+    <string name="uninstall_opt_4">Quá nhiều quảng cáo</string>
+    <string name="uninstall_opt_5">Chất lượng ảnh chưa như mong đợi</string>
+    <string name="uninstall_opt_6">Lý do khác</string>
+    <string name="uninstall_hint_other">Vui lòng chia sẻ thêm ý kiến của bạn...</string>
 </resources>

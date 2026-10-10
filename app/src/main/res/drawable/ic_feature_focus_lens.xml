@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
+    android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- Outer concentric ring -->
+    <!-- Outer concentric ring (cx 12, cy 12, r 8) -->
     <path
-        android:strokeColor="#4D7BF6"
-        android:strokeWidth="1.75"
+        android:strokeColor="#4A63E8"
+        android:strokeWidth="2.2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M12,12m-8.5,0a8.5,8.5 0 1,1 17,0a8.5,8.5 0 1,1 -17,0" />
-    <!-- Middle concentric ring -->
+        android:pathData="M12,20A8,8 0 1,1 12,4a8,8 0 0,1 0,16z" />
+    <!-- Inner concentric ring (cx 12, cy 12, r 3) -->
     <path
-        android:strokeColor="#4D7BF6"
-        android:strokeWidth="1.75"
+        android:strokeColor="#4A63E8"
+        android:strokeWidth="2.2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M12,12m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
-    <!-- Center solid dot -->
-    <path
-        android:fillColor="#4D7BF6"
-        android:pathData="M12,12m-1.5,0a1.5,1.5 0 1,1 3,0a1.5,1.5 0 1,1 -3,0" />
+        android:pathData="M12,15A3,3 0 1,1 12,9a3,3 0 0,1 0,6z" />
 </vector>

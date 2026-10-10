@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_restore_screen">
+
+    <!-- Top Bar: Back Button & Header Title -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="3dp"
+        app:cardPreventCornerOverlap="false"
+        app:strokeWidth="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/btn_back"
+            android:src="@drawable/ic_chevron_left" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvHeaderTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đang khôi phục ảnh"
+        android:textColor="#17327C"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnBack" />
+
+    <!-- Center Content: Illustration, Circular Progress, and Status Texts -->
+    <LinearLayout
+        android:id="@+id/layoutCenterContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack"
+        app:layout_constraintVertical_bias="0.42">
+
+        <!-- 3D Layered Illustration Block (Matching the Right Screen Mockup) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutIllustration"
+            android:layout_width="144dp"
+            android:layout_height="144dp">
+
+            <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left, 0 deg) -->
+            <View
+                android:id="@+id/layerBackBlue"
+                android:layout_width="104dp"
+                android:layout_height="104dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_restore_back_layer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 2. Main Glassmorphic Photo Card Layer (Tilted ~7 deg Clockwise matching Figma) -->
+            <FrameLayout
+                android:id="@+id/cardFront"
+                android:layout_width="116dp"
+                android:layout_height="116dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:rotation="7"
+                android:elevation="4dp"
+                android:background="@drawable/bg_restore_illustration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Photo Frame"
+                    android:src="@drawable/ic_restore_illustration_photo" />
+            </FrameLayout>
+
+            <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right, Horizontal arrows) -->
+            <FrameLayout
+                android:id="@+id/badgeCompare"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="-8dp"
+                android:layout_marginBottom="-4dp"
+                android:rotation="0"
+                android:background="@drawable/bg_restore_compare_badge"
+                android:elevation="6dp"
+                app:layout_constraintBottom_toBottomOf="@+id/cardFront"
+                app:layout_constraintEnd_toEndOf="@+id/cardFront">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Compare"
+                    android:src="@drawable/ic_compare_arrows" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Circular Progress Ring with Center Percentage -->
+        <FrameLayout
+            android:id="@+id/layoutProgressRing"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="46dp">
+
+            <com.example.phortart_video_990.ui.screen.feature.restore.widget.CircularProgressView
+                android:id="@+id/progressCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tvProgressPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="#102148"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                tools:text="49%" />
+        </FrameLayout>
+
+        <!-- Status Texts -->
+        <TextView
+            android:id="@+id/tvStatusTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="38dp"
+            android:gravity="center"
+            android:text="Đang khôi phục ảnh..."
+            android:textColor="#102148"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvStatusSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="Vui lòng đợi trong giây lát"
+            android:textColor="#6F7E94"
+            android:textSize="13.5sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
