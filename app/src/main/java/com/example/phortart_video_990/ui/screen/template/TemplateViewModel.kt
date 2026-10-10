@@ -14,17 +14,20 @@ class TemplateViewModel(
     private val repository: TemplateRepository = TemplateRepository()
 ) : ViewModel() {
 
-    private val _categories = MutableStateFlow<List<CategoryModel>>(repository.getDefaultCategories())
+    private val _categories = MutableStateFlow<List<CategoryModel>>(emptyList())
     val categories: StateFlow<List<CategoryModel>> = _categories.asStateFlow()
 
     private val _selectedCategoryCode = MutableStateFlow("ALL")
     val selectedCategoryCode: StateFlow<String> = _selectedCategoryCode.asStateFlow()
 
-    private val _templates = MutableStateFlow<List<TemplateModel>>(repository.getDefaultTemplates())
+    private val _templates = MutableStateFlow<List<TemplateModel>>(emptyList())
     val templates: StateFlow<List<TemplateModel>> = _templates.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Cache of all visual templates loaded from API
+    private var allVisualTemplates: List<TemplateModel> = emptyList()
 
     init {
         loadData()
@@ -34,23 +37,47 @@ class TemplateViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Load ONLY visual template categories from API (excludes music)
+                // 1. Fetch all visual templates first to know which categories actually have templates
+                val allTemplates = repository.getTemplates(categoryCode = "ALL")
+                allVisualTemplates = allTemplates
+
+                // 2. Fetch categories from API
                 val apiCategories = repository.getTemplateCategories()
-                _categories.value = apiCategories
 
-                // 2. Load templates for currently selected category
-                val currentCode = _selectedCategoryCode.value
-                val selectedCat = apiCategories.find { it.code.equals(currentCode, ignoreCase = true) }
-                val templateList = repository.getTemplates(categoryCode = currentCode, categoryName = selectedCat?.name)
-                _templates.value = templateList
+                // Set of non-empty category identifiers found in actual templates
+                val templateCategoriesPresent = allTemplates.map { it.category.trim().lowercase() }
+                    .filter { it.isNotBlank() }
+                    .toSet()
 
-                // 3. Dynamic category discovery from templates
-                discoverExtraCategories(templateList)
-            } catch (e: Exception) {
-                // Keep default templates on error
-                if (_templates.value.isEmpty()) {
-                    _templates.value = repository.getDefaultTemplates()
+                // Only keep categories that have templates (and ALL), excluding AI TOOL
+                val validCategories = apiCategories.filter { cat ->
+                    if (cat.isAiTool) return@filter false
+                    if (cat.code.equals("ALL", ignoreCase = true)) return@filter true
+                    val codeMatch = cat.code.trim().lowercase() in templateCategoriesPresent
+                    val nameMatch = cat.name.trim().lowercase() in templateCategoriesPresent
+                    codeMatch || nameMatch
+                }.toMutableList()
+
+                // Also discover any extra categories present in templates that weren't in API categories
+                val existingCodes = validCategories.map { it.code.trim().lowercase() }.toSet()
+                allTemplates.forEach { tpl ->
+                    val catCode = tpl.category.trim()
+                    val isMusic = catCode.startsWith("MUSIC_", ignoreCase = true) || tpl.isMusic
+                    val isAi = catCode.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
+                            catCode.equals("AI_TOOL", ignoreCase = true)
+                    if (catCode.isNotBlank() && !isMusic && !isAi && !existingCodes.contains(catCode.lowercase())) {
+                        validCategories.add(CategoryModel(code = catCode, name = catCode, active = true))
+                    }
                 }
+
+                _categories.value = validCategories
+
+                // Filter templates for current selected category
+                val currentCode = _selectedCategoryCode.value
+                val selectedCat = validCategories.find { it.code.equals(currentCode, ignoreCase = true) }
+                _templates.value = filterTemplatesByCategory(allTemplates, currentCode, selectedCat?.name)
+            } catch (e: Exception) {
+                _templates.value = emptyList()
             } finally {
                 _isLoading.value = false
             }
@@ -68,34 +95,33 @@ class TemplateViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val list = repository.getTemplates(categoryCode = categoryCode, categoryName = categoryName)
-                _templates.value = list
-                discoverExtraCategories(list)
-            } catch (e: Exception) {
-                if (_templates.value.isEmpty()) {
-                    _templates.value = repository.getDefaultTemplates()
+                if (allVisualTemplates.isNotEmpty()) {
+                    _templates.value = filterTemplatesByCategory(allVisualTemplates, categoryCode, categoryName)
+                } else {
+                    val list = repository.getTemplates(categoryCode = categoryCode, categoryName = categoryName)
+                    _templates.value = list
                 }
+            } catch (e: Exception) {
+                _templates.value = emptyList()
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    private fun discoverExtraCategories(templates: List<TemplateModel>) {
-        val currentCats = _categories.value.toMutableList()
-        var updated = false
-        val existingCodes = currentCats.map { it.code.lowercase() }.toSet()
+    private fun filterTemplatesByCategory(
+        templates: List<TemplateModel>,
+        categoryCode: String,
+        categoryName: String?
+    ): List<TemplateModel> {
+        val isAll = categoryCode.isBlank() ||
+                categoryCode.equals("ALL", ignoreCase = true) ||
+                categoryCode.equals("Tất cả", ignoreCase = true)
+        if (isAll) return templates
 
-        templates.forEach { tpl ->
-            val code = tpl.category.trim()
-            val isMusic = code.startsWith("MUSIC_", ignoreCase = true) || tpl.isMusic
-            if (code.isNotBlank() && !isMusic && !existingCodes.contains(code.lowercase())) {
-                currentCats.add(CategoryModel(code = code, name = code, active = true))
-                updated = true
-            }
-        }
-        if (updated) {
-            _categories.value = currentCats
+        return templates.filter {
+            it.category.equals(categoryCode, ignoreCase = true) ||
+                    (!categoryName.isNullOrBlank() && it.category.equals(categoryName, ignoreCase = true))
         }
     }
 }

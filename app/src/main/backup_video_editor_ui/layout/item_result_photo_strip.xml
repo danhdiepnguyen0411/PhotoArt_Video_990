@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPhotoItem"
+        android:layout_width="56dp"
+        android:layout_height="72dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#4A65ED"
+        app:strokeWidth="2dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivPhotoThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+            <!-- Number badge in top-left corner -->
+            <TextView
+                android:id="@+id/tvOrderNumber"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/bg_photo_number_badge"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                tools:text="1" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Transition divider icon between photos -->
+    <ImageView
+        android:id="@+id/ivTransitionIcon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginHorizontal="3dp"
+        android:src="@drawable/ic_transition_bowtie"
+        app:tint="#8FA1D8" />
+
+</LinearLayout>

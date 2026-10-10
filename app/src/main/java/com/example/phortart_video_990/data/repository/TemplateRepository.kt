@@ -21,69 +21,9 @@ class TemplateRepository(
     private val gson = Gson()
     private val TAG = "TemplateRepository"
 
-    fun getDefaultCategories(): List<CategoryModel> = listOf(
-        CategoryModel(code = "ALL", name = "Tất cả", active = true),
-        CategoryModel(code = "AI_EFFECT", name = "AI Effect", active = true),
-        CategoryModel(code = "AI_STYLE", name = "AI Style", active = true),
-        CategoryModel(code = "AI_DANCE", name = "AI Dance", active = true)
-    )
+    fun getDefaultCategories(): List<CategoryModel> = listOf(CategoryModel.ALL)
 
-    fun getDefaultTemplates(): List<TemplateModel> = listOf(
-        TemplateModel(
-            id = "tpl_1",
-            title = "Cùng nhau đi khắp th...",
-            duration = "00:16",
-            views = "892,4K",
-            photoCount = "6",
-            category = "AI_EFFECT",
-            localImageRes = R.drawable.template_trendy
-        ),
-        TemplateModel(
-            id = "tpl_2",
-            title = "Khoảnh khắc đáng nhớ",
-            duration = "00:20",
-            views = "756,3K",
-            photoCount = "4",
-            category = "AI_STYLE",
-            localImageRes = R.drawable.template_selfie
-        ),
-        TemplateModel(
-            id = "tpl_3",
-            title = "Tình yêu ngọt ngào",
-            duration = "00:15",
-            views = "412,8K",
-            photoCount = "2",
-            category = "AI_DANCE",
-            localImageRes = R.drawable.suggestion_ai_portrait
-        ),
-        TemplateModel(
-            id = "tpl_4",
-            title = "Một ngày ở Paris",
-            duration = "00:18",
-            views = "934,5K",
-            photoCount = "5",
-            category = "AI_EFFECT",
-            localImageRes = R.drawable.suggestion_ai_style
-        ),
-        TemplateModel(
-            id = "tpl_5",
-            title = "Ánh nắng thanh xuân",
-            duration = "00:21",
-            views = "620,1K",
-            photoCount = "3",
-            category = "AI_STYLE",
-            localImageRes = R.drawable.template_vintage
-        ),
-        TemplateModel(
-            id = "tpl_6",
-            title = "Vũ trụ huyền bí",
-            duration = "00:17",
-            views = "815,6K",
-            photoCount = "7",
-            category = "AI_DANCE",
-            localImageRes = R.drawable.template_fantasy
-        )
-    )
+    fun getDefaultTemplates(): List<TemplateModel> = emptyList()
 
     /**
      * Fetch all categories from API.
@@ -106,17 +46,13 @@ class TemplateRepository(
                 } else {
                     try {
                         val categories = parseCategories(jsonElement)
-                        val activeCategories = categories.filter { it.active && it.name.isNotBlank() }
+                        val activeCategories = categories.filter { it.active && it.name.isNotBlank() && !it.isAiTool }
                             .sortedBy { it.orderPosition }
 
-                        if (activeCategories.isEmpty()) {
-                            continuation.resume(getDefaultCategories())
-                        } else {
-                            val resultList = mutableListOf(CategoryModel.ALL)
-                            resultList.addAll(activeCategories)
-                            Log.d(TAG, "Loaded ${resultList.size} categories from API")
-                            continuation.resume(resultList)
-                        }
+                        val resultList = mutableListOf(CategoryModel.ALL)
+                        resultList.addAll(activeCategories)
+                        Log.d(TAG, "Loaded ${resultList.size} categories from API")
+                        continuation.resume(resultList)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error parsing categories: ${e.message}", e)
                         continuation.resume(getDefaultCategories())
@@ -127,15 +63,12 @@ class TemplateRepository(
     }
 
     /**
-     * Fetch ONLY template categories (excludes MUSIC categories).
+     * Fetch ONLY template categories (excludes MUSIC and AI TOOL categories).
      */
     suspend fun getTemplateCategories(): List<CategoryModel> {
         val all = getCategories()
         val templateCats = mutableListOf<CategoryModel>()
-        val fromApi = all.filter { it.code != "ALL" && !it.isMusicCategory }
-        if (fromApi.isEmpty()) {
-            return getDefaultCategories()
-        }
+        val fromApi = all.filter { it.code != "ALL" && !it.isMusicCategory && !it.isAiTool }
         templateCats.add(CategoryModel.ALL)
         templateCats.addAll(fromApi)
         return templateCats
@@ -147,12 +80,12 @@ class TemplateRepository(
     suspend fun getMusicCategories(): List<CategoryModel> {
         val all = getCategories()
         val musicCats = mutableListOf(CategoryModel.ALL)
-        musicCats.addAll(all.filter { it.code != "ALL" && it.isMusicCategory })
+        musicCats.addAll(all.filter { it.code != "ALL" && it.isMusicCategory && !it.isAiTool })
         return musicCats
     }
 
     /**
-     * Fetch visual templates from API (excludes music tracks).
+     * Fetch visual templates from API (excludes music tracks and AI TOOL).
      */
     suspend fun getTemplates(
         categoryCode: String? = null,
@@ -164,9 +97,7 @@ class TemplateRepository(
 
         val client = getClient()
         if (client == null) {
-            val defaults = getDefaultTemplates()
-            val filtered = if (isAll) defaults else defaults.filter { it.category.equals(categoryCode, ignoreCase = true) }.ifEmpty { defaults }
-            return@withContext filtered
+            return@withContext emptyList()
         }
 
         suspendCancellableCoroutine { continuation ->
@@ -177,18 +108,14 @@ class TemplateRepository(
 
                 if (throwable != null || jsonElement == null) {
                     Log.e(TAG, "Failed to fetch templates: ${throwable?.message}")
-                    val defaults = getDefaultTemplates()
-                    val filtered = if (isAll) defaults else defaults.filter { it.category.equals(categoryCode, ignoreCase = true) }.ifEmpty { defaults }
-                    continuation.resume(filtered)
+                    continuation.resume(emptyList())
                 } else {
                     try {
                         val allTemplates = parseTemplates(jsonElement)
                         val visualTemplates = allTemplates.filter { !it.isMusic }
 
                         if (visualTemplates.isEmpty()) {
-                            val defaults = getDefaultTemplates()
-                            val filtered = if (isAll) defaults else defaults.filter { it.category.equals(categoryCode, ignoreCase = true) }.ifEmpty { defaults }
-                            continuation.resume(filtered)
+                            continuation.resume(emptyList())
                             return@getTemplateApps
                         }
 
@@ -197,17 +124,14 @@ class TemplateRepository(
                                 it.category.equals(filterParam, ignoreCase = true) ||
                                         (!categoryName.isNullOrBlank() && it.category.equals(categoryName, ignoreCase = true))
                             }
-                            if (filtered.isNotEmpty()) {
-                                continuation.resume(filtered)
-                                return@getTemplateApps
-                            }
+                            continuation.resume(filtered)
+                            return@getTemplateApps
                         }
 
                         continuation.resume(visualTemplates)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error parsing templates: ${e.message}", e)
-                        val defaults = getDefaultTemplates()
-                        continuation.resume(defaults)
+                        continuation.resume(emptyList())
                     }
                 }
             }
@@ -258,6 +182,175 @@ class TemplateRepository(
                 }
             }
         }
+    }
+
+    /**
+     * Process image with template code using ArtMagicClient SDK backend.
+     */
+    suspend fun processImageEditing(
+        file: java.io.File,
+        code: String,
+        options: String = "{}",
+        attachmentFiles: List<java.io.File> = emptyList(),
+        prompt: String? = null
+    ): Result<JsonElement> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val client = getClient()
+            if (client == null) {
+                if (continuation.isActive) continuation.resume(Result.failure(Exception("ArtMagicClient is not initialized")))
+                return@suspendCancellableCoroutine
+            }
+
+            client.processImageEditing(file, code, options, attachmentFiles, prompt) { result, error ->
+                if (!continuation.isActive) return@processImageEditing
+                if (error != null) {
+                    continuation.resume(Result.failure(error))
+                } else if (result != null) {
+                    continuation.resume(Result.success(result))
+                } else {
+                    continuation.resume(Result.failure(Exception("Unknown error processing image")))
+                }
+            }
+        }
+    }
+
+    /**
+     * Poll result for image editing by requestId.
+     */
+    suspend fun getImageEditingResult(requestId: String): Result<JsonElement> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val client = getClient()
+            if (client == null) {
+                if (continuation.isActive) continuation.resume(Result.failure(Exception("ArtMagicClient is not initialized")))
+                return@suspendCancellableCoroutine
+            }
+
+            client.getImageEditingResult(requestId) { result, error ->
+                if (!continuation.isActive) return@getImageEditingResult
+                if (error != null) {
+                    continuation.resume(Result.failure(error))
+                } else if (result != null) {
+                    continuation.resume(Result.success(result))
+                } else {
+                    continuation.resume(Result.failure(Exception("Unknown error querying result")))
+                }
+            }
+        }
+    }
+
+    /**
+     * Poll image editing result with adaptive interval and timeout.
+     */
+    suspend fun pollImageEditingResult(
+        requestId: String,
+        intervalMillis: Long = 5_000L,
+        timeoutMillis: Long = 180_000L,
+        onProgress: ((Int) -> Unit)? = null
+    ): Result<JsonElement> = withContext(Dispatchers.IO) {
+        val startTime = System.currentTimeMillis()
+        var currentInterval = intervalMillis.coerceAtLeast(4_000L)
+        val maxInterval = 8_000L
+        var attempt = 0
+
+        // Initial delay before 1st poll
+        kotlinx.coroutines.delay(4_000L)
+
+        val pollResult = kotlinx.coroutines.withTimeoutOrNull(timeoutMillis) {
+            while (true) {
+                attempt++
+                val res = getImageEditingResult(requestId)
+                if (res.isSuccess) {
+                    val data = res.getOrNull()
+                    if (data != null && isImageEditingResultReady(data)) {
+                        Log.d(TAG, "Polling requestId=$requestId succeeded on attempt $attempt")
+                        return@withTimeoutOrNull res
+                    }
+                    currentInterval = (currentInterval * 1.2f).toLong().coerceAtMost(maxInterval)
+                } else {
+                    val err = res.exceptionOrNull()
+                    val msg = err?.message.orEmpty()
+                    val isRetriable = msg.contains("408") ||
+                            msg.contains("429") ||
+                            msg.contains("202") ||
+                            msg.contains("404") && attempt <= 4 ||
+                            msg.contains("processing", ignoreCase = true) ||
+                            msg.contains("queue", ignoreCase = true) ||
+                            msg.contains("pending", ignoreCase = true) ||
+                            msg.contains("not ready", ignoreCase = true) ||
+                            msg.contains("timeout", ignoreCase = true)
+
+                    if (!isRetriable) {
+                        Log.e(TAG, "Fatal error polling requestId=$requestId: $msg")
+                        return@withTimeoutOrNull res
+                    }
+                }
+
+                // Update simulated progress between 25% and 90%
+                val elapsedSec = (System.currentTimeMillis() - startTime) / 1000.0
+                val progress = (25 + 65 * (1.0 - Math.exp(-elapsedSec / 25.0))).toInt().coerceIn(25, 92)
+                onProgress?.invoke(progress)
+
+                kotlinx.coroutines.delay(currentInterval)
+            }
+            @Suppress("UNREACHABLE_CODE")
+            null
+        }
+
+        pollResult ?: Result.failure(Exception("Polling timeout after ${timeoutMillis}ms for requestId=$requestId"))
+    }
+
+    fun extractRequestId(element: JsonElement?): String? {
+        if (element == null || !element.isJsonObject) return null
+        val obj = element.asJsonObject
+        val dataObj = obj.get("data")?.takeIf { it.isJsonObject }?.asJsonObject
+        return dataObj?.get("requestId")?.asString
+            ?: dataObj?.get("request_id")?.asString
+            ?: dataObj?.get("taskId")?.asString
+            ?: dataObj?.get("task_id")?.asString
+            ?: obj.get("requestId")?.asString
+            ?: obj.get("request_id")?.asString
+            ?: obj.get("taskId")?.asString
+            ?: obj.get("task_id")?.asString
+    }
+
+    fun extractVideoUrl(element: JsonElement?): String? {
+        if (element == null || !element.isJsonObject) return null
+        val root = element.asJsonObject
+
+        fun findUrlInObject(obj: com.google.gson.JsonObject?): String? {
+            if (obj == null) return null
+            val keys = listOf(
+                "output_url", "video_url", "output_video_url", "url",
+                "result_url", "output", "videoUrl", "outputUrl"
+            )
+            for (key in keys) {
+                val elementValue = obj.get(key)
+                if (elementValue != null && !elementValue.isJsonNull) {
+                    val str = elementValue.asString
+                    if (!str.isNullOrBlank() && str.startsWith("http", ignoreCase = true)) {
+                        return str
+                    }
+                }
+            }
+            return null
+        }
+
+        // 1. Kiểm tra data object (nơi chứa output_url từ processImageEditing)
+        val dataObj = root.get("data")?.takeIf { it.isJsonObject }?.asJsonObject
+        findUrlInObject(dataObj)?.let { return it }
+
+        // 2. Kiểm tra data con bên trong data.data nếu có
+        val nestedDataObj = dataObj?.get("data")?.takeIf { it.isJsonObject }?.asJsonObject
+        findUrlInObject(nestedDataObj)?.let { return it }
+
+        // 3. Kiểm tra root object
+        findUrlInObject(root)?.let { return it }
+
+        return null
+    }
+
+    private fun isImageEditingResultReady(data: JsonElement): Boolean {
+        return extractVideoUrl(data) != null
     }
 
     private fun parseCategories(jsonElement: JsonElement): List<CategoryModel> {

@@ -24,6 +24,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private var selectedCategoryCode: String = "ALL"
     private var mediaPlayer: MediaPlayer? = null
     private var currentPlayingPosition: Int = -1
+    private var audioActionJob: kotlinx.coroutines.Job? = null
 
     override fun initView() {
         binding.tvTopTitle.text = getString(R.string.func_04_music)
@@ -46,8 +47,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             onPreviewClick = { track, position ->
                 toggleAudioPreview(track, position)
             },
-            onSelectClick = { track ->
-                selectTrack(track)
+            onSelectClick = { track, position ->
+                selectTrack(track, position)
             }
         )
         binding.rvMusicTracks.layoutManager = LinearLayoutManager(requireContext())
@@ -132,6 +133,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             return
         }
 
+        // Hủy bất kỳ tác vụ tải hoặc chọn trước đó đang diễn ra
+        audioActionJob?.cancel()
+        audioActionJob = null
+
         if (currentPlayingPosition == position && mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
             musicAdapter.setPlayingState(position, false)
@@ -140,44 +145,108 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
         stopAudio()
 
-        try {
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(audioUrl)
-                setOnPreparedListener { mp ->
-                    mp.start()
-                    currentPlayingPosition = position
-                    musicAdapter.setPlayingState(position, true)
-                }
-                setOnCompletionListener {
-                    musicAdapter.setPlayingState(position, false)
-                    currentPlayingPosition = -1
-                }
-                setOnErrorListener { _, _, _ ->
-                    musicAdapter.setPlayingState(position, false)
-                    currentPlayingPosition = -1
-                    true
-                }
-                prepareAsync()
+        // Hiển thị loading indicator tại icon nghe thử của item (đồng thời adapter tự clear các loading khác)
+        musicAdapter.setPreviewLoading(position)
+
+        audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
+            val cachedFile = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+                requireContext(),
+                audioUrl
+            )
+
+            if (!isAdded || view == null) return@launch
+
+            if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
+                musicAdapter.clearAllLoading()
+                Toast.makeText(requireContext(), "Không thể tải bản nhạc xem trước", Toast.LENGTH_SHORT).show()
+                return@launch
             }
-        } catch (e: Exception) {
-            musicAdapter.setPlayingState(position, false)
+
+            try {
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(
+                        android.media.AudioAttributes.Builder()
+                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setDataSource(cachedFile.absolutePath)
+                    setOnPreparedListener { mp ->
+                        mp.start()
+                        currentPlayingPosition = position
+                        musicAdapter.setPlayingState(position, true)
+                    }
+                    setOnCompletionListener {
+                        musicAdapter.setPlayingState(position, false)
+                        currentPlayingPosition = -1
+                    }
+                    setOnErrorListener { _, _, _ ->
+                        musicAdapter.setPlayingState(position, false)
+                        currentPlayingPosition = -1
+                        true
+                    }
+                    prepareAsync()
+                }
+            } catch (e: Exception) {
+                musicAdapter.setPlayingState(position, false)
+            }
         }
     }
 
-    private fun selectTrack(track: TemplateModel) {
-        stopAudio()
-        Toast.makeText(requireContext(), "Đã chọn nhạc: ${track.title}", Toast.LENGTH_SHORT).show()
+    private fun selectTrack(track: TemplateModel, position: Int) {
+        // Hủy bất kỳ tác vụ tải nghe thử hoặc chọn trước đó
+        audioActionJob?.cancel()
+        audioActionJob = null
 
-        // Return selected music title to parent screen (e.g. MemoriesFragment)
+        stopAudio()
+
+        val audioUrl = track.safeAudioUrl
+        if (audioUrl.isNullOrBlank()) {
+            returnTrackResult(track, null)
+            return
+        }
+
+        // Hiển thị loading tại nút Chọn (tự động xóa loading ở tất cả nút khác)
+        musicAdapter.setSelectLoading(position)
+
+        audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
+            val cachedFile = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+                requireContext(),
+                audioUrl
+            )
+
+            if (!isAdded || view == null) return@launch
+
+            musicAdapter.clearAllLoading()
+            returnTrackResult(track, cachedFile?.absolutePath)
+        }
+    }
+
+    private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
+        // Return selected music title, audio URL, cached local path, and cover image to parent screen
         findNavController().previousBackStackEntry?.savedStateHandle?.set(
             "selected_music_title",
             track.title
+        )
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+            "selected_music_audio_url",
+            track.safeAudioUrl
+        )
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+            "selected_music_file_path",
+            cachedFilePath
+        )
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+            "selected_music_image_url",
+            track.safeImageUrl
         )
 
         findNavController().popBackStack()
     }
 
     private fun stopAudio() {
+        audioActionJob?.cancel()
+        audioActionJob = null
         try {
             if (mediaPlayer?.isPlaying == true) {
                 mediaPlayer?.stop()
@@ -191,6 +260,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 musicAdapter.setPlayingState(currentPlayingPosition, false)
                 currentPlayingPosition = -1
             }
+            musicAdapter.clearAllLoading()
         }
     }
 
@@ -200,6 +270,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     }
 
     override fun onDestroyView() {
+        audioActionJob?.cancel()
+        audioActionJob = null
         stopAudio()
         super.onDestroyView()
     }
