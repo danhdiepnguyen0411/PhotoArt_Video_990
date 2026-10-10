@@ -15,6 +15,8 @@ abstract class BaseFragment<VB : ViewBinding>(
     val binding get() = _binding!!
     val bindingOrNull get() = _binding
 
+    private var appLoadingDialog: com.example.phortart_video_990.core.dialog.AppLoadingDialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,7 +37,44 @@ abstract class BaseFragment<VB : ViewBinding>(
     open fun initView() {}
     open fun initListener() {}
 
+    /**
+     * Hiển thị loading dialog chuẩn chung cho toàn bộ app
+     */
+    fun showLoading(
+        title: String = "Đang xử lý...",
+        subtitle: String? = "Vui lòng chờ trong giây lát",
+        cancelable: Boolean = false
+    ) {
+        val ctx = context ?: return
+        if (appLoadingDialog == null) {
+            appLoadingDialog = com.example.phortart_video_990.core.dialog.AppLoadingDialog.show(
+                context = ctx,
+                title = title,
+                subtitle = subtitle,
+                cancelable = cancelable
+            )
+        } else {
+            appLoadingDialog?.updateMessage(title, subtitle)
+            if (appLoadingDialog?.isShowing != true) {
+                try {
+                    appLoadingDialog?.show()
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    /**
+     * Ẩn loading dialog chung
+     */
+    fun hideLoading() {
+        try {
+            appLoadingDialog?.dismiss()
+        } catch (_: Exception) {}
+        appLoadingDialog = null
+    }
+
     override fun onDestroyView() {
+        hideLoading()
         super.onDestroyView()
         _binding = null
     }
