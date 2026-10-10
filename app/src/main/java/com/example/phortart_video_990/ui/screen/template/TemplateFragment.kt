@@ -1,5 +1,8 @@
 package com.example.phortart_video_990.ui.screen.template
 
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,6 +24,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     private lateinit var templateAdapter: TemplateAdapter
 
     override fun initView() {
+        setupTitleGradient()
+
         // Setup Dynamic Category Filter RecyclerView
         categoryAdapter = CategoryAdapter(
             categories = viewModel.categories.value,
@@ -43,6 +48,23 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         binding.rvTemplates.adapter = templateAdapter
 
         observeData()
+    }
+
+    private fun setupTitleGradient() {
+        binding.tvTemplateHeaderTitle.post {
+            val paint = binding.tvTemplateHeaderTitle.paint
+            val width = paint.measureText(binding.tvTemplateHeaderTitle.text.toString())
+            if (width > 0) {
+                val textShader = LinearGradient(
+                    0f, 0f, width, 0f,
+                    intArrayOf(Color.parseColor("#4A7BFE"), Color.parseColor("#9153EE")),
+                    null,
+                    Shader.TileMode.CLAMP
+                )
+                binding.tvTemplateHeaderTitle.paint.shader = textShader
+                binding.tvTemplateHeaderTitle.invalidate()
+            }
+        }
     }
 
     override fun initListener() {

@@ -4,47 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_bg">
+    android:background="@drawable/bg_restore_screen">
 
-    <!-- Top Bar -->
-    <LinearLayout
-        android:id="@+id/llTopBar"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
+    <!-- Circular Back Button -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="3dp"
+        app:cardPreventCornerOverlap="false"
+        app:strokeWidth="0dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
             android:contentDescription="@string/btn_back"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/navy" />
-
-        <TextView
-            android:id="@+id/tvTopTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/feature_restore_title"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+            android:src="@drawable/ic_chevron_left" />
+    </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/btnStartRestore"
-        app:layout_constraintTop_toBottomOf="@+id/llTopBar">
+        app:layout_constraintTop_toBottomOf="@+id/btnBack">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,151 +46,285 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="20dp">
 
-            <!-- Feature Illustration Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="3dp"
-                app:strokeColor="@color/card_stroke"
-                app:strokeWidth="1dp">
+            <!-- 3D Layered Illustration Block with Blue Under-Layer & Floating Badge -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutIllustration"
+                android:layout_width="144dp"
+                android:layout_height="144dp">
 
-                <ImageView
-                    android:id="@+id/ivFeatureArt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="16dp"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="Feature Art"
-                    android:src="@drawable/feature_restore_photo" />
-            </com.google.android.material.card.MaterialCardView>
+                <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left) -->
+                <View
+                    android:id="@+id/layerBackBlue"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_restore_back_layer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- 2. Main Glassmorphic Photo Card Layer -->
+                <FrameLayout
+                    android:id="@+id/cardFront"
+                    android:layout_width="118dp"
+                    android:layout_height="118dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_restore_illustration"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Photo Frame"
+                        android:src="@drawable/ic_restore_illustration_photo" />
+                </FrameLayout>
+
+                <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right) -->
+                <FrameLayout
+                    android:id="@+id/badgeCompare"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="-10dp"
+                    android:layout_marginBottom="-6dp"
+                    android:background="@drawable/bg_restore_compare_badge"
+                    android:elevation="4dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/cardFront"
+                    app:layout_constraintEnd_toEndOf="@+id/cardFront">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Compare"
+                        android:src="@drawable/ic_compare_arrows" />
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Main Title: Khôi phục ảnh -->
             <TextView
-                android:id="@+id/tvFunctionName"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="@string/feature_restore_title"
-                android:textColor="@color/navy"
-                android:textSize="22sp"
+                android:text="Khôi phục ảnh"
+                android:textColor="#102148"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
+            <!-- Subtitle Description -->
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="20dp"
                 android:gravity="center"
-                android:lineSpacingExtra="3dp"
-                android:text="Khôi phục ảnh mờ, ảnh cũ và giữ lại những kỷ niệm đáng nhớ."
-                android:textColor="@color/muted"
+                android:lineSpacingExtra="4dp"
+                android:text="Biến những bức ảnh cũ, mờ, hư hỏng thành\nhình ảnh rõ nét, sống động hơn."
+                android:textColor="#6F7E94"
                 android:textSize="14sp" />
 
-            <!-- Image Upload & Preview Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardUploadRestore"
+            <!-- Features Container -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginTop="24dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/card_stroke"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <!-- Feature 1: Sửa ảnh mờ, nhòe -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:id="@+id/llRestoreUploadPrompt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="999dp"
+                        app:cardElevation="3dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:strokeWidth="0dp">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_filter_restore"
-                            app:tint="@color/primary"
-                            android:contentDescription="Upload Restore" />
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Sun Rays"
+                            android:src="@drawable/ic_feature_sun_rays" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Tải ảnh cần khôi phục lên"
-                            android:textColor="@color/navy"
-                            android:textSize="14sp"
+                            android:text="Sửa ảnh mờ, nhòe"
+                            android:textColor="#102148"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Nhấn để chọn ảnh từ thư viện"
-                            android:textColor="@color/muted"
-                            android:textSize="12sp" />
-
+                            android:layout_marginTop="3dp"
+                            android:text="Làm rõ chi tiết, sắc nét hơn."
+                            android:textColor="#8292A6"
+                            android:textSize="13.5sp" />
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/ivPreviewRestore"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:visibility="gone"
-                        android:contentDescription="Preview Restore" />
+                </LinearLayout>
 
-                    <!-- Badge "Khôi phục AI" -->
-                    <TextView
-                        android:id="@+id/tvBadgeRestore"
-                        android:layout_width="wrap_content"
+                <!-- Feature 2: Khôi phục ảnh cũ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="999dp"
+                        app:cardElevation="3dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:strokeWidth="0dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Old Photo"
+                            android:src="@drawable/ic_feature_photo" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="@drawable/bg_media_badge"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="4dp"
-                        android:text="Khôi phục AI"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Khôi phục ảnh cũ"
+                            android:textColor="#102148"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Giảm nhiễu, cải thiện màu sắc."
+                            android:textColor="#8292A6"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Feature 3: Tăng độ chân thực -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="999dp"
+                        app:cardElevation="3dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:strokeWidth="0dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="True Details"
+                            android:src="@drawable/ic_feature_focus_lens" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tăng độ chân thực"
+                            android:textColor="#102148"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Giữ nguyên vẻ tự nhiên của ảnh."
+                            android:textColor="#8292A6"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Restore Action Button -->
-    <androidx.appcompat.widget.AppCompatButton
+    <!-- Bottom Action Button: Bắt đầu ngay -> -->
+    <LinearLayout
         android:id="@+id/btnStartRestore"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="56dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="28dp"
-        android:background="@drawable/bg_btn_primary"
-        android:drawableEnd="@drawable/ic_arrow_right"
-        android:paddingHorizontal="24dp"
-        android:text="Bắt đầu khôi phục"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:background="@drawable/bg_btn_start_restore"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bắt đầu ngay"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Next"
+            android:src="@drawable/ic_arrow_forward_white" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

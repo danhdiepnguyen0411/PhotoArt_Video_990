@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Center hollow circle -->
+    <path
+        android:strokeColor="#4D7BF6"
+        android:strokeWidth="1.75"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M12,12m-3.8,0a3.8,3.8 0 1,1 7.6,0a3.8,3.8 0 1,1 -7.6,0" />
+    <!-- 8 rays with clear gap from the center circle -->
+    <path
+        android:strokeColor="#4D7BF6"
+        android:strokeWidth="1.75"
+        android:strokeLineCap="round"
+        android:pathData="M12,2v2.8M12,19.2V22M2,12h2.8M19.2,12H22M4.93,4.93l2,2M17.07,17.07l2,2M4.93,19.07l2,-2M17.07,6.93l2,-2" />
+</vector>
