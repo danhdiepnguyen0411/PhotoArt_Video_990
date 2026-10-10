@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="16dp"
+    android:viewportWidth="200"
+    android:viewportHeight="16">
+    <path
+        android:strokeColor="#A4B4F2"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="
+        M4,8v0 M10,6v4 M16,4v8 M22,7v2 M28,3v10 M34,5v6 M40,2v12 M46,6v4 M52,4v8 M58,7v2 M64,1v14 M70,5v6 M76,3v10 M82,6v4 M88,2v12 M94,5v6 M100,4v8 M106,7v2 M112,3v10 M118,6v4 M124,1v14 M130,5v6 M136,4v8 M142,7v2 M148,3v10 M154,6v4 M160,2v12 M166,5v6 M172,4v8 M178,7v2 M184,5v6 M190,7v2 M196,8v0" />
+</vector>

@@ -94,6 +94,19 @@
         <action
             android:id="@+id/action_memoriesFragment_to_musicFragment"
             app:destination="@id/musicFragment" />
+        <action
+            android:id="@+id/action_memoriesFragment_to_videoResultFragment"
+            app:destination="@id/videoResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/videoResultFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.memories.VideoResultFragment"
+        android:label="VideoResultFragment"
+        tools:layout="@layout/fragment_video_result">
+        <action
+            android:id="@+id/action_videoResultFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
     </fragment>
 
     <fragment

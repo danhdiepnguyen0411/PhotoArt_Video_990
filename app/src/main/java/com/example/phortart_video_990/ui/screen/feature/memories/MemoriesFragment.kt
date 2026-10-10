@@ -31,20 +31,65 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     private var selectedMusicTitle: String? = null
+    private var selectedMusicAudioUrl: String? = null
+    private var selectedMusicImageUrl: String? = null
 
     override fun initView() {
         binding.tvTopTitle.text = getString(R.string.feature_video_title).replace("\n", " ")
 
         updatePhotosUi()
 
+        // Read any already set music selection immediately from savedStateHandle (for first-time navigation)
+        val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        stateHandle?.get<String>("selected_music_title")?.let { musicTitle ->
+            if (musicTitle.isNotBlank()) {
+                selectedMusicTitle = musicTitle
+                binding.tvSelectedMusicTitle.text = musicTitle
+                binding.tvSelectedMusicSubtitle.text = "Đã chọn nhạc nền cho video"
+            }
+        }
+        stateHandle?.get<String?>("selected_music_audio_url")?.let { audioUrl ->
+            selectedMusicAudioUrl = audioUrl
+        }
+        stateHandle?.get<String?>("selected_music_image_url")?.let { imageUrl ->
+            selectedMusicImageUrl = imageUrl
+            if (!imageUrl.isNullOrBlank()) {
+                binding.ivMusicIcon.load(imageUrl) {
+                    crossfade(true)
+                    error(R.drawable.ic_func_music)
+                    placeholder(R.drawable.ic_func_music)
+                }
+            } else {
+                binding.ivMusicIcon.setImageResource(R.drawable.ic_func_music)
+            }
+        }
+
         // Observe returned music selection from MusicFragment
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<String>("selected_music_title")
+        stateHandle?.getLiveData<String>("selected_music_title")
             ?.observe(viewLifecycleOwner) { musicTitle ->
                 if (!musicTitle.isNullOrBlank()) {
                     selectedMusicTitle = musicTitle
                     binding.tvSelectedMusicTitle.text = musicTitle
                     binding.tvSelectedMusicSubtitle.text = "Đã chọn nhạc nền cho video"
+                }
+            }
+
+        stateHandle?.getLiveData<String?>("selected_music_audio_url")
+            ?.observe(viewLifecycleOwner) { audioUrl ->
+                selectedMusicAudioUrl = audioUrl
+            }
+
+        stateHandle?.getLiveData<String?>("selected_music_image_url")
+            ?.observe(viewLifecycleOwner) { imageUrl ->
+                selectedMusicImageUrl = imageUrl
+                if (!imageUrl.isNullOrBlank()) {
+                    binding.ivMusicIcon.load(imageUrl) {
+                        crossfade(true)
+                        error(R.drawable.ic_func_music)
+                        placeholder(R.drawable.ic_func_music)
+                    }
+                } else {
+                    binding.ivMusicIcon.setImageResource(R.drawable.ic_func_music)
                 }
             }
     }
@@ -142,29 +187,18 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 return@setOnClickListener
             }
 
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
+            val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+            val finalTrack = selectedMusicTitle ?: stateHandle?.get<String>("selected_music_title")
+            val finalAudioUrl = selectedMusicAudioUrl ?: stateHandle?.get<String?>("selected_music_audio_url")
+            val finalImageUrl = selectedMusicImageUrl ?: stateHandle?.get<String?>("selected_music_image_url")
 
-            val videoTitle = if (!selectedMusicTitle.isNullOrBlank()) {
-                "Video tạo từ ${selectedPhotos.size} ảnh AI • Nhạc: $selectedMusicTitle"
-            } else {
-                "Video tạo từ ${selectedPhotos.size} ảnh AI"
-            }
-
-            val historyItem = HistoryItemModel(
-                type = "Gom ảnh",
-                title = videoTitle,
-                date = currentDate,
-                imageUri = selectedPhotos.first().toString()
+            val bundle = VideoResultFragment.createBundle(
+                photos = selectedPhotos.map { it.toString() },
+                track = finalTrack,
+                audioUrl = finalAudioUrl,
+                imageUrl = finalImageUrl
             )
-            historyRepository.addHistoryItem(historyItem)
-
-            Toast.makeText(
-                requireContext(),
-                "Đã tạo video thành công từ ${selectedPhotos.size} ảnh của bạn!",
-                Toast.LENGTH_SHORT
-            ).show()
-            findNavController().popBackStack()
+            findNavController().navigate(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
         }
     }
 }
