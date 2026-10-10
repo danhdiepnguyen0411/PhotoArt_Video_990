@@ -1,6 +1,7 @@
 package com.example.phortart_video_990.ui.screen.feature.restore
 
 import android.net.Uri
+import com.example.phortart_video_990.R
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,19 +23,10 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val historyItem = HistoryItemModel(
-                type = "Khôi phục",
-                title = "Khôi phục ảnh cũ",
-                date = currentDate,
-                imageUri = uri.toString()
+            findNavController().navigate(
+                R.id.action_restoreFragment_to_restoreLoadingFragment,
+                androidx.core.os.bundleOf(RestoreLoadingFragment.KEY_IMAGE_URI to uri.toString())
             )
-            historyRepository.addHistoryItem(historyItem)
-
-            Toast.makeText(requireContext(), "Đã chọn ảnh và bắt đầu khôi phục!", Toast.LENGTH_SHORT).show()
-            findNavController().popBackStack()
         }
     }
 

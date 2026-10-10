@@ -116,13 +116,57 @@
         android:id="@+id/restoreFragment"
         android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreFragment"
         android:label="RestoreFragment"
-        tools:layout="@layout/fragment_restore" />
+        tools:layout="@layout/fragment_restore">
+        <action
+            android:id="@+id/action_restoreFragment_to_restoreLoadingFragment"
+            app:destination="@id/restoreLoadingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/restoreLoadingFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreLoadingFragment"
+        android:label="RestoreLoadingFragment"
+        tools:layout="@layout/fragment_restore_loading">
+        <action
+            android:id="@+id/action_restoreLoadingFragment_to_restoreResultFragment"
+            app:destination="@id/restoreResultFragment"
+            app:popUpTo="@id/restoreFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/restoreResultFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreResultFragment"
+        android:label="RestoreResultFragment"
+        tools:layout="@layout/fragment_restore_result" />
 
     <fragment
         android:id="@+id/enhanceFragment"
         android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceFragment"
         android:label="EnhanceFragment"
-        tools:layout="@layout/fragment_enhance" />
+        tools:layout="@layout/fragment_enhance">
+        <action
+            android:id="@+id/action_enhanceFragment_to_enhanceLoadingFragment"
+            app:destination="@id/enhanceLoadingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/enhanceLoadingFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceLoadingFragment"
+        android:label="EnhanceLoadingFragment"
+        tools:layout="@layout/fragment_enhance_loading">
+        <action
+            android:id="@+id/action_enhanceLoadingFragment_to_enhanceResultFragment"
+            app:destination="@id/enhanceResultFragment"
+            app:popUpTo="@id/enhanceFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/enhanceResultFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceResultFragment"
+        android:label="EnhanceResultFragment"
+        tools:layout="@layout/fragment_enhance_result" />
 
     <fragment
         android:id="@+id/musicFragment"

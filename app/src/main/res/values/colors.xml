@@ -11,6 +11,8 @@
     <color name="splash_subtitle">#5A7AA8</color>
     <color name="soft">#8296BC</color>
     <color name="line">#387896CD</color>
+    <color name="nav_active">#4A63E8</color>
+    <color name="nav_inactive">#8F9BBD</color>
 
     <!-- Banner DS Palette -->
     <color name="banner_navy">#17327C</color>

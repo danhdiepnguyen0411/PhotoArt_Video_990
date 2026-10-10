@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="uninstall_shortcut"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_uninstall_trash"
+        android:shortcutShortLabel="@string/shortcut_uninstall"
+        android:shortcutLongLabel="@string/shortcut_uninstall_desc">
+        <intent
+            android:action="com.example.phortart_video_990.ACTION_UNINSTALL"
+            android:targetPackage="com.example.phortart_video_990"
+            android:targetClass="com.example.phortart_video_990.MainActivity">
+            <extra android:name="target_screen" android:value="uninstall" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>
