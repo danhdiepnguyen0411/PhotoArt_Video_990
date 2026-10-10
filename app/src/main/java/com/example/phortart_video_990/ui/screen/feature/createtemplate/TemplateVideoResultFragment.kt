@@ -44,6 +44,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
     private var isExporting = false
+    private var isMusicChanged = false
 
     // Playback state
     private var isPlaying = false
@@ -93,6 +94,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
                 appDocumentVideoFile = null
                 tempShareCacheFile?.delete()
                 tempShareCacheFile = null
+                isMusicChanged = true
 
                 updateMusicInfoUi()
                 handleMusicChanged(newAudioUrl, newFilePath)
@@ -435,16 +437,19 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
                     title = "PhotoArt_Template_Video"
                 )
 
-                // 3. Cập nhật vào Lịch sử
-                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-                val title = if (!musicTitle.isNullOrBlank()) "Mẫu AI • Nhạc: $musicTitle" else "Video Mẫu AI"
-                val item = HistoryItemModel(
-                    type = "Mẫu AI",
-                    title = title,
-                    date = dateFormat.format(Date()),
-                    imageUri = docFile.absolutePath
-                )
-                historyRepository.addHistoryItem(item)
+                // 3. Chỉ cập nhật thêm vào Lịch sử nếu người dùng đã đổi nhạc mới
+                if (isMusicChanged) {
+                    val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                    val title = if (!musicTitle.isNullOrBlank()) "Mẫu AI • Nhạc: $musicTitle" else "Video Mẫu AI"
+                    val item = HistoryItemModel(
+                        type = "Mẫu AI",
+                        title = title,
+                        date = dateFormat.format(Date()),
+                        imageUri = docFile.absolutePath
+                    )
+                    historyRepository.addHistoryItem(item)
+                    isMusicChanged = false
+                }
 
                 Toast.makeText(requireContext(), "Đã lưu video thành công vào thư viện ảnh!", Toast.LENGTH_SHORT).show()
                 // Tiếp tục ở lại màn hình để người dùng có thể xem lại hoặc chia sẻ tiếp

@@ -18,12 +18,17 @@ data class CategoryModel(
                 name.startsWith("MUSIC_", ignoreCase = true)
 
     val isAiTool: Boolean
-        get() = code.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
-                name.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
-                code.equals("AI_TOOL", ignoreCase = true) ||
-                name.equals("AI_TOOL", ignoreCase = true) ||
-                groupCode.equals("AI_TOOL", ignoreCase = true) ||
-                groupName.equals("AI_TOOL", ignoreCase = true)
+        get() {
+            val c = code.replace("_", " ").trim().lowercase()
+            val n = name.replace("_", " ").trim().lowercase()
+            val gc = groupCode?.replace("_", " ")?.trim()?.lowercase().orEmpty()
+            val gn = groupName?.replace("_", " ")?.trim()?.lowercase().orEmpty()
+            return c.contains("ai tool") || c.contains("ai gen") ||
+                    n.contains("ai tool") || n.contains("ai gen") ||
+                    gc.contains("ai tool") || gc.contains("ai gen") ||
+                    gn.contains("ai tool") || gn.contains("ai gen") ||
+                    c == "ai_tool" || n == "ai_tool"
+        }
 
     val displayName: String
         get() {

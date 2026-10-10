@@ -18,6 +18,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
     private val filterTabs = listOf(
         HistoryFilterItem("Tất cả", R.drawable.ic_filter_all),
         HistoryFilterItem("Gom ảnh", R.drawable.ic_filter_music),
+        HistoryFilterItem("Mẫu AI", R.drawable.ic_filter_template),
         HistoryFilterItem("Prompt AI", R.drawable.ic_filter_sparkle),
         HistoryFilterItem("Khôi phục", R.drawable.ic_filter_restore)
     )
@@ -40,16 +41,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
         historyAdapter = HistoryAdapter(
             items = emptyList(),
             onItemClick = { item ->
-                // Dialog xác nhận xem hoặc xóa mục lịch sử
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle(item.title)
-                    .setMessage("Bạn muốn xóa mục này khỏi Lịch sử và bộ nhớ máy?")
-                    .setPositiveButton("Xóa") { _, _ ->
-                        historyRepository.deleteHistoryItem(item)
-                        loadHistory()
-                    }
-                    .setNegativeButton("Hủy", null)
-                    .show()
+                HistoryPreviewDialog.newInstance(item) { deletedItem ->
+                    historyRepository.deleteHistoryItem(deletedItem)
+                    loadHistory()
+                }.show(childFragmentManager, "HistoryPreviewDialog")
             }
         )
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())

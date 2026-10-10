@@ -25,15 +25,32 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
             val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
             val currentDate = dateFormat.format(Date())
 
+            // Copy file ảnh vào thư mục bộ nhớ bền vững của App
+            var savedPath = uri.toString()
+            try {
+                val inputDir = java.io.File(requireContext().filesDir, "PhotoArtRestores").apply { mkdirs() }
+                val targetFile = java.io.File(inputDir, "restore_${System.currentTimeMillis()}.jpg")
+                requireContext().contentResolver.openInputStream(uri)?.use { input ->
+                    java.io.FileOutputStream(targetFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                if (targetFile.exists() && targetFile.length() > 0) {
+                    savedPath = targetFile.absolutePath
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             val historyItem = HistoryItemModel(
                 type = "Khôi phục",
                 title = "Khôi phục ảnh cũ",
                 date = currentDate,
-                imageUri = uri.toString()
+                imageUri = savedPath
             )
             historyRepository.addHistoryItem(historyItem)
 
-            Toast.makeText(requireContext(), "Đã chọn ảnh và bắt đầu khôi phục!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Đã lưu ảnh khôi phục vào Lịch sử!", Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
         }
     }

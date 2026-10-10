@@ -34,6 +34,18 @@
                 android:contentDescription="History Thumbnail"
                 android:scaleType="centerCrop"
                 tools:src="@drawable/history_1" />
+
+            <ImageView
+                android:id="@+id/ivVideoBadge"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_circle_close"
+                android:padding="5dp"
+                android:src="@drawable/ic_play_small"
+                android:visibility="gone"
+                app:tint="@color/white"
+                tools:visibility="visible" />
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout

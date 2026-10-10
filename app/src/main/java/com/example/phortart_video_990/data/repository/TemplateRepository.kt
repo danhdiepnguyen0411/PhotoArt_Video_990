@@ -112,7 +112,7 @@ class TemplateRepository(
                 } else {
                     try {
                         val allTemplates = parseTemplates(jsonElement)
-                        val visualTemplates = allTemplates.filter { !it.isMusic }
+                        val visualTemplates = allTemplates.filter { !it.isMusic && !it.isAiTool }
 
                         if (visualTemplates.isEmpty()) {
                             continuation.resume(emptyList())

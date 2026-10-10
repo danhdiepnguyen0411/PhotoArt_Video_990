@@ -261,8 +261,25 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     binding.btnCreateVideo.isEnabled = true
 
                     if (generatedVideoFile.exists() && generatedVideoFile.length() > 0) {
+                        // Lưu bản cố định vào App Documents & ghi nhận vào History ngay lập tức
+                        val savedDoc = VideoGenerator.saveVideoToAppDocuments(
+                            context = requireContext(),
+                            sourceFile = generatedVideoFile,
+                            title = "PhotoArt_Memories_${System.currentTimeMillis()}"
+                        )
+
+                        val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                        val videoTitle = if (!finalTrack.isNullOrBlank()) "Gom ảnh • Nhạc: $finalTrack" else "Video gom ảnh"
+                        val historyItem = HistoryItemModel(
+                            type = "Gom ảnh",
+                            title = videoTitle,
+                            date = dateFormat.format(Date()),
+                            imageUri = savedDoc.absolutePath
+                        )
+                        historyRepository.addHistoryItem(historyItem)
+
                         navigateToVideoResult(
-                            videoPath = generatedVideoFile.absolutePath,
+                            videoPath = savedDoc.absolutePath,
                             finalTrack = finalTrack,
                             finalAudioUrl = finalAudioUrl,
                             finalAudioPath = resolvedAudioPath,

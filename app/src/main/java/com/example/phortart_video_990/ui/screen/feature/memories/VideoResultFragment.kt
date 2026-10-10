@@ -50,6 +50,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
     private var isExporting = false
+    private var isMusicChanged = false
 
     override fun initView() {
         val args = arguments
@@ -87,6 +88,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                 appDocumentVideoFile = null
                 tempShareCacheFile?.delete()
                 tempShareCacheFile = null
+                isMusicChanged = true
 
                 updateMusicInfoUi()
                 handleMusicChanged(newAudioUrl, newFilePath)
@@ -432,17 +434,20 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     title = "PhotoArt_Memories_Video"
                 )
 
-                // 3. Lưu vào Lịch sử (History) của app
-                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-                val currentDate = dateFormat.format(Date())
+                // 3. Chỉ lưu thêm vào Lịch sử nếu người dùng đã đổi nhạc mới
+                if (isMusicChanged) {
+                    val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                    val currentDate = dateFormat.format(Date())
 
-                val historyItem = HistoryItemModel(
-                    type = "Gom ảnh",
-                    title = videoTitle,
-                    date = currentDate,
-                    imageUri = docFile.absolutePath
-                )
-                historyRepository.addHistoryItem(historyItem)
+                    val historyItem = HistoryItemModel(
+                        type = "Gom ảnh",
+                        title = videoTitle,
+                        date = currentDate,
+                        imageUri = docFile.absolutePath
+                    )
+                    historyRepository.addHistoryItem(historyItem)
+                    isMusicChanged = false
+                }
 
                 Toast.makeText(requireContext(), "Đã lưu video thành công vào ứng dụng và thư viện ảnh!", Toast.LENGTH_SHORT).show()
             } else {

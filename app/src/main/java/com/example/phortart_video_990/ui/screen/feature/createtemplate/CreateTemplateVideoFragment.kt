@@ -286,8 +286,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 // 6. Điều hướng sang màn xem video kết quả
                 val finalVideo = finalVideoToPlay
                 if (!finalVideo.isNullOrBlank()) {
-                    saveToHistory(finalVideo, photoUri.toString())
-                    navigateToResult(finalVideo, photoUri.toString(), audioPath)
+                    val savedVideoPath = saveToHistory(finalVideo, photoUri.toString())
+                    navigateToResult(savedVideoPath, photoUri.toString(), audioPath)
                 } else {
                     // Nếu backend trả về kết quả thành công nhưng không có direct video url, fallback điều hướng với ảnh
                     navigateToResult(null, photoUri.toString(), audioPath)
@@ -312,18 +312,35 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         findNavController().navigate(R.id.action_createTemplateVideoFragment_to_templateVideoResultFragment, bundle)
     }
 
-    private fun saveToHistory(videoUrl: String, photoUri: String) {
-        try {
-            val dateStr = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+    private suspend fun saveToHistory(videoPathOrUrl: String, photoUri: String): String {
+        return try {
+            val dateStr = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault()).format(Date())
+            val sourceFile = File(videoPathOrUrl)
+            
+            // Nếu là file video cục bộ, lưu vào App Documents để tồn tại vĩnh viễn
+            val finalPath = if (sourceFile.exists()) {
+                val docFile = VideoGenerator.saveVideoToAppDocuments(
+                    context = requireContext(),
+                    sourceFile = sourceFile,
+                    title = "Template_AI_${System.currentTimeMillis()}"
+                )
+                docFile.absolutePath
+            } else {
+                videoPathOrUrl
+            }
+
             val item = HistoryItemModel(
-                title = templateTitle,
+                title = templateTitle.ifBlank { "Video Mẫu AI" },
                 date = dateStr,
                 type = "Mẫu AI",
                 imageUrl = templateThumbnailUrl.ifBlank { photoUri },
-                imageUri = photoUri
+                imageUri = finalPath
             )
             historyRepository.addHistoryItem(item)
-        } catch (_: Exception) {}
+            finalPath
+        } catch (e: Exception) {
+            videoPathOrUrl
+        }
     }
 
     private fun copyUriToFile(uri: Uri): File? {

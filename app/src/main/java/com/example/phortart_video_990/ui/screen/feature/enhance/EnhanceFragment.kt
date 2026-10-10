@@ -51,14 +51,24 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
                 val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
                 val currentDate = dateFormat.format(Date())
 
+                // Chọn ảnh kết quả tương ứng theo prompt để làm thumbnail
+                val resultImageRes = when {
+                    text.contains("Cyberpunk", ignoreCase = true) || text.contains("chiến binh", ignoreCase = true) -> R.drawable.suggestion_ai_style
+                    text.contains("Anime", ignoreCase = true) || text.contains("Ghibli", ignoreCase = true) -> R.drawable.suggestion_ai_portrait
+                    text.contains("Fantasy", ignoreCase = true) || text.contains("Lâu đài", ignoreCase = true) -> R.drawable.suggestion_ai_fantasy
+                    else -> R.drawable.suggestion_ai_effect
+                }
+
                 val historyItem = HistoryItemModel(
                     type = "Prompt AI",
                     title = text,
-                    date = currentDate
+                    date = currentDate,
+                    imageRes = resultImageRes
                 )
                 historyRepository.addHistoryItem(historyItem)
 
-                Toast.makeText(requireContext(), "Đang sinh ảnh nghệ thuật bằng AI...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Đã tạo ảnh và lưu vào Lịch sử!", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
             }
         }
     }

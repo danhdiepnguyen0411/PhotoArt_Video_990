@@ -84,7 +84,8 @@
     <string name="history_title">Lịch sử</string>
     <string name="history_subtitle">Xem lại những bức ảnh bạn đã chỉnh sửa và lưu giữ tại đây.</string>
     <string name="history_tab_all">Tất cả</string>
-    <string name="history_tab_video">Tạo video</string>
+    <string name="history_tab_video">Gom ảnh</string>
+    <string name="history_tab_template">Mẫu AI</string>
     <string name="history_tab_prompt">Prompt AI</string>
     <string name="history_tab_restore">Khôi phục</string>
     <string name="history_empty_title">Chưa có bản lưu nào</string>

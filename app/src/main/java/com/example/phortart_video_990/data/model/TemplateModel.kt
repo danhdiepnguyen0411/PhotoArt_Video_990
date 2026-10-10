@@ -35,4 +35,15 @@ data class TemplateModel(
                 templateType.equals("AUDIO", ignoreCase = true) ||
                 videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true ||
                 imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true
+
+    val isAiTool: Boolean
+        get() {
+            val cat = category.replace("_", " ").trim().lowercase()
+            val tit = title.replace("_", " ").trim().lowercase()
+            val idStr = id.replace("_", " ").trim().lowercase()
+            return cat.contains("ai tool") || cat.contains("ai gen") ||
+                    tit.contains("ai tool") || tit.contains("ai gen") ||
+                    idStr.contains("ai tool") || idStr.contains("ai gen") ||
+                    cat == "ai_tool" || tit == "ai_tool"
+        }
 }

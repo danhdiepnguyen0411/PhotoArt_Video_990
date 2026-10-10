@@ -234,10 +234,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun loadApiTemplates() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val templates = templateRepository.getTemplates()
-                if (templates.isNotEmpty()) {
+                // Must have a valid image and not belong to AI TOOL / AI GEN
+                val validTemplates = templateRepository.getTemplates().filter {
+                    !it.isAiTool && !it.safeImageUrl.isNullOrBlank()
+                }
+                if (validTemplates.isNotEmpty()) {
                     val flameColor = Color.parseColor("#FF7A2F")
-                    val hotList = templates.take(8).map {
+                    val hotList = validTemplates.take(8).map {
                         HomeMediaItemModel(
                             label = it.title,
                             category = it.category,
@@ -248,7 +251,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     }
                     hotTemplateAdapter.submitList(hotList)
 
-                    val remaining = if (templates.size > 8) templates.drop(8) else templates
+                    val remaining = if (validTemplates.size > 8) validTemplates.drop(8) else validTemplates
                     val suggestionList = remaining.take(8).map {
                         HomeMediaItemModel(
                             label = it.title,

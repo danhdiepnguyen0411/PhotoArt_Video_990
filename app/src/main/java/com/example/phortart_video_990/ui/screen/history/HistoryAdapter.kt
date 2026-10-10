@@ -47,6 +47,12 @@ class HistoryAdapter(
                 binding.ivHistoryThumb.setImageResource(R.drawable.bg_card_white)
             }
 
+            val isVideo = item.type.equals("Gom ảnh", ignoreCase = true) ||
+                    item.type.equals("Mẫu AI", ignoreCase = true) ||
+                    item.imageUri?.endsWith(".mp4", ignoreCase = true) == true
+
+            binding.ivVideoBadge.visibility = if (isVideo) android.view.View.VISIBLE else android.view.View.GONE
+
             binding.tvHistoryTitle.text = item.title
             binding.tvHistoryDate.text = item.date
             binding.root.setOnClickListener { onItemClick(item) }
