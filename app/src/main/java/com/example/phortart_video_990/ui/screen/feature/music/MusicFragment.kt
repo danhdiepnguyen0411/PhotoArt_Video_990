@@ -166,12 +166,19 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
     private fun selectTrack(track: TemplateModel) {
         stopAudio()
-        Toast.makeText(requireContext(), "Đã chọn nhạc: ${track.title}", Toast.LENGTH_SHORT).show()
 
-        // Return selected music title to parent screen (e.g. MemoriesFragment)
+        // Return selected music title, audio URL, and cover image to parent screen
         findNavController().previousBackStackEntry?.savedStateHandle?.set(
             "selected_music_title",
             track.title
+        )
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+            "selected_music_audio_url",
+            track.safeAudioUrl
+        )
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+            "selected_music_image_url",
+            track.safeImageUrl
         )
 
         findNavController().popBackStack()

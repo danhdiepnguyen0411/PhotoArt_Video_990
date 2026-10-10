@@ -28,6 +28,35 @@ class HistoryRepository(context: Context) {
         prefs.historyJson = gson.toJson(current)
     }
 
+    /**
+     * Xóa mục lịch sử và xóa file video vật lý tương ứng trong App Documents (nếu có).
+     */
+    fun deleteHistoryItem(item: HistoryItemModel) {
+        val current = getHistoryList().toMutableList()
+        val removed = current.removeAll { it.title == item.title && it.date == item.date }
+        if (removed) {
+            prefs.historyJson = gson.toJson(current)
+        }
+
+        // Xóa file vật lý trong App Documents nếu imageUri/filePath trỏ tới file
+        val path = item.imageUri ?: item.imageUrl
+        if (!path.isNullOrBlank()) {
+            try {
+                val file = if (path.startsWith("file://")) {
+                    java.io.File(java.net.URI(path))
+                } else if (path.startsWith("/")) {
+                    java.io.File(path)
+                } else null
+
+                if (file != null && file.exists() && file.absolutePath.contains("PhotoArtVideos")) {
+                    file.delete()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun clearHistory() {
         prefs.historyJson = null
     }

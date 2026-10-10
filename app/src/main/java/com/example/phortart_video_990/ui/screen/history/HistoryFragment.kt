@@ -37,9 +37,21 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
         binding.rvHistoryFilter.adapter = filterAdapter
 
         // History items list (starts empty, loads real user data)
-        historyAdapter = HistoryAdapter(emptyList()) { item ->
-            // Click item
-        }
+        historyAdapter = HistoryAdapter(
+            items = emptyList(),
+            onItemClick = { item ->
+                // Dialog xác nhận xem hoặc xóa mục lịch sử
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle(item.title)
+                    .setMessage("Bạn muốn xóa mục này khỏi Lịch sử và bộ nhớ máy?")
+                    .setPositiveButton("Xóa") { _, _ ->
+                        historyRepository.deleteHistoryItem(item)
+                        loadHistory()
+                    }
+                    .setNegativeButton("Hủy", null)
+                    .show()
+            }
+        )
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvHistory.adapter = historyAdapter
     }

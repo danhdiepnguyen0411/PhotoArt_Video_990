@@ -1,0 +1,57 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "id": 1,
+      "severity": "blocking",
+      "confidence": "confirmed",
+      "title": "Client first-seen/baseline NEW rule still shipped instead of server createdAt rule",
+      "files": [
+        "app/src/main/java/com/aiart/photo/video/generator/domain/policy/NewBadgePolicy.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/data/repository/TemplateBadgeRepositoryImpl.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/data/local/entity/TemplateBadgeStateEntity.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/data/local/dao/TemplateBadgeStateDao.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/di/DatabaseModule.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/ui/home/HomeViewModel.kt",
+        "app/src/main/java/com/aiart/photo/video/generator/ui/discover/BaseDiscoverViewModel.kt"
+      ],
+      "detail": "NewBadgePolicy.isNewCandidate reads state.firstSeen and compares it with BASELINE, and syncCatalog writes first_seen_at. The report cites a 'Quyết định user (vòng 3)' that does not appear in the user's messages. Per the brief, a missing createdAt must be reported as a warning; it must not be replaced with the rejected fallback.",
+      "action": "Remove syncCatalog, firstSeen, BASELINE and their call sites. Change isNewCandidate to template.createdAt > 0 && (now - createdAt).coerceAtLeast(0) <= 7d. Narrow the entity to opened codes only (template_code PK, opened_at NOT NULL) and expose StateFlow<Set<String>>. Regenerate the migration8To9 CREATE TABLE to match the Room DDL and re-run the seeded v8->v9 favorites check. Escalate to the user that the API currently returns no createdAt, so NEW stays hidden until the backend adds it."
+    },
+    {
+      "id": 2,
+      "severity": "blocking",
+      "confidence": "confirmed",
+      "title": "createdAt parsing still optLong (ISO strings silently become 0)",
+      "files": [
+        "app/src/main/java/com/aiart/photo/video/generator/data/repository/ArtTemplateRepositoryImpl.kt"
+      ],
+      "detail": "Line 567: obj.optLong(\"createdAt\", 0L). An ISO-8601 string produces 0, so NEW would never show even after the backend adds the field.",
+      "action": "Parse createdAt/created_at as a number, a numeric string, or ISO-8601. For ISO, use SimpleDateFormat with UTC and Locale.US, with and without millis, and create the formatter once per catalog parse. Do not use java.time. Fall back to 0L."
+    },
+    {
+      "id": 3,
+      "severity": "needs-user-decision",
+      "confidence": "confirmed",
+      "title": "Video icon removed instead of moved to bottom-right",
+      "files": [
+        "app/src/main/res/layout/item_home_template_card.xml",
+        "app/src/main/res/layout/item_discover_template_card.xml"
+      ],
+      "detail": "User message 2, item 3 asks for the video icon to move to bottom-right. ivVideoIndicator is absent from both card layouts (removed in cd0ce5b). The header comment now says 'no video indicator', which records the deviation but does not resolve it.",
+      "action": "Restore the video icon at bottom-right with its existing visibility, toggled both ways in bind, or get explicit user confirmation that cd0ce5b supersedes the decision."
+    },
+    {
+      "id": 4,
+      "severity": "non-blocking",
+      "confidence": "confirmed",
+      "title": "Hardcoded dp in uncommitted Discover NEW pill restyle",
+      "files": [
+        "app/src/main/res/layout/item_discover_template_card.xml"
+      ],
+      "detail": "The uncommitted diff replaces @dimen/template_badge_height with literal 6dp/2dp padding and a 6dp margin.",
+      "action": "Reuse the Home card's badge tokens or snap to @dimen/spacing_* tokens."
+    }
+  ],
+  "reviewDoc": "/Volumes/ExternalSSD/android_apps/893-PHOTO-ART/.agents/tasks/home-new-badge-review.md"
+}

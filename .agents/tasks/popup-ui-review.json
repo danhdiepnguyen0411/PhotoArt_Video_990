@@ -1,0 +1,10 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    "BLOCKING (confirmed, visual): The secondary glass pill (Exit popup 'Exit', Notification popup 'Don’t allow') renders (114,114,114) on the emulator in both keyboard and touch mode, while Figma 235:774 / 214:3189 renders ~#5D5D5D on the left fading to ~#565656 on the right, and bg_btn_dialog_glass_pill's own solid is #5E5E5E. The extra ~20 levels are the focus highlight of the ripple (cinema_btn_back_bg, 20% white) because btnSecondary is focusableInTouchMode=true in dialog_app_modal.xml and UI Automator reports it focused after show and after a tap. Fix only for GLASS (e.g. in applyGlassAppearance set isFocusableInTouchMode=false on btnPrimary/btnSecondary, or otherwise suppress the focus tint on the glass pill) so other popups are unchanged, then re-measure in touch mode: pill must sample ~93 to 86.",
+    "NON-BLOCKING (confirmed): commit f22d15d contains an unrelated 100%-similarity rename of SelectTemplateAdapter.kt (ui/create/photo/adapter -> ui/create/adapter) coming from another task's staged index. Do not revert it (that task's working tree depends on it) but keep it out of any PR/squash of this popup work.",
+    "NON-BLOCKING (likely): dialog_glass_stroke (#36FFFFFF) is 3 alpha levels from the existing cinema_btn_back_bg (#33FFFFFF); on-device border already matches Figma (~97). Prefer reusing the existing token to avoid a duplicate colour, or keep it with a note that it is Figma-measured.",
+    "NON-BLOCKING (possible): The Notification popup (3-line message wrap, frame height 428dp) was not opened in this review; RTL (ar), large font scale, 320dp width and light theme are unverified. Spot-check at least the Notification popup after fixing the pill colour."
+  ],
+  "reviewDoc": "/Volumes/ExternalSSD/android_apps/893-PHOTO-ART/.agents/tasks/popup-ui-review.md"
+}
