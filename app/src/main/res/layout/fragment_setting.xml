@@ -5,25 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
     <LinearLayout
+        android:id="@+id/llSettingContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="44dp"
-        android:paddingBottom="88dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
 
         <!-- Top Title -->
         <TextView
             android:id="@+id/tvSettingHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-black"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="14dp"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
             android:text="@string/settings_title"
-            android:textColor="#3879F6"
-            android:textSize="28sp"
+            android:textColor="#2563EB"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <!-- IAP Banner Card -->
@@ -31,19 +35,19 @@
             android:id="@+id/cardIapBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="22dp"
             android:background="@drawable/bg_iap_banner"
-            android:padding="14dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="18dp">
 
             <!-- Left Crown Art -->
             <ImageView
                 android:id="@+id/ivIapCrown"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:contentDescription="Crown"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_setting_iap"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,40 +56,45 @@
                 android:id="@+id/llIapInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="6dp"
+                android:layout_marginStart="58dp"
+                android:layout_marginEnd="72dp"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/ivIapFloating"
-                app:layout_constraintStart_toEndOf="@+id/ivIapCrown"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/tvIapTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
                     android:text="@string/settings_iap_title"
-                    android:textColor="#162858"
-                    android:textSize="16sp"
+                    android:textColor="#1A2779"
+                    android:textSize="16.5sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvIapDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:lineSpacingExtra="2dp"
                     android:text="@string/settings_iap_desc"
-                    android:textColor="#7188B5"
-                    android:textSize="12sp" />
+                    android:textColor="#6D7FA5"
+                    android:textSize="11.5sp" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnIapUpgrade"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="34dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_btn_setting_iap"
+                    android:elevation="2dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
                     android:gravity="center"
-                    android:paddingHorizontal="14dp"
+                    android:paddingHorizontal="16dp"
                     android:text="Nâng cấp ngay →"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
@@ -96,9 +105,10 @@
             <!-- Right Floating Art -->
             <ImageView
                 android:id="@+id/ivIapFloating"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:contentDescription="Star"
+                android:layout_width="92dp"
+                android:layout_height="92dp"
+                android:layout_marginEnd="-8dp"
+                android:contentDescription="Art"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_setting_iap_2"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -111,11 +121,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="10dp"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
             android:text="@string/settings_group_options"
-            android:textColor="#576E8E"
-            android:textSize="14sp"
+            android:textColor="#63769C"
+            android:textSize="13.5sp"
             android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
@@ -123,9 +135,9 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="18dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E5EDFA"
-            app:strokeWidth="1.2dp">
+            app:cardElevation="2dp"
+            app:strokeColor="#DCE8FC"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -140,12 +152,12 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="13dp">
 
                     <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:background="@drawable/bg_setting_icon_blue">
 
                         <ImageView
@@ -154,7 +166,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="Language"
                             android:src="@drawable/ic_globe"
-                            app:tint="#3879F6" />
+                            app:tint="#3B82F6" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -167,9 +179,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="@string/setting_language"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
+                            android:textColor="#1B286F"
+                            android:textSize="14.5sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -177,8 +190,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textColor="#8C9CB9"
+                            android:textSize="11.5sp"
                             tools:text="Tiếng Việt" />
                     </LinearLayout>
 
@@ -187,7 +201,7 @@
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#A0B4D2" />
+                        app:tint="#A7B6D4" />
                 </LinearLayout>
 
                 <View
@@ -202,14 +216,15 @@
                     android:id="@+id/rowNotification"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="13dp">
 
                     <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:background="@drawable/bg_setting_icon_pink">
 
                         <ImageView
@@ -218,7 +233,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="Notification"
                             android:src="@drawable/ic_bell"
-                            app:tint="#F43F5E" />
+                            app:tint="#EC4899" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -231,27 +246,26 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="@string/setting_notification"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
+                            android:textColor="#1B286F"
+                            android:textSize="14.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/setting_notification_desc"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp" />
+                            android:textColor="#8C9CB9"
+                            android:textSize="11.5sp" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.example.phortart_video_990.core.view.PillSwitchView
                         android:id="@+id/switchNotification"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        app:thumbTint="@color/switch_thumb_selector"
-                        app:trackTint="@color/switch_track_selector" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -261,11 +275,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="10dp"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
             android:text="@string/settings_group_support"
-            android:textColor="#576E8E"
-            android:textSize="14sp"
+            android:textColor="#63769C"
+            android:textSize="13.5sp"
             android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
@@ -273,9 +289,9 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="18dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E5EDFA"
-            app:strokeWidth="1.2dp">
+            app:cardElevation="2dp"
+            app:strokeColor="#DCE8FC"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -290,12 +306,12 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="13dp">
 
                     <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:background="@drawable/bg_setting_icon_green">
 
                         <ImageView
@@ -317,18 +333,20 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="@string/setting_rate"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
+                            android:textColor="#1B286F"
+                            android:textSize="14.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/setting_rate_desc"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp" />
+                            android:textColor="#8C9CB9"
+                            android:textSize="11.5sp" />
                     </LinearLayout>
 
                     <ImageView
@@ -336,7 +354,7 @@
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#A0B4D2" />
+                        app:tint="#A7B6D4" />
                 </LinearLayout>
 
                 <View
@@ -354,12 +372,12 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="13dp">
 
                     <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:background="@drawable/bg_setting_icon_purple">
 
                         <ImageView
@@ -381,18 +399,20 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="@string/setting_privacy_title"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
+                            android:textColor="#1B286F"
+                            android:textSize="14.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/setting_privacy_desc"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp" />
+                            android:textColor="#8C9CB9"
+                            android:textSize="11.5sp" />
                     </LinearLayout>
 
                     <ImageView
@@ -400,7 +420,7 @@
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#A0B4D2" />
+                        app:tint="#A7B6D4" />
                 </LinearLayout>
 
                 <View
@@ -418,12 +438,12 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="13dp">
 
                     <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:background="@drawable/bg_setting_icon_magenta">
 
                         <ImageView
@@ -432,7 +452,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="About"
                             android:src="@drawable/ic_info_circle"
-                            app:tint="#D946EF" />
+                            app:tint="#A855F7" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -445,18 +465,20 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
                             android:text="@string/setting_about"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
+                            android:textColor="#1B286F"
+                            android:textSize="14.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/setting_about_version"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp" />
+                            android:textColor="#8C9CB9"
+                            android:textSize="11.5sp" />
                     </LinearLayout>
 
                     <ImageView
@@ -464,71 +486,7 @@
                         android:layout_height="16dp"
                         android:contentDescription="Arrow"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#A0B4D2" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="68dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="#F0F4FA" />
-
-                <!-- Uninstall App / Survey -->
-                <LinearLayout
-                    android:id="@+id/rowUninstallApp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
-
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_circle_uninstall_unable">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Uninstall"
-                            android:src="@drawable/ic_shortcut_uninstall_trash"
-                            app:tint="#DC2626" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Gỡ cài đặt ứng dụng"
-                            android:textColor="#162858"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Khảo sát ý kiến đóng góp"
-                            android:textColor="#889DB8"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription="Arrow"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="#A0B4D2" />
+                        app:tint="#A7B6D4" />
                 </LinearLayout>
 
             </LinearLayout>

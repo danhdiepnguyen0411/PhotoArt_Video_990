@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.bouncycastle)
     implementation(libs.coil)
+    implementation(libs.coil.video)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

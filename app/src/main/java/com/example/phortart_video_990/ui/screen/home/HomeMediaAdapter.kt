@@ -50,20 +50,6 @@ class HomeMediaAdapter(
                 binding.ivMediaThumb.setImageResource(R.drawable.bg_card_white)
             }
 
-            binding.tvMediaBadge.text = item.label
-            binding.tvMediaBadge.isSelected = true
-
-            if (item.iconRes != 0) {
-                binding.ivBadgeIcon.visibility = View.VISIBLE
-                binding.ivBadgeIcon.setImageResource(item.iconRes)
-                if (item.iconTint != null) {
-                    binding.ivBadgeIcon.imageTintList = ColorStateList.valueOf(item.iconTint)
-                } else {
-                    binding.ivBadgeIcon.imageTintList = ColorStateList.valueOf(Color.parseColor("#1B2A6B"))
-                }
-            } else {
-                binding.ivBadgeIcon.visibility = View.GONE
-            }
 
             binding.root.setOnClickListener {
                 onItemClick(item)

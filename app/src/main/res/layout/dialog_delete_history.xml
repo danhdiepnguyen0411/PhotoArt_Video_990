@@ -11,41 +11,39 @@
     android:orientation="vertical"
     android:paddingHorizontal="24dp"
     android:paddingTop="32dp"
-    android:paddingBottom="24dp">
+    android:paddingBottom="20dp">
 
-    <!-- Top Icon Badge (64dp, Blue/Purple #EEF2FF) -->
+    <!-- Top Icon Badge (64dp, Red #FEE2E2) -->
     <FrameLayout
         android:id="@+id/flIconContainer"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@drawable/bg_dialog_icon_badge_blue">
+        android:background="@drawable/bg_dialog_icon_badge_red">
 
         <ImageView
-            android:id="@+id/imgSaveSuccess"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:id="@+id/imgDeleteIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_dialog_save_check"
+            android:src="@drawable/ic_trash"
+            app:tint="#DC2626"
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
-    <!-- Title "Lưu thành công" -->
+    <!-- Title "Xóa mục lịch sử" -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:fontFamily="@font/plus_jakarta_sans"
-        app:fontFamily="@font/plus_jakarta_sans"
+        android:fontFamily="@font/plus_jakarta_sans_bold"
         android:gravity="center"
         android:includeFontPadding="false"
         android:letterSpacing="-0.015"
-        android:lineHeight="28sp"
-        app:lineHeight="28sp"
-        android:text="@string/save_success_title"
+        android:text="Xóa mục lịch sử"
         android:textColor="#111827"
-        android:textFontWeight="700"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <!-- Subtitle -->
     <TextView
@@ -54,35 +52,45 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/plus_jakarta_sans"
-        app:fontFamily="@font/plus_jakarta_sans"
         android:gravity="center"
         android:includeFontPadding="false"
         android:letterSpacing="0"
-        android:lineHeight="20sp"
-        app:lineHeight="20sp"
-        android:text="@string/save_success_desc"
+        android:lineSpacingExtra="2dp"
+        android:text="Bạn có chắc chắn muốn xóa tác phẩm này khỏi danh sách lịch sử không? Hành động này không thể hoàn tác."
         android:textColor="#64748B"
-        android:textFontWeight="400"
         android:textSize="13sp" />
 
-    <!-- Done Button -->
+    <!-- Delete Button -->
     <TextView
-        android:id="@+id/btnDone"
+        android:id="@+id/btnConfirmDelete"
         android:layout_width="match_parent"
         android:layout_height="46dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/bg_btn_dialog_primary"
+        android:background="@drawable/bg_btn_dialog_red"
         android:elevation="2dp"
-        android:fontFamily="@font/plus_jakarta_sans"
-        app:fontFamily="@font/plus_jakarta_sans"
+        android:fontFamily="@font/plus_jakarta_sans_bold"
         android:gravity="center"
         android:includeFontPadding="false"
         android:letterSpacing="0"
-        android:lineHeight="20sp"
-        app:lineHeight="20sp"
-        android:text="@string/btn_done"
+        android:text="Xóa"
         android:textColor="#FFFFFF"
-        android:textFontWeight="600"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <!-- Cancel Button -->
+    <TextView
+        android:id="@+id/btnCancelDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackground"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:text="Hủy"
+        android:textColor="#64748B"
         android:textSize="14sp" />
 
 </LinearLayout>

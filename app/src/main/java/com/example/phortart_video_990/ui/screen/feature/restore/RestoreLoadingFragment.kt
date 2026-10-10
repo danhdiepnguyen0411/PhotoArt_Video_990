@@ -14,14 +14,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.data.model.HistoryItemModel
+import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.data.repository.RestoreRepository
 import com.example.phortart_video_990.databinding.FragmentRestoreLoadingBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(FragmentRestoreLoadingBinding::inflate) {
 
     private val restoreRepository by lazy { RestoreRepository(requireContext()) }
+    private val historyRepository by lazy { HistoryRepository(requireContext()) }
     private var progressAnimator: ValueAnimator? = null
     private var originalUriString: String? = null
 
@@ -106,10 +112,45 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
             val finalInputUrl = restoreData?.inputUrl ?: uriStr
             val finalOutputUrl = restoreData?.outputUrl ?: uriStr
 
+            // Preload the restored image into Coil cache so it renders immediately upon opening result screen
+            try {
+                val imageLoader = coil.Coil.imageLoader(requireContext())
+                val outRequest = coil.request.ImageRequest.Builder(requireContext())
+                    .data(finalOutputUrl)
+                    .build()
+                imageLoader.execute(outRequest)
+
+                if (finalInputUrl.startsWith("http://") || finalInputUrl.startsWith("https://")) {
+                    val inRequest = coil.request.ImageRequest.Builder(requireContext())
+                        .data(finalInputUrl)
+                        .build()
+                    imageLoader.execute(inRequest)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            // Tự động lưu vào lịch sử ngay khi gen ra thành công
+            try {
+                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                val currentDate = dateFormat.format(Date())
+                val historyItem = HistoryItemModel(
+                    type = "Khôi phục",
+                    title = "Khôi phục ảnh cũ",
+                    date = currentDate,
+                    imageUri = finalOutputUrl,
+                    imageUrl = finalOutputUrl,
+                    beforeUri = finalInputUrl
+                )
+                historyRepository.addHistoryItem(historyItem)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             // Finish progress smoothly to 100%
             progressAnimator?.cancel()
             val finalAnimator = ValueAnimator.ofFloat(binding.progressCircle.getProgress(), 100f).apply {
-                duration = 400
+                duration = 350
                 addUpdateListener { anim ->
                     val v = anim.animatedValue as Float
                     binding.progressCircle.setProgress(v)
@@ -118,7 +159,7 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
             }
             finalAnimator.start()
 
-            delay(450)
+            delay(400)
 
             if (!isAdded) return@launch
 

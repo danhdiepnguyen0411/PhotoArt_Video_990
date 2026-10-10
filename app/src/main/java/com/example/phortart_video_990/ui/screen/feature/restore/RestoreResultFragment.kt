@@ -70,19 +70,7 @@ class RestoreResultFragment : BaseFragment<FragmentRestoreResultBinding>(Fragmen
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnSaveImage.isEnabled = false
-            val savedUri = restoreRepository.saveImageToGallery(targetSource)
-
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val historyItem = HistoryItemModel(
-                type = "Khôi phục",
-                title = "Khôi phục ảnh cũ",
-                date = currentDate,
-                imageUri = savedUri?.toString() ?: targetSource
-            )
-            historyRepository.addHistoryItem(historyItem)
-
+            restoreRepository.saveImageToGallery(targetSource)
             binding.btnSaveImage.isEnabled = true
             com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
         }

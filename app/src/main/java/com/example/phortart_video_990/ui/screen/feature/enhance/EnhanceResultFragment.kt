@@ -84,19 +84,7 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnDownload.isEnabled = false
-            val savedUri = promptRepository.saveImageToGallery(imageUrl)
-
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val historyItem = HistoryItemModel(
-                type = "Prompt AI",
-                title = userPrompt.ifBlank { "Tạo ảnh AI" },
-                date = currentDate,
-                imageUri = savedUri?.toString() ?: imageUrl
-            )
-            historyRepository.addHistoryItem(historyItem)
-
+            promptRepository.saveImageToGallery(imageUrl)
             binding.btnDownload.isEnabled = true
             com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
         }

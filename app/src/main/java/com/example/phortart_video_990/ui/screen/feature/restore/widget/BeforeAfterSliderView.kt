@@ -94,6 +94,8 @@ class BeforeAfterSliderView @JvmOverloads constructor(
     private var splitRatio: Float = 0.5f
 
     init {
+        clipChildren = true
+        clipToOutline = true
         addView(ivAfter)
         addView(ivBefore)
         addView(dividerLine)
@@ -135,6 +137,20 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         val thumbH = thumbCard.height
         thumbCard.x = splitX - thumbW / 2f
         thumbCard.y = (h - thumbH) / 2f
+
+        // Khi kéo sát mép (splitRatio -> 0 hoặc splitRatio -> 1), nút tròn và thanh sẽ khuất theo
+        val edgeThreshold = 0.05f
+        val edgeAlpha = when {
+            splitRatio < edgeThreshold -> (splitRatio / edgeThreshold).coerceIn(0f, 1f)
+            splitRatio > (1f - edgeThreshold) -> ((1f - splitRatio) / edgeThreshold).coerceIn(0f, 1f)
+            else -> 1f
+        }
+        thumbCard.alpha = edgeAlpha
+        dividerLine.alpha = edgeAlpha
+
+        // Badge "Trước" và "Sau" ẩn tương ứng khi xem trọn 1 ảnh
+        badgeBefore.alpha = (splitRatio / 0.12f).coerceIn(0f, 1f)
+        badgeAfter.alpha = ((1f - splitRatio) / 0.12f).coerceIn(0f, 1f)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -144,7 +160,7 @@ class BeforeAfterSliderView @JvmOverloads constructor(
                 val touchX = event.x
                 val w = width.toFloat()
                 if (w > 0f) {
-                    splitRatio = (touchX / w).coerceIn(0.04f, 0.96f)
+                    splitRatio = (touchX / w).coerceIn(0f, 1f)
                     updateSliderPosition()
                     invalidate()
                 }
@@ -159,10 +175,17 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         return super.onTouchEvent(event)
     }
 
-    fun setBeforeImage(source: Any?) {
+    fun setBeforeImage(source: Any?, isFallback: Boolean = false) {
         if (source != null) {
             ivBefore.load(source) {
                 crossfade(true)
+            }
+            if (isFallback) {
+                val matrix = android.graphics.ColorMatrix()
+                matrix.setSaturation(0f)
+                ivBefore.colorFilter = android.graphics.ColorMatrixColorFilter(matrix)
+            } else {
+                ivBefore.colorFilter = null
             }
         }
     }

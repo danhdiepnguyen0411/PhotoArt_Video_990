@@ -1,33 +1,44 @@
 package com.example.phortart_video_990.ui.screen.setting
 
-import android.content.Intent
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.findNavController
-import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.AppDialogHelper
-import com.example.phortart_video_990.core.utils.NotificationPermissionManager
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.databinding.FragmentSettingBinding
-import com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity
 
 class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBinding::inflate) {
 
     override fun initView() {
+        // Apply window insets for status bar
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            binding.llSettingContent.updatePadding(
+                top = statusBarInset + (16 * resources.displayMetrics.density).toInt()
+            )
+            insets
+        }
+
         val prefs = PreferencesManager.getInstance(requireContext())
         binding.tvCurrentLanguage.text = prefs.languageName
-        binding.switchNotification.isChecked = NotificationPermissionManager.isNotificationPermissionGranted(requireContext())
+        binding.switchNotification.isChecked = prefs.isNotificationEnabled
     }
 
     override fun onResume() {
         super.onResume()
         val prefs = PreferencesManager.getInstance(requireContext())
         binding.tvCurrentLanguage.text = prefs.languageName
-        binding.switchNotification.isChecked = NotificationPermissionManager.isNotificationPermissionGranted(requireContext())
+        binding.switchNotification.isChecked = prefs.isNotificationEnabled
     }
 
     override fun initListener() {
+        val prefs = PreferencesManager.getInstance(requireContext())
+
         // Language Option
         binding.cardLanguageSetting.setOnClickListener {
             val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
@@ -36,14 +47,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
         // Notification Toggle / Row
         binding.rowNotification.setOnClickListener {
-            NotificationPermissionManager.openNotificationSettings(requireContext()) {
-                binding.switchNotification.isChecked = NotificationPermissionManager.isNotificationPermissionGranted(requireContext())
-            }
+            binding.switchNotification.toggle()
         }
-        binding.switchNotification.setOnClickListener {
-            NotificationPermissionManager.openNotificationSettings(requireContext()) {
-                binding.switchNotification.isChecked = NotificationPermissionManager.isNotificationPermissionGranted(requireContext())
-            }
+        binding.switchNotification.onCheckedChangeListener = { isChecked ->
+            prefs.isNotificationEnabled = isChecked
         }
 
         // IAP Upgrade Button
@@ -54,11 +61,6 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
         // Rate App -> Opens interactive 5-star rating popup
         binding.rowRateApp.setOnClickListener {
             AppDialogHelper.showRateDialog(requireActivity())
-        }
-
-        // Uninstall App Survey
-        binding.rowUninstallApp.setOnClickListener {
-            startActivity(Intent(requireContext(), UninstallActivity::class.java))
         }
 
         // Privacy Policy

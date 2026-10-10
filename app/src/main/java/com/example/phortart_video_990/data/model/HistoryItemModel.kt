@@ -10,5 +10,6 @@ data class HistoryItemModel(
     val date: String = "",
     val imageUri: String? = null,
     val imageUrl: String? = null,
-    @param:DrawableRes val imageRes: Int = 0
+    @param:DrawableRes val imageRes: Int = 0,
+    val beforeUri: String? = null
 )
