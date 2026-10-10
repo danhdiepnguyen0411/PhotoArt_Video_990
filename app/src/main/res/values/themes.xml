@@ -24,4 +24,13 @@
         <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
+
+    <style name="DialogFullScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:statusBarColor">#CC000000</item>
+        <item name="android:navigationBarColor">#CC000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

@@ -83,6 +83,9 @@
         <action
             android:id="@+id/action_mainFragment_to_languageFragment"
             app:destination="@id/languageFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_createTemplateVideoFragment"
+            app:destination="@id/createTemplateVideoFragment" />
     </fragment>
 
     <!-- 5 Feature Screens -->
@@ -93,6 +96,19 @@
         tools:layout="@layout/fragment_memories">
         <action
             android:id="@+id/action_memoriesFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
+        <action
+            android:id="@+id/action_memoriesFragment_to_videoResultFragment"
+            app:destination="@id/videoResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/videoResultFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.memories.VideoResultFragment"
+        android:label="VideoResultFragment"
+        tools:layout="@layout/fragment_video_result">
+        <action
+            android:id="@+id/action_videoResultFragment_to_musicFragment"
             app:destination="@id/musicFragment" />
     </fragment>
 
@@ -163,5 +179,28 @@
         android:name="com.example.phortart_video_990.ui.screen.feature.upscale.UpscaleFragment"
         android:label="UpscaleFragment"
         tools:layout="@layout/fragment_upscale" />
+
+    <fragment
+        android:id="@+id/createTemplateVideoFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment"
+        android:label="CreateTemplateVideoFragment"
+        tools:layout="@layout/fragment_create_template_video">
+        <action
+            android:id="@+id/action_createTemplateVideoFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
+        <action
+            android:id="@+id/action_createTemplateVideoFragment_to_templateVideoResultFragment"
+            app:destination="@id/templateVideoResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/templateVideoResultFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.createtemplate.TemplateVideoResultFragment"
+        android:label="TemplateVideoResultFragment"
+        tools:layout="@layout/fragment_template_video_result">
+        <action
+            android:id="@+id/action_templateVideoResultFragment_to_musicFragment"
+            app:destination="@id/musicFragment" />
+    </fragment>
 
 </navigation>
