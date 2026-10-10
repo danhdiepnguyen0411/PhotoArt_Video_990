@@ -4,13 +4,17 @@ import android.net.Uri
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
+import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,6 +36,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
     private var selectedMusicTitle: String? = null
     private var selectedMusicAudioUrl: String? = null
+    private var selectedMusicAudioFilePath: String? = null
     private var selectedMusicImageUrl: String? = null
 
     override fun initView() {
@@ -50,6 +55,9 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
         stateHandle?.get<String?>("selected_music_audio_url")?.let { audioUrl ->
             selectedMusicAudioUrl = audioUrl
+        }
+        stateHandle?.get<String?>("selected_music_file_path")?.let { filePath ->
+            selectedMusicAudioFilePath = filePath
         }
         stateHandle?.get<String?>("selected_music_image_url")?.let { imageUrl ->
             selectedMusicImageUrl = imageUrl
@@ -77,6 +85,11 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         stateHandle?.getLiveData<String?>("selected_music_audio_url")
             ?.observe(viewLifecycleOwner) { audioUrl ->
                 selectedMusicAudioUrl = audioUrl
+            }
+
+        stateHandle?.getLiveData<String?>("selected_music_file_path")
+            ?.observe(viewLifecycleOwner) { filePath ->
+                selectedMusicAudioFilePath = filePath
             }
 
         stateHandle?.getLiveData<String?>("selected_music_image_url")
@@ -190,15 +203,99 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
             val finalTrack = selectedMusicTitle ?: stateHandle?.get<String>("selected_music_title")
             val finalAudioUrl = selectedMusicAudioUrl ?: stateHandle?.get<String?>("selected_music_audio_url")
+            val finalAudioPath = selectedMusicAudioFilePath ?: stateHandle?.get<String?>("selected_music_file_path")
             val finalImageUrl = selectedMusicImageUrl ?: stateHandle?.get<String?>("selected_music_image_url")
 
-            val bundle = VideoResultFragment.createBundle(
-                photos = selectedPhotos.map { it.toString() },
-                track = finalTrack,
-                audioUrl = finalAudioUrl,
-                imageUrl = finalImageUrl
+            binding.btnCreateVideo.isEnabled = false
+            showLoading(
+                title = "Đang tạo video...",
+                subtitle = "Đang chuẩn bị hình ảnh và hiệu ứng..."
             )
-            findNavController().navigate(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    // 1. Tải nhạc nền nếu cần
+                    var resolvedAudioPath = finalAudioPath
+                    val hasValidAudioFile = !resolvedAudioPath.isNullOrBlank() && File(resolvedAudioPath).let { it.exists() && it.length() > 0 }
+                    if (!hasValidAudioFile && !finalAudioUrl.isNullOrBlank()) {
+                        showLoading(
+                            title = "Đang tải nhạc nền...",
+                            subtitle = "Vui lòng chờ trong giây lát"
+                        )
+                        val downloaded = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+                            requireContext(),
+                            finalAudioUrl
+                        )
+                        if (downloaded != null && downloaded.exists() && downloaded.length() > 0) {
+                            resolvedAudioPath = downloaded.absolutePath
+                            selectedMusicAudioFilePath = resolvedAudioPath
+                        }
+                    }
+
+                    // 2. Tính toán thời lượng và sinh hiệu ứng chuyển cảnh
+                    val photoCount = selectedPhotos.size
+                    val videoDurationSec = VideoGenerator.calculateVideoDuration(photoCount)
+                    val transitions = VideoGenerator.generateRandomTransitions(photoCount)
+                    val photoUriStrings = selectedPhotos.map { it.toString() }
+
+                    // Nguồn âm thanh (ưu tiên file nội bộ đã tải)
+                    val audioSource = resolvedAudioPath?.takeIf { File(it).exists() } ?: finalAudioUrl
+
+                    // 3. Render video MP4 hoàn chỉnh (ảnh + chuyển cảnh + ghép nhạc)
+                    val generatedVideoFile = VideoGenerator.generateMp4FromPhotos(
+                        context = requireContext(),
+                        photoUris = photoUriStrings,
+                        durationSec = videoDurationSec,
+                        audioUrl = audioSource,
+                        transitions = transitions,
+                        onProgress = { progress, status ->
+                            showLoading(
+                                title = "Đang tạo video...",
+                                subtitle = "$status ($progress%)"
+                            )
+                        }
+                    )
+
+                    if (!isAdded || view == null) return@launch
+                    hideLoading()
+                    binding.btnCreateVideo.isEnabled = true
+
+                    if (generatedVideoFile.exists() && generatedVideoFile.length() > 0) {
+                        navigateToVideoResult(
+                            videoPath = generatedVideoFile.absolutePath,
+                            finalTrack = finalTrack,
+                            finalAudioUrl = finalAudioUrl,
+                            finalAudioPath = resolvedAudioPath,
+                            finalImageUrl = finalImageUrl
+                        )
+                    } else {
+                        Toast.makeText(requireContext(), "Không thể tạo file video. Vui lòng thử lại!", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    if (!isAdded || view == null) return@launch
+                    hideLoading()
+                    binding.btnCreateVideo.isEnabled = true
+                    Toast.makeText(requireContext(), "Lỗi khi tạo video: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+    }
+
+    private fun navigateToVideoResult(
+        videoPath: String,
+        finalTrack: String?,
+        finalAudioUrl: String?,
+        finalAudioPath: String?,
+        finalImageUrl: String?
+    ) {
+        val bundle = VideoResultFragment.createBundle(
+            videoPath = videoPath,
+            photos = selectedPhotos.map { it.toString() },
+            track = finalTrack,
+            audioUrl = finalAudioUrl,
+            audioPath = finalAudioPath,
+            imageUrl = finalImageUrl
+        )
+        findNavController().navigate(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
     }
 }
