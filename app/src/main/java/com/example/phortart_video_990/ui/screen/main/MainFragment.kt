@@ -15,13 +15,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
             insets
         }
 
-        // Apply bottom insets as padding ONLY to cardBottomNav container so background extends to edge
-        // while bottomNavigationView height remains intact at 64dp
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            binding.cardBottomNav.setPadding(0, 0, 0, navBarInset)
-            insets
-        }
 
         val adapter = MainPagerAdapter(this)
         binding.vpMainTabs.adapter = adapter
