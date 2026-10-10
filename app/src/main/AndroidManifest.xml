@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".PhotoArtApp"
@@ -25,6 +26,20 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <activity
+            android:name=".ui.screen.uninstall.UninstallActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PhortArt_Video_990"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="com.example.phortart_video_990.ACTION_UNINSTALL" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

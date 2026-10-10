@@ -49,30 +49,32 @@
             android:paddingTop="10dp"
             android:paddingBottom="20dp">
 
-            <!-- 3D Layered Illustration Block with Blue Under-Layer & Floating Badge -->
+            <!-- 3D Layered Illustration Block (Matching the Right Screen Mockup) -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutIllustration"
                 android:layout_width="144dp"
                 android:layout_height="144dp">
 
-                <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left) -->
+                <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left, 0 deg) -->
                 <View
                     android:id="@+id/layerBackBlue"
                     android:layout_width="104dp"
                     android:layout_height="104dp"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/bg_restore_back_layer"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- 2. Main Glassmorphic Photo Card Layer -->
+                <!-- 2. Main Glassmorphic Photo Card Layer (Tilted ~7 deg Clockwise matching Figma) -->
                 <FrameLayout
                     android:id="@+id/cardFront"
-                    android:layout_width="118dp"
-                    android:layout_height="118dp"
+                    android:layout_width="116dp"
+                    android:layout_height="116dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="10dp"
+                    android:rotation="7"
+                    android:elevation="4dp"
                     android:background="@drawable/bg_restore_illustration"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -85,15 +87,16 @@
                         android:src="@drawable/ic_restore_illustration_photo" />
                 </FrameLayout>
 
-                <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right) -->
+                <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right, Horizontal arrows) -->
                 <FrameLayout
                     android:id="@+id/badgeCompare"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:layout_marginEnd="-10dp"
-                    android:layout_marginBottom="-6dp"
+                    android:layout_marginEnd="-8dp"
+                    android:layout_marginBottom="-4dp"
+                    android:rotation="0"
                     android:background="@drawable/bg_restore_compare_badge"
-                    android:elevation="4dp"
+                    android:elevation="6dp"
                     app:layout_constraintBottom_toBottomOf="@+id/cardFront"
                     app:layout_constraintEnd_toEndOf="@+id/cardFront">
 
@@ -112,10 +115,10 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:text="Khôi phục ảnh"
-                android:textColor="#102148"
+                android:textColor="#17327C"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -129,14 +132,14 @@
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
                 android:text="Biến những bức ảnh cũ, mờ, hư hỏng thành\nhình ảnh rõ nét, sống động hơn."
-                android:textColor="#6F7E94"
+                android:textColor="#7A8FB8"
                 android:textSize="14sp" />
 
             <!-- Features Container -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="28dp"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp">
 
@@ -148,8 +151,8 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
                         app:cardElevation="3dp"
@@ -157,8 +160,8 @@
                         app:strokeWidth="0dp">
 
                         <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:contentDescription="Sun Rays"
                             android:src="@drawable/ic_feature_sun_rays" />
@@ -167,7 +170,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -175,8 +178,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Sửa ảnh mờ, nhòe"
-                            android:textColor="#102148"
-                            android:textSize="16sp"
+                            android:textColor="#1B2A8C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -184,8 +187,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:text="Làm rõ chi tiết, sắc nét hơn."
-                            android:textColor="#8292A6"
-                            android:textSize="13.5sp" />
+                            android:textColor="#8296BC"
+                            android:textSize="12.5sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -194,13 +197,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
+                    android:layout_marginTop="18dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
                         app:cardElevation="3dp"
@@ -208,8 +211,8 @@
                         app:strokeWidth="0dp">
 
                         <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:contentDescription="Old Photo"
                             android:src="@drawable/ic_feature_photo" />
@@ -218,7 +221,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -226,8 +229,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Khôi phục ảnh cũ"
-                            android:textColor="#102148"
-                            android:textSize="16sp"
+                            android:textColor="#1B2A8C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -235,8 +238,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:text="Giảm nhiễu, cải thiện màu sắc."
-                            android:textColor="#8292A6"
-                            android:textSize="13.5sp" />
+                            android:textColor="#8296BC"
+                            android:textSize="12.5sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -245,13 +248,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
+                    android:layout_marginTop="18dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
                         app:cardElevation="3dp"
@@ -259,8 +262,8 @@
                         app:strokeWidth="0dp">
 
                         <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:contentDescription="True Details"
                             android:src="@drawable/ic_feature_focus_lens" />
@@ -269,7 +272,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -277,8 +280,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Tăng độ chân thực"
-                            android:textColor="#102148"
-                            android:textSize="16sp"
+                            android:textColor="#1B2A8C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -286,8 +289,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:text="Giữ nguyên vẻ tự nhiên của ảnh."
-                            android:textColor="#8292A6"
-                            android:textSize="13.5sp" />
+                            android:textColor="#8296BC"
+                            android:textSize="12.5sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -301,7 +304,7 @@
     <LinearLayout
         android:id="@+id/btnStartRestore"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="52dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="28dp"
         android:background="@drawable/bg_btn_start_restore"
@@ -316,7 +319,7 @@
             android:layout_height="wrap_content"
             android:text="Bắt đầu ngay"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
         <ImageView

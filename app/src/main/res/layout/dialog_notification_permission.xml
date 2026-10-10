@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llDialogContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minWidth="320dp"
+    android:background="@drawable/bg_dialog_task_removal"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="32dp"
+    android:paddingBottom="20dp">
+
+    <!-- Top Circle Icon Badge (64dp, Blue/Purple #EEF2FF) -->
+    <FrameLayout
+        android:id="@+id/flIconContainer"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_dialog_icon_badge_blue">
+
+        <ImageView
+            android:id="@+id/imgNotificationIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_popup_bell"
+            app:tint="#4A63E8"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <!-- Title "Enable Notifications" -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        app:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.015"
+        android:lineHeight="28sp"
+        app:lineHeight="28sp"
+        android:text="Enable Notifications"
+        android:textColor="#111827"
+        android:textFontWeight="700"
+        android:textSize="18sp" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        app:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:letterSpacing="0"
+        android:lineHeight="20sp"
+        app:lineHeight="20sp"
+        android:text="Get instant alerts when your AI artwork is ready and explore fresh video &amp; photo styles."
+        android:textColor="#64748B"
+        android:textFontWeight="400"
+        android:textSize="13sp" />
+
+    <!-- Go to Settings Button -->
+    <TextView
+        android:id="@+id/btnGoToSettings"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_btn_dialog_primary"
+        android:elevation="2dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        app:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:letterSpacing="0"
+        android:lineHeight="20sp"
+        app:lineHeight="20sp"
+        android:text="Go to settings"
+        android:textColor="#FFFFFF"
+        android:textFontWeight="600"
+        android:textSize="14sp" />
+
+    <!-- Cancel Button -->
+    <TextView
+        android:id="@+id/btnDontAllow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackground"
+        android:fontFamily="@font/plus_jakarta_sans"
+        app:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:letterSpacing="0"
+        android:lineHeight="20sp"
+        app:lineHeight="20sp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:text="Cancel"
+        android:textColor="#64748B"
+        android:textFontWeight="500"
+        android:textSize="14sp" />
+
+</LinearLayout>

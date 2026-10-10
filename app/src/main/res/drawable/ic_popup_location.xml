@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="44dp"
+    android:viewportWidth="36"
+    android:viewportHeight="44">
+    <!-- Solid dark green location pin with inner hole -->
+    <path
+        android:fillColor="#095E36"
+        android:fillType="evenOdd"
+        android:pathData="M18,42 C16.5,38.5 4,24.5 4,14 C4,6.268 10.268,0 18,0 C25.732,0 32,6.268 32,14 C32,24.5 19.5,38.5 18,42 Z M18,8.5 C14.962,8.5 12.5,10.962 12.5,14 C12.5,17.038 14.962,19.5 18,19.5 C21.038,19.5 23.5,17.038 23.5,14 C23.5,10.962 21.038,8.5 18,8.5 Z" />
+</vector>

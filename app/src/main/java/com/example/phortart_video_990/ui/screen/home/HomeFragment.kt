@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.phortart_video_990.core.utils.navigateSafe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.phortart_video_990.R
@@ -76,6 +77,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onResume() {
         super.onResume()
         loadRecentHistory()
+        checkCustomNotificationPermission()
+    }
+
+    private fun checkCustomNotificationPermission() {
+        if (com.example.phortart_video_990.core.utils.NotificationPermissionManager.shouldShowNotificationDialog(requireContext())) {
+            binding.root.post {
+                if (isAdded && com.example.phortart_video_990.core.utils.NotificationPermissionManager.shouldShowNotificationDialog(requireContext())) {
+                    com.example.phortart_video_990.core.dialog.NotificationDialogHelper.showNotificationDialog(requireActivity())
+                }
+            }
+        }
     }
 
     private fun setupHeader() {
@@ -268,10 +280,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun navigateToFeature(featureId: String) {
         val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
         when (featureId) {
-            "video" -> navController.navigate(R.id.action_mainFragment_to_memoriesFragment)
-            "prompt" -> navController.navigate(R.id.action_mainFragment_to_enhanceFragment)
-            "restore" -> navController.navigate(R.id.action_mainFragment_to_restoreFragment)
-            "music" -> navController.navigate(R.id.action_mainFragment_to_musicFragment)
+            "video" -> navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
+            "prompt" -> navController.navigateSafe(R.id.action_mainFragment_to_enhanceFragment)
+            "restore" -> navController.navigateSafe(R.id.action_mainFragment_to_restoreFragment)
+            "music" -> navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)
         }
     }
 

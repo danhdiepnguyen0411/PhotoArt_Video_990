@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.phortart_video_990.core.utils.navigateSafe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phortart_video_990.R
@@ -40,9 +41,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         // Setup Template Grid (2 Columns)
         templateAdapter = TemplateAdapter(emptyList()) { selectedTemplate ->
             // Navigate to feature create video with template
-            parentFragment?.parentFragment?.findNavController()?.navigate(
-                R.id.action_mainFragment_to_memoriesFragment
-            ) ?: findNavController().navigate(R.id.action_mainFragment_to_memoriesFragment)
+            val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+            navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
         }
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = templateAdapter

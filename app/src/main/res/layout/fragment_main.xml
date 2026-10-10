@@ -33,7 +33,7 @@
             android:layout_height="64dp"
             android:background="@color/white"
             app:elevation="0dp"
-            app:itemIconSize="22dp"
+            app:itemIconSize="26dp"
             app:itemIconTint="@color/bottom_nav_color_selector"
             app:itemTextColor="@color/bottom_nav_color_selector"
             app:itemTextAppearanceActive="@style/BottomNavTextActive"
@@ -41,6 +41,14 @@
             app:itemRippleColor="@android:color/transparent"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu" />
+
+        <View
+            android:id="@+id/navIndicator"
+            android:layout_width="24dp"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_indicator" />
 
     </FrameLayout>
 

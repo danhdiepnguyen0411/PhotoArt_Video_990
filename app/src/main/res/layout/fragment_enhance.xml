@@ -4,208 +4,557 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_bg">
+    android:background="@drawable/bg_ai_create_screen">
 
-    <!-- Top Bar -->
-    <LinearLayout
-        android:id="@+id/llTopBar"
+    <!-- Top Bar: Back, Title "AI Create ✦", Heart Action -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/btn_back"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/navy" />
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="999dp"
+            app:cardElevation="3dp"
+            app:cardPreventCornerOverlap="false"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tvTopTitle"
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/btn_back"
+                android:src="@drawable/ic_chevron_left" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/layoutTopTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/feature_prompt_title"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginStart="14dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="@+id/btnBack">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tvTopTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI Create"
+                android:textColor="#3250C9"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:contentDescription="Sparkle"
+                android:src="@drawable/ic_sparkle_chip"
+                app:tint="#6B5CE7" />
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnFavorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="999dp"
+            app:cardElevation="3dp"
+            app:cardPreventCornerOverlap="false"
+            app:strokeWidth="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:contentDescription="Favorite"
+                android:src="@drawable/ic_heart_outline"
+                app:tint="#5B6FF6" />
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Scrollable Body Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/btnGeneratePrompt"
-        app:layout_constraintTop_toBottomOf="@+id/llTopBar">
+        app:layout_constraintTop_toBottomOf="@+id/topBar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="20dp">
 
-            <!-- Feature Illustration Card -->
+            <!-- Section 1 & 2 Container Card (White rounded card matching Figma) -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="3dp"
-                app:strokeColor="@color/card_stroke"
-                app:strokeWidth="1dp">
-
-                <ImageView
-                    android:id="@+id/ivFeatureArt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="16dp"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="Feature Art"
-                    android:src="@drawable/feature_ai_prompt" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:id="@+id/tvFunctionName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:text="@string/feature_prompt_title"
-                android:textColor="@color/navy"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:lineSpacingExtra="3dp"
-                android:text="Mô tả điều bạn tưởng tượng, AI sẽ biến nó thành hình ảnh tuyệt đẹp."
-                android:textColor="@color/muted"
-                android:textSize="14sp" />
-
-            <!-- Prompt Input Card -->
-            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPromptContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/card_stroke"
-                app:strokeWidth="1dp">
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardPreventCornerOverlap="false"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="18dp">
 
-                    <EditText
-                        android:id="@+id/etPromptInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:background="@android:color/transparent"
-                        android:gravity="top|start"
-                        android:hint="Mô tả ý tưởng của bạn bằng tiếng Anh hoặc tiếng Việt..."
-                        android:inputType="textMultiLine"
-                        android:textColor="@color/navy"
-                        android:textColorHint="@color/muted"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tvPromptCounter"
+                    <!-- Section 1: Nhập mô tả (Prompt) -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="0/500"
-                        android:textColor="@color/muted"
-                        android:textSize="11sp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="Sparkle"
+                            android:src="@drawable/ic_sparkle_chip"
+                            app:tint="#3556D4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="Nhập mô tả (Prompt)"
+                            android:textColor="#3250C9"
+                            android:textSize="15.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_prompt_input">
+
+                        <EditText
+                            android:id="@+id/etPromptInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@null"
+                            android:gravity="top|start"
+                            android:hint="Ví dụ: Cô gái anime, mặc váy trắng, đứng giữa cánh đồng hoa..."
+                            android:importantForAutofill="no"
+                            android:inputType="textMultiLine"
+                            android:paddingHorizontal="14dp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="24dp"
+                            android:textColor="#102148"
+                            android:textColorHint="#94A3B8"
+                            android:textSize="13.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvPromptCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:layout_marginEnd="14dp"
+                            android:layout_marginBottom="10dp"
+                            android:text="0/500"
+                            android:textColor="#94A3B8"
+                            android:textSize="11.5sp" />
+                    </FrameLayout>
+
+                    <!-- Section 2: Gợi ý prompt -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="Sparkle"
+                            android:src="@drawable/ic_sparkle_chip"
+                            app:tint="#3556D4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="Gợi ý prompt"
+                            android:textColor="#3250C9"
+                            android:textSize="15.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Suggestions Grid (Row 1) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipAnimeGirl"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Anime girl"
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipFantasy"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Fantasy ..."
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipCutePet"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Cute pet"
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Suggestions Grid (Row 2) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipCyberpunk"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Cyberpunk"
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipNature"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Nature"
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipPortrait"
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_prompt_chip"
+                            android:drawableStart="@drawable/ic_sparkle_chip"
+                            android:drawablePadding="4dp"
+                            android:drawableTint="#5373F2"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="Portrait"
+                            android:textColor="#3250C9"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Sample Idea Tags -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Gợi ý ý tưởng"
-                android:textColor="@color/navy"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
+            <!-- Section 3: Style -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tagCyberpunk"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_category_chip_unselected"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="Cyberpunk"
-                    android:textColor="@color/muted"
-                    android:textSize="12sp" />
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="Sparkle"
+                    android:src="@drawable/ic_sparkle_chip"
+                    app:tint="#3556D4" />
 
                 <TextView
-                    android:id="@+id/tagAnime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_category_chip_unselected"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="Anime Art"
-                    android:textColor="@color/muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tagFantasy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_category_chip_unselected"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="Fantasy 3D"
-                    android:textColor="@color/muted"
-                    android:textSize="12sp" />
+                    android:layout_marginStart="6dp"
+                    android:text="Style"
+                    android:textColor="#3250C9"
+                    android:textSize="17.5sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- Horizontal Style Cards -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Style 1: Cyber Move (Selected) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStyle1"
+                        android:layout_width="112dp"
+                        android:layout_height="148dp"
+                        android:layout_marginEnd="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="2dp"
+                        app:strokeColor="#3B82F6"
+                        app:strokeWidth="2.5dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/ivStyle1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/template_trendy" />
+
+                            <!-- Bottom Gradient Scrim for text readability -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/bg_style_scrim" />
+
+                            <!-- Hot Badge -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="top|start"
+                                android:layout_margin="8dp"
+                                android:background="@drawable/bg_badge_hot"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="7dp"
+                                android:paddingVertical="3dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🔥 Hot"
+                                    android:textColor="@color/white"
+                                    android:textSize="10.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Style Name -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom|start"
+                                android:layout_margin="10dp"
+                                android:text="Cyber Move"
+                                android:textColor="@color/white"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Style 2: Street Vibes -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStyle2"
+                        android:layout_width="112dp"
+                        android:layout_height="148dp"
+                        android:layout_marginEnd="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="2dp"
+                        app:strokeColor="@color/transparent"
+                        app:strokeWidth="0dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/ivStyle2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/history_3" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/bg_style_scrim" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom|start"
+                                android:layout_margin="10dp"
+                                android:text="Street Vibes"
+                                android:textColor="@color/white"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Style 3: Urban Renaissance -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStyle3"
+                        android:layout_width="112dp"
+                        android:layout_height="148dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="2dp"
+                        app:strokeColor="@color/transparent"
+                        app:strokeWidth="0dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/ivStyle3"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/suggestion_ai_portrait" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/bg_style_scrim" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom|start"
+                                android:layout_margin="10dp"
+                                android:text="Urban\nRenaissance"
+                                android:textColor="@color/white"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+            </HorizontalScrollView>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Generate Action Button -->
-    <androidx.appcompat.widget.AppCompatButton
+    <!-- Bottom Action Button: Tạo ảnh -> -->
+    <LinearLayout
         android:id="@+id/btnGeneratePrompt"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="28dp"
-        android:background="@drawable/bg_btn_primary"
-        android:drawableEnd="@drawable/ic_arrow_right"
-        android:paddingHorizontal="24dp"
-        android:text="Tạo ảnh ngay"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_btn_ai_create"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:contentDescription="Magic"
+            android:src="@drawable/ic_wand_magic" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="Tạo ảnh"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:contentDescription="Next"
+            android:src="@drawable/ic_arrow_forward_white" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

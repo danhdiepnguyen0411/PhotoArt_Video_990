@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
+    android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- Center hollow circle -->
+    <!-- Center circle (cx 12, cy 12, r 3) -->
     <path
-        android:strokeColor="#4D7BF6"
-        android:strokeWidth="1.75"
+        android:strokeColor="#4A63E8"
+        android:strokeWidth="2.2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M12,12m-3.8,0a3.8,3.8 0 1,1 7.6,0a3.8,3.8 0 1,1 -7.6,0" />
-    <!-- 8 rays with clear gap from the center circle -->
+        android:pathData="M12,15A3,3 0 1,1 12,9a3,3 0 0,1 0,6z" />
+    <!-- 8 rays matching GearIcon in App.tsx -->
     <path
-        android:strokeColor="#4D7BF6"
-        android:strokeWidth="1.75"
+        android:strokeColor="#4A63E8"
+        android:strokeWidth="2.2"
         android:strokeLineCap="round"
-        android:pathData="M12,2v2.8M12,19.2V22M2,12h2.8M19.2,12H22M4.93,4.93l2,2M17.07,17.07l2,2M4.93,19.07l2,-2M17.07,6.93l2,-2" />
+        android:strokeLineJoin="round"
+        android:pathData="M12,2v3 M12,19v3 M2,12h3 M19,12h3 M4.9,4.9l2.1,2.1 M17,17l2.1,2.1 M4.9,19.1L7,17 M17,7l2.1,-2.1" />
 </vector>
