@@ -42,7 +42,7 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         val density = resources.displayMetrics.density
         val size = (34 * density).toInt()
         layoutParams = LayoutParams(size, size)
-        cardElevation = 4 * density
+        cardElevation = 0f
         radius = size / 2f
         setCardBackgroundColor(Color.WHITE)
         strokeWidth = 0

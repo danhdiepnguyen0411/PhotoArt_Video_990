@@ -91,7 +91,6 @@
                     android:layout_height="34dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_btn_setting_iap"
-                    android:elevation="2dp"
                     android:fontFamily="@font/plus_jakarta_sans_bold"
                     android:gravity="center"
                     android:paddingHorizontal="16dp"
@@ -135,7 +134,7 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp"
+            app:cardElevation="0dp"
             app:strokeColor="#DCE8FC"
             app:strokeWidth="1dp">
 
@@ -289,7 +288,7 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp"
+            app:cardElevation="0dp"
             app:strokeColor="#DCE8FC"
             app:strokeWidth="1dp">
 

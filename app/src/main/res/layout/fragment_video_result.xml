@@ -49,8 +49,7 @@
         android:layout_marginBottom="12dp"
         app:cardBackgroundColor="#CFE0F7"
         app:cardCornerRadius="22dp"
-        app:cardElevation="8dp"
-        app:cardMaxElevation="12dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toTopOf="@+id/cardVideoInfo"
         app:layout_constraintTop_toBottomOf="@+id/llTopBar">
 
@@ -100,7 +99,7 @@
                 android:layout_gravity="center"
                 app:cardBackgroundColor="#CCFFFFFF"
                 app:cardCornerRadius="27dp"
-                app:cardElevation="6dp">
+                app:cardElevation="0dp">
 
                 <ImageView
                     android:id="@+id/ivPlayPauseIcon"
@@ -125,10 +124,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:shadowColor="#59000000"
-                    android:shadowDx="0"
-                    android:shadowDy="1"
-                    android:shadowRadius="4"
                     android:text="00:00 / 00:15"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
@@ -156,7 +151,7 @@
         android:layout_marginBottom="16dp"
         app:cardBackgroundColor="#EBFFFFFF"
         app:cardCornerRadius="16dp"
-        app:cardElevation="3dp"
+        app:cardElevation="0dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
@@ -333,7 +328,6 @@
         android:background="#A6000000"
         android:clickable="true"
         android:focusable="true"
-        android:elevation="50dp"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -347,7 +341,7 @@
             android:layout_gravity="center"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="24dp"
-            app:cardElevation="20dp">
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
