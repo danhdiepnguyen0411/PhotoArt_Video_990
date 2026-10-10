@@ -21,7 +21,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         insetsController.isAppearanceLightStatusBars = true
         insetsController.isAppearanceLightNavigationBars = true
 
-        SystemBarInsetsHelper.hideSystemNavigationBar(window)
+        SystemBarInsetsHelper.hideSystemBars(window)
 
         // Initialize launcher shortcut for Uninstall
         com.example.phortart_video_990.core.utils.ShortcutHelper.initUninstallShortcut(this)
@@ -51,7 +51,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun onResume() {
         super.onResume()
-        SystemBarInsetsHelper.hideSystemNavigationBar(window)
+        SystemBarInsetsHelper.hideSystemBars(window)
         NotificationPermissionManager.onAppForegrounded(this)
 
         if (NotificationPermissionManager.isNotificationPermissionGranted(this)) {
@@ -67,7 +67,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            SystemBarInsetsHelper.hideSystemNavigationBar(window)
+            SystemBarInsetsHelper.hideSystemBars(window)
         }
     }
 }

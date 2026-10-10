@@ -16,10 +16,11 @@ fun NavController.navigateSafe(@IdRes actionId: Int, args: Bundle? = null) {
         if (action != null) {
             navigate(actionId, args)
         } else {
-            Log.w(
-                "NavigationExt",
-                "Action $actionId not found in current destination ${destination.label} (${destination.id}), skipping"
-            )
+            try {
+                navigate(actionId, args)
+            } catch (ex: Exception) {
+                Log.w("NavigationExt", "Action or destination $actionId not found in current destination ${destination.label} (${destination.id})", ex)
+            }
         }
     } catch (e: Exception) {
         Log.e("NavigationExt", "navigateSafe error: ${e.message}", e)
