@@ -1,12 +1,16 @@
 package com.example.phortart_video_990.ui.screen.history
 
+import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentHistoryBinding
+import com.google.gson.Gson
 
 class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBinding::inflate) {
 
@@ -40,16 +44,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
         historyAdapter = HistoryAdapter(
             items = emptyList(),
             onItemClick = { item ->
-                // Dialog xác nhận xem hoặc xóa mục lịch sử
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle(item.title)
-                    .setMessage("Bạn muốn xóa mục này khỏi Lịch sử và bộ nhớ máy?")
-                    .setPositiveButton("Xóa") { _, _ ->
-                        historyRepository.deleteHistoryItem(item)
-                        loadHistory()
-                    }
-                    .setNegativeButton("Hủy", null)
-                    .show()
+                val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+                val bundle = Bundle().apply {
+                    putString(HistoryDetailFragment.KEY_HISTORY_ITEM_JSON, Gson().toJson(item))
+                }
+                navController.navigateSafe(R.id.action_mainFragment_to_historyDetailFragment, bundle)
             }
         )
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())

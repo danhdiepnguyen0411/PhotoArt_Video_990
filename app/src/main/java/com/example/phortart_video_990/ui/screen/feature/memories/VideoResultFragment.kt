@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.dialog.AppDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.ShareUtils
 import com.example.phortart_video_990.core.utils.VideoGenerator
@@ -63,6 +64,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         updateMusicInfoUi()
         updatePlayStateUi(false)
         initializeVideo()
+        autoSaveVideoToHistory()
 
         // Lắng nghe đổi bài hát mới từ MusicFragment
         val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
@@ -90,6 +92,46 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
 
                 updateMusicInfoUi()
                 handleMusicChanged(newAudioUrl, newFilePath)
+            }
+        }
+    }
+
+    private var hasAutoSavedHistory = false
+
+    private fun autoSaveVideoToHistory() {
+        if (hasAutoSavedHistory) return
+        val path = videoPath ?: return
+        val localFile = File(path)
+        if (!localFile.exists()) return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val savedDoc = VideoGenerator.saveVideoToAppDocuments(
+                    context = requireContext(),
+                    sourceFile = localFile,
+                    title = "Memories_${System.currentTimeMillis()}"
+                )
+                appDocumentVideoFile = savedDoc
+
+                val videoTitle = if (!musicTitle.isNullOrBlank()) {
+                    "Video tạo từ ${photoUris.size.coerceAtLeast(1)} ảnh AI • Nhạc: $musicTitle"
+                } else {
+                    "Video tạo từ ${photoUris.size.coerceAtLeast(1)} ảnh AI"
+                }
+
+                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                val currentDate = dateFormat.format(Date())
+
+                val historyItem = HistoryItemModel(
+                    type = "Gom ảnh",
+                    title = videoTitle,
+                    date = currentDate,
+                    imageUri = savedDoc.absolutePath
+                )
+                historyRepository.addHistoryItem(historyItem)
+                hasAutoSavedHistory = true
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -414,7 +456,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     "Video tạo từ ${photoUris.size.coerceAtLeast(1)} ảnh AI"
                 }
 
-                // 1. Lưu bản gốc vào App Documents riêng
+                // 1. Lưu bản gốc vào App Documents riêng nếu chưa có
                 val docFile = if (appDocumentVideoFile == null) {
                     val savedDoc = VideoGenerator.saveVideoToAppDocuments(
                         context = requireContext(),
@@ -432,19 +474,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     title = "PhotoArt_Memories_Video"
                 )
 
-                // 3. Lưu vào Lịch sử (History) của app
-                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-                val currentDate = dateFormat.format(Date())
-
-                val historyItem = HistoryItemModel(
-                    type = "Gom ảnh",
-                    title = videoTitle,
-                    date = currentDate,
-                    imageUri = docFile.absolutePath
-                )
-                historyRepository.addHistoryItem(historyItem)
-
-                Toast.makeText(requireContext(), "Đã lưu video thành công vào ứng dụng và thư viện ảnh!", Toast.LENGTH_SHORT).show()
+                AppDialogHelper.showSaveSuccessDialog(requireActivity())
             } else {
                 Toast.makeText(requireContext(), "Không thể lưu video!", Toast.LENGTH_SHORT).show()
             }

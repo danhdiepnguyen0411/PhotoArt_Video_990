@@ -48,6 +48,43 @@ object AppDialogHelper {
     }
 
     /**
+     * Shows Delete History confirmation popup (600Y Tree Scan design system)
+     */
+    fun showDeleteHistoryDialog(
+        activity: Activity,
+        onConfirmDelete: () -> Unit
+    ) {
+        if (activity.isFinishing || activity.isDestroyed) return
+
+        val dialogView = LayoutInflater.from(activity).inflate(R.layout.dialog_delete_history, null)
+        val btnConfirm = dialogView.findViewById<TextView>(R.id.btnConfirmDelete)
+        val btnCancel = dialogView.findViewById<TextView>(R.id.btnCancelDelete)
+
+        val dialog = AlertDialog.Builder(activity)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        btnConfirm.setOnClickListener {
+            dialog.dismiss()
+            onConfirmDelete.invoke()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.apply {
+            setLayout(
+                (activity.resources.displayMetrics.widthPixels * 0.90).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+    }
+
+    /**
      * Shows Restore Error popup
      */
     fun showRestoreErrorDialog(

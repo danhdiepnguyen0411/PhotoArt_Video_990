@@ -201,8 +201,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupRecentHistory() {
-        recentHistoryAdapter = HomeMediaAdapter(emptyList()) {
-            (parentFragment as? MainFragment)?.selectTab(2)
+        recentHistoryAdapter = HomeMediaAdapter(emptyList()) { item ->
+            val historyItems = historyRepository.getHistoryList()
+            val matched = historyItems.find { it.title == item.label || (item.imageUrl != null && it.imageUrl == item.imageUrl) }
+            if (matched != null) {
+                val bundle = android.os.Bundle().apply {
+                    putString(
+                        com.example.phortart_video_990.ui.screen.history.HistoryDetailFragment.KEY_HISTORY_ITEM_JSON,
+                        com.google.gson.Gson().toJson(matched)
+                    )
+                }
+                val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+                navController.navigateSafe(R.id.action_mainFragment_to_historyDetailFragment, bundle)
+            } else {
+                (parentFragment as? MainFragment)?.selectTab(2)
+            }
         }
         binding.rvRecentHistory.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -226,8 +239,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupSuggestions() {
-        suggestionAdapter = HomeMediaAdapter(emptyList()) {
-            (parentFragment as? MainFragment)?.selectTab(1)
+        suggestionAdapter = HomeMediaAdapter(emptyList()) { item ->
+            val bundle = android.os.Bundle().apply {
+                putString("template_title", item.label)
+                putString("template_category", item.category)
+                putString("template_thumb", item.imageUrl)
+            }
+            val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+            navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
         }
         binding.rvSuggestions.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -235,15 +254,44 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupHotTemplates() {
-        hotTemplateAdapter = HomeMediaAdapter(emptyList()) {
-            (parentFragment as? MainFragment)?.selectTab(1)
+        hotTemplateAdapter = HomeMediaAdapter(emptyList()) { item ->
+            val bundle = android.os.Bundle().apply {
+                putString("template_title", item.label)
+                putString("template_category", item.category)
+                putString("template_thumb", item.imageUrl)
+            }
+            val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+            navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
         }
         binding.rvHotTemplates.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvHotTemplates.adapter = hotTemplateAdapter
     }
 
+    private fun getFigmaSuggestionFallback(): List<HomeMediaItemModel> {
+        return listOf(
+            HomeMediaItemModel(imageRes = R.drawable.suggestion_ai_effect, label = "AI Effect", category = "AI_EFFECT"),
+            HomeMediaItemModel(imageRes = R.drawable.suggestion_ai_style, label = "AI Style", category = "AI_STYLE"),
+            HomeMediaItemModel(imageRes = R.drawable.suggestion_ai_dance, label = "AI Dance", category = "AI_DANCE"),
+            HomeMediaItemModel(imageRes = R.drawable.suggestion_ai_fantasy, label = "Fantasy", category = "FANTASY"),
+            HomeMediaItemModel(imageRes = R.drawable.suggestion_ai_portrait, label = "Portrait", category = "PORTRAIT")
+        )
+    }
+
+    private fun getFigmaHotFallback(): List<HomeMediaItemModel> {
+        return listOf(
+            HomeMediaItemModel(imageRes = R.drawable.template_selfie, label = "Selfie", category = "SELFIE"),
+            HomeMediaItemModel(imageRes = R.drawable.template_fantasy, label = "Fantasy", category = "FANTASY"),
+            HomeMediaItemModel(imageRes = R.drawable.template_trendy, label = "Trendy", category = "TRENDY"),
+            HomeMediaItemModel(imageRes = R.drawable.template_cinematic, label = "Cinematic", category = "CINEMATIC"),
+            HomeMediaItemModel(imageRes = R.drawable.template_vintage, label = "Vintage", category = "VINTAGE")
+        )
+    }
+
     private fun loadApiTemplates() {
+        hotTemplateAdapter.submitList(getFigmaHotFallback())
+        suggestionAdapter.submitList(getFigmaSuggestionFallback())
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val templates = templateRepository.getTemplates()
@@ -272,7 +320,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     suggestionAdapter.submitList(suggestionList)
                 }
             } catch (e: Exception) {
-                // If API fails, lists remain empty (no fake data)
+                // Keep the Figma fallback items
             }
         }
     }

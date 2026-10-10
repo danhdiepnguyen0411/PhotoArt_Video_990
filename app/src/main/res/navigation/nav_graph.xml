@@ -86,6 +86,9 @@
         <action
             android:id="@+id/action_mainFragment_to_createTemplateVideoFragment"
             app:destination="@id/createTemplateVideoFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_historyDetailFragment"
+            app:destination="@id/historyDetailFragment" />
     </fragment>
 
     <!-- 5 Feature Screens -->
@@ -201,6 +204,26 @@
         <action
             android:id="@+id/action_templateVideoResultFragment_to_musicFragment"
             app:destination="@id/musicFragment" />
+    </fragment>
+
+    <!-- History Detail Screen -->
+    <fragment
+        android:id="@+id/historyDetailFragment"
+        android:name="com.example.phortart_video_990.ui.screen.history.HistoryDetailFragment"
+        android:label="HistoryDetailFragment"
+        tools:layout="@layout/fragment_history_detail">
+        <action
+            android:id="@+id/action_historyDetailFragment_to_restoreFragment"
+            app:destination="@id/restoreFragment" />
+        <action
+            android:id="@+id/action_historyDetailFragment_to_enhanceFragment"
+            app:destination="@id/enhanceFragment" />
+        <action
+            android:id="@+id/action_historyDetailFragment_to_memoriesFragment"
+            app:destination="@id/memoriesFragment" />
+        <action
+            android:id="@+id/action_historyDetailFragment_to_createTemplateVideoFragment"
+            app:destination="@id/createTemplateVideoFragment" />
     </fragment>
 
 </navigation>

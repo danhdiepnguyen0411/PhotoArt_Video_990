@@ -38,8 +38,8 @@
     <string name="home_brand_title">Photo AI</string>
     <string name="home_see_all">Xem tất cả</string>
     <string name="home_recent_history">Lịch sử gần đây</string>
-    <string name="home_suggestions">Gợi ý chủ đề cho bạn</string>
-    <string name="home_hot_templates">Template hot</string>
+    <string name="home_suggestions">Dành riêng cho bạn</string>
+    <string name="home_hot_templates">Hot</string>
 
     <!-- 3 Core Features -->
     <string name="feature_video_title">Gom ảnh\ntạo video</string>

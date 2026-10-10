@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.dialog.AppDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.ShareUtils
 import com.example.phortart_video_990.core.utils.VideoGenerator
@@ -435,19 +436,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
                     title = "PhotoArt_Template_Video"
                 )
 
-                // 3. Cập nhật vào Lịch sử
-                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-                val title = if (!musicTitle.isNullOrBlank()) "Mẫu AI • Nhạc: $musicTitle" else "Video Mẫu AI"
-                val item = HistoryItemModel(
-                    type = "Mẫu AI",
-                    title = title,
-                    date = dateFormat.format(Date()),
-                    imageUri = docFile.absolutePath
-                )
-                historyRepository.addHistoryItem(item)
-
-                Toast.makeText(requireContext(), "Đã lưu video thành công vào thư viện ảnh!", Toast.LENGTH_SHORT).show()
-                // Tiếp tục ở lại màn hình để người dùng có thể xem lại hoặc chia sẻ tiếp
+                AppDialogHelper.showSaveSuccessDialog(requireActivity())
             } else {
                 Toast.makeText(requireContext(), "Không thể xuất video!", Toast.LENGTH_SHORT).show()
             }

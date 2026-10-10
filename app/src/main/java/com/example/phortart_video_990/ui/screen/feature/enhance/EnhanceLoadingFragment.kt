@@ -12,14 +12,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.AIPromptRepository
+import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentEnhanceLoadingBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(FragmentEnhanceLoadingBinding::inflate) {
 
     private val promptRepository by lazy { AIPromptRepository(requireContext()) }
+    private val historyRepository by lazy { HistoryRepository(requireContext()) }
     private var progressAnimator: ValueAnimator? = null
 
     private var userPrompt: String = ""
@@ -87,6 +93,35 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
                 return@launch
             }
             val outputUrl = result.getOrNull()?.outputUrl.orEmpty()
+
+            // Preload the AI generated image into Coil cache so it renders immediately upon opening result screen
+            if (outputUrl.isNotBlank()) {
+                try {
+                    val imageLoader = coil.Coil.imageLoader(requireContext())
+                    val request = coil.request.ImageRequest.Builder(requireContext())
+                        .data(outputUrl)
+                        .build()
+                    imageLoader.execute(request)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                // Tự động lưu vào lịch sử ngay khi gen ra thành công
+                try {
+                    val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                    val currentDate = dateFormat.format(Date())
+                    val historyItem = HistoryItemModel(
+                        type = "Prompt AI",
+                        title = userPrompt.ifBlank { "Tạo ảnh AI" },
+                        date = currentDate,
+                        imageUri = outputUrl,
+                        imageUrl = outputUrl
+                    )
+                    historyRepository.addHistoryItem(historyItem)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
 
             // Animate to 100%
             progressAnimator?.cancel()

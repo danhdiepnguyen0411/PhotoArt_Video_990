@@ -25,8 +25,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_success_popup_check"
-            app:tint="#4A63E8"
+            android:src="@drawable/ic_dialog_save_check"
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
