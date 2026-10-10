@@ -17,16 +17,15 @@ import java.util.Locale
 
 class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesBinding::inflate) {
 
-    private var selectedImageUri: Uri? = null
+    private val selectedPhotos = mutableListOf<Uri>()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            selectedImageUri = uri
-            binding.ivSelectedPhoto.visibility = View.VISIBLE
-            binding.llUploadPrompt.visibility = View.GONE
-            binding.ivSelectedPhoto.load(uri) {
-                crossfade(true)
+    private val pickMultipleImagesLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
+            val newUris = uris.filter { it !in selectedPhotos }
+            if (newUris.isNotEmpty()) {
+                selectedPhotos.addAll(newUris)
+                updatePhotosUi()
             }
         }
     }
@@ -35,7 +34,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
     override fun initView() {
         binding.tvTopTitle.text = getString(R.string.feature_video_title).replace("\n", " ")
-        binding.tvFunctionName.text = getString(R.string.feature_video_title).replace("\n", " ")
+
+        updatePhotosUi()
 
         // Observe returned music selection from MusicFragment
         findNavController().currentBackStackEntry?.savedStateHandle
@@ -49,13 +49,87 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             }
     }
 
+    private fun updatePhotosUi() {
+        val count = selectedPhotos.size
+        if (count > 0) {
+            binding.cardUploadPhoto.visibility = View.GONE
+            binding.llSelectedPhotosContainer.visibility = View.VISIBLE
+            binding.tvSelectedCount.visibility = View.VISIBLE
+            binding.tvSelectedCount.text = "$count ảnh đã chọn"
+
+            // Layer 1 (Top image)
+            binding.ivStackImage1.load(selectedPhotos[0]) {
+                crossfade(true)
+            }
+
+            // Layer 2 (Middle image)
+            if (count > 1) {
+                binding.cardStack2.visibility = View.VISIBLE
+                binding.ivStackImage2.load(selectedPhotos[1]) {
+                    crossfade(true)
+                }
+            } else {
+                binding.cardStack2.visibility = View.GONE
+            }
+
+            // Layer 3 (Bottom image)
+            if (count > 2) {
+                binding.cardStack3.visibility = View.VISIBLE
+                binding.ivStackImage3.load(selectedPhotos[2]) {
+                    crossfade(true)
+                }
+            } else {
+                binding.cardStack3.visibility = View.GONE
+            }
+
+            // Badge overlay text on top image (+N or count)
+            if (count > 1) {
+                binding.tvStackCountBadge.visibility = View.VISIBLE
+                binding.tvStackCountBadge.text = "+${count - 1}"
+            } else {
+                binding.tvStackCountBadge.visibility = View.GONE
+            }
+        } else {
+            binding.cardUploadPhoto.visibility = View.VISIBLE
+            binding.llSelectedPhotosContainer.visibility = View.GONE
+            binding.tvSelectedCount.visibility = View.GONE
+        }
+    }
+
+    private fun openPhotoViewer(initialPosition: Int = 0) {
+        if (selectedPhotos.isEmpty()) return
+        PhotoViewerDialog(
+            context = requireContext(),
+            photos = selectedPhotos,
+            initialPosition = initialPosition,
+            onPhotosChanged = {
+                updatePhotosUi()
+            },
+            onAddMoreRequested = {
+                pickMultipleImagesLauncher.launch("image/*")
+            }
+        ).show()
+    }
+
     override fun initListener() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
 
         binding.cardUploadPhoto.setOnClickListener {
-            pickImageLauncher.launch("image/*")
+            pickMultipleImagesLauncher.launch("image/*")
+        }
+
+        binding.btnAddMorePhotos.setOnClickListener {
+            pickMultipleImagesLauncher.launch("image/*")
+        }
+
+        binding.cardPhotoStackContainer.setOnClickListener {
+            openPhotoViewer(0)
+        }
+
+        binding.btnViewAllPhotos.setOnClickListener {
+            openPhotoViewer(0)
         }
 
         binding.cardSelectMusic.setOnClickListener {
@@ -63,8 +137,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
 
         binding.btnCreateVideo.setOnClickListener {
-            if (selectedImageUri == null) {
-                Toast.makeText(requireContext(), "Vui lòng chọn ảnh từ thư viện để tạo video", Toast.LENGTH_SHORT).show()
+            if (selectedPhotos.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng chọn ít nhất 1 ảnh để tạo video", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -72,20 +146,24 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val currentDate = dateFormat.format(Date())
 
             val videoTitle = if (!selectedMusicTitle.isNullOrBlank()) {
-                "Video tạo từ ảnh AI • Nhạc: $selectedMusicTitle"
+                "Video tạo từ ${selectedPhotos.size} ảnh AI • Nhạc: $selectedMusicTitle"
             } else {
-                "Video tạo từ ảnh AI"
+                "Video tạo từ ${selectedPhotos.size} ảnh AI"
             }
 
             val historyItem = HistoryItemModel(
                 type = "Gom ảnh",
                 title = videoTitle,
                 date = currentDate,
-                imageUri = selectedImageUri.toString()
+                imageUri = selectedPhotos.first().toString()
             )
             historyRepository.addHistoryItem(historyItem)
 
-            Toast.makeText(requireContext(), "Đã tạo video thành công từ ảnh của bạn!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Đã tạo video thành công từ ${selectedPhotos.size} ảnh của bạn!",
+                Toast.LENGTH_SHORT
+            ).show()
             findNavController().popBackStack()
         }
     }
