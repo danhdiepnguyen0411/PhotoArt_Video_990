@@ -14,13 +14,13 @@ class TemplateViewModel(
     private val repository: TemplateRepository = TemplateRepository()
 ) : ViewModel() {
 
-    private val _categories = MutableStateFlow<List<CategoryModel>>(listOf(CategoryModel.ALL))
+    private val _categories = MutableStateFlow<List<CategoryModel>>(repository.getDefaultCategories())
     val categories: StateFlow<List<CategoryModel>> = _categories.asStateFlow()
 
     private val _selectedCategoryCode = MutableStateFlow("ALL")
     val selectedCategoryCode: StateFlow<String> = _selectedCategoryCode.asStateFlow()
 
-    private val _templates = MutableStateFlow<List<TemplateModel>>(emptyList())
+    private val _templates = MutableStateFlow<List<TemplateModel>>(repository.getDefaultTemplates())
     val templates: StateFlow<List<TemplateModel>> = _templates.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
@@ -47,7 +47,10 @@ class TemplateViewModel(
                 // 3. Dynamic category discovery from templates
                 discoverExtraCategories(templateList)
             } catch (e: Exception) {
-                _templates.value = emptyList()
+                // Keep default templates on error
+                if (_templates.value.isEmpty()) {
+                    _templates.value = repository.getDefaultTemplates()
+                }
             } finally {
                 _isLoading.value = false
             }
@@ -69,7 +72,9 @@ class TemplateViewModel(
                 _templates.value = list
                 discoverExtraCategories(list)
             } catch (e: Exception) {
-                _templates.value = emptyList()
+                if (_templates.value.isEmpty()) {
+                    _templates.value = repository.getDefaultTemplates()
+                }
             } finally {
                 _isLoading.value = false
             }

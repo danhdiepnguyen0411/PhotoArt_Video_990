@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    app:cardBackgroundColor="@color/card_bg"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/card_stroke"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="1dp"
+    app:cardPreventCornerOverlap="false"
+    app:strokeColor="#EFF2F7"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -19,17 +20,17 @@
         <!-- Thumbnail Container -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="170dp">
+            android:layout_height="180dp">
 
             <ImageView
                 android:id="@+id/ivTemplateThumb"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
                 android:contentDescription="Template Cover"
+                android:scaleType="centerCrop"
                 tools:src="@drawable/template_trendy" />
 
-            <!-- Duration Badge -->
+            <!-- Duration Badge (Bottom-Left) -->
             <LinearLayout
                 android:id="@+id/llDurationBadge"
                 android:layout_width="wrap_content"
@@ -39,14 +40,14 @@
                 android:background="@drawable/bg_template_duration"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp"
+                android:paddingHorizontal="7dp"
                 android:paddingVertical="3dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
                     android:contentDescription="Play"
                     android:src="@drawable/ic_play_small" />
 
@@ -58,36 +59,34 @@
                     android:textColor="@color/white"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    tools:text="0:15" />
+                    tools:text="00:16" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Info Section -->
+        <!-- Information Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
-            android:paddingVertical="10dp">
+            android:paddingTop="8dp"
+            android:paddingBottom="10dp">
 
-            <!-- Title with marquee for long text -->
+            <!-- Title with single line and end ellipsis -->
             <TextView
                 android:id="@+id/tvTemplateTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:singleLine="true"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:scrollHorizontally="true"
-                android:textColor="@color/navy"
+                android:textColor="#1A243D"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                tools:text="Yêu thương đong đầy" />
+                tools:text="Cùng nhau đi khắp th..." />
 
-            <!-- Meta Row -->
+            <!-- Meta Row: Views, Photo count, Chevron -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,8 +102,8 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
                         android:contentDescription="Views"
                         android:src="@drawable/ic_eye_small" />
 
@@ -113,33 +112,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:textColor="@color/muted"
+                        android:textColor="#8E9BB0"
                         android:textSize="11sp"
-                        tools:text="1.2k" />
+                        tools:text="892,4K" />
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="Photos"
+                        android:src="@drawable/ic_template_images" />
 
                     <TextView
-                        android:id="@+id/tvSource"
+                        android:id="@+id/tvPhotoCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="#157664E8"
-                        android:paddingHorizontal="5dp"
-                        android:paddingVertical="1dp"
-                        android:textColor="@color/purple_primary"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        tools:text="CapCut" />
+                        android:layout_marginStart="4dp"
+                        android:textColor="#8E9BB0"
+                        android:textSize="11sp"
+                        tools:text="6" />
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:id="@+id/ivArrow"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
                     android:contentDescription="Arrow"
-                    android:src="@drawable/ic_arrow_right"
+                    android:src="@drawable/ic_chevron_right"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/muted" />
+                    app:tint="#CBD5E1" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

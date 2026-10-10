@@ -1,5 +1,6 @@
 package com.example.phortart_video_990.ui.screen.template
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -50,10 +51,10 @@ class CategoryAdapter(
 
             if (isSelected) {
                 binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_selected)
-                binding.tvCategoryName.setTextColor(binding.root.context.getColor(R.color.white))
+                binding.tvCategoryName.setTextColor(Color.WHITE)
             } else {
                 binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_unselected)
-                binding.tvCategoryName.setTextColor(binding.root.context.getColor(R.color.muted))
+                binding.tvCategoryName.setTextColor(Color.parseColor("#596579"))
             }
 
             binding.root.setOnClickListener {
