@@ -23,7 +23,7 @@
             android:focusable="true"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="999dp"
-            app:cardElevation="3dp"
+            app:cardElevation="0dp"
             app:cardPreventCornerOverlap="false"
             app:strokeWidth="0dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +74,7 @@
             android:focusable="true"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="999dp"
-            app:cardElevation="3dp"
+            app:cardElevation="0dp"
             app:cardPreventCornerOverlap="false"
             app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="2dp"
+                app:cardElevation="0dp"
                 app:cardPreventCornerOverlap="false"
                 app:strokeWidth="0dp">
 
@@ -376,7 +376,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="18dp"
-                        app:cardElevation="2dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="#3B82F6"
                         app:strokeWidth="2.5dp">
 
@@ -441,7 +441,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="18dp"
-                        app:cardElevation="2dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="@color/transparent"
                         app:strokeWidth="0dp">
 
@@ -482,7 +482,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="18dp"
-                        app:cardElevation="2dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="@color/transparent"
                         app:strokeWidth="0dp">
 

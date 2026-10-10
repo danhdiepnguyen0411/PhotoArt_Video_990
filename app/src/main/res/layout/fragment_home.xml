@@ -74,13 +74,9 @@
                 android:background="@drawable/bg_btn_pro"
                 android:clickable="true"
                 android:focusable="true"
-                android:elevation="4dp"
                 android:gravity="center"
                 android:paddingStart="18dp"
                 android:paddingEnd="20dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#606E64EB"
-                android:outlineSpotShadowColor="#706E64EB"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -141,7 +137,6 @@
                 android:layout_marginBottom="12dp"
                 android:paddingVertical="4dp"
                 android:paddingHorizontal="6dp"
-                android:elevation="12dp"
                 app:layout_constraintBottom_toBottomOf="@+id/cvBannerWrapper"
                 app:layout_constraintEnd_toEndOf="@+id/cvBannerWrapper"
                 app:layout_constraintStart_toStartOf="@+id/cvBannerWrapper" />
@@ -168,10 +163,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -211,10 +202,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"
@@ -243,10 +230,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -286,10 +269,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"
@@ -318,10 +297,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -361,10 +336,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"

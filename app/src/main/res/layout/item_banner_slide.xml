@@ -100,7 +100,6 @@
                 android:clickable="true"
                 android:drawableEnd="@drawable/ic_arrow_right_btn"
                 android:drawablePadding="8dp"
-                android:elevation="6dp"
                 android:focusable="true"
                 android:gravity="center"
                 android:paddingStart="24dp"
@@ -109,9 +108,6 @@
                 android:textSize="15sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#606464EB"
-                android:outlineSpotShadowColor="#706464EB"
                 tools:text="Thử ngay" />
 
         </LinearLayout>

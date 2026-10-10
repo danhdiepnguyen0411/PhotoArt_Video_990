@@ -7,7 +7,7 @@
     android:layout_margin="5dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="18dp"
-    app:cardElevation="1dp"
+    app:cardElevation="0dp"
     app:cardPreventCornerOverlap="false"
     app:strokeColor="#EFF2F7"
     app:strokeWidth="1dp">

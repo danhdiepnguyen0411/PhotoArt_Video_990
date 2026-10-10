@@ -289,19 +289,7 @@ class UninstallActivity : AppCompatActivity() {
             )
             texts[i]?.typeface = if (isSelected) boldTypeface else regularTypeface
             texts[i]?.setTextColor(android.graphics.Color.parseColor(if (isSelected) "#111827" else "#39403D"))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                if (isSelected) {
-                    card.elevation = 3f * density
-                    card.outlineAmbientShadowColor = android.graphics.Color.parseColor("#14000000")
-                    card.outlineSpotShadowColor = android.graphics.Color.parseColor("#14000000")
-                } else {
-                    card.elevation = 4f * density
-                    card.outlineAmbientShadowColor = android.graphics.Color.parseColor("#0D131B2E")
-                    card.outlineSpotShadowColor = android.graphics.Color.parseColor("#0D131B2E")
-                }
-            } else {
-                card.elevation = if (isSelected) 3f * density else 4f * density
-            }
+            card.elevation = 0f
         }
 
         val etOtherDetails = findViewById<EditText>(R.id.etOtherDetails)

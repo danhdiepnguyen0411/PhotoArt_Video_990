@@ -94,10 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardMaxElevation="10dp"
-                    android:outlineAmbientShadowColor="#33000000"
-                    android:outlineSpotShadowColor="#33000000"
+                    app:cardElevation="0dp"
                     app:strokeWidth="0dp"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardPreventCornerOverlap="false"
@@ -197,10 +194,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardMaxElevation="10dp"
-                    android:outlineAmbientShadowColor="#33000000"
-                    android:outlineSpotShadowColor="#33000000"
+                    app:cardElevation="0dp"
                     app:strokeWidth="0dp"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardPreventCornerOverlap="false"
@@ -315,9 +309,6 @@
                 android:layout_height="wrap_content"
                 android:minHeight="54dp"
                 android:background="@drawable/bg_btn_uninstall_bottom_primary"
-                android:elevation="4dp"
-                android:outlineAmbientShadowColor="#1F000000"
-                android:outlineSpotShadowColor="#1F000000"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:paddingTop="16dp"
@@ -385,7 +376,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FAFAFA"
-            android:elevation="4dp"
             android:outlineProvider="none"
             android:clickable="true"
             android:focusable="true"
@@ -469,9 +459,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -509,9 +496,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -549,9 +533,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -589,9 +570,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -629,9 +607,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -669,9 +644,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_uninstall_card_unselected"
-                    android:elevation="4dp"
-                    android:outlineAmbientShadowColor="#0D131B2E"
-                    android:outlineSpotShadowColor="#0D131B2E"
                     android:padding="16dp">
 
                     <TextView
@@ -747,9 +719,6 @@
                 android:layout_height="wrap_content"
                 android:minHeight="54dp"
                 android:background="@drawable/bg_btn_uninstall_bottom_primary"
-                android:elevation="4dp"
-                android:outlineAmbientShadowColor="#1F000000"
-                android:outlineSpotShadowColor="#1F000000"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:paddingTop="16dp"
