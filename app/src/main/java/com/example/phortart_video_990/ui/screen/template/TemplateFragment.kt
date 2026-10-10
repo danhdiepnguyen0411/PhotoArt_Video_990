@@ -39,10 +39,14 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
 
         // Setup Template Grid (2 Columns)
         templateAdapter = TemplateAdapter(emptyList()) { selectedTemplate ->
-            // Navigate to feature create video with template
-            parentFragment?.parentFragment?.findNavController()?.navigate(
-                R.id.action_mainFragment_to_memoriesFragment
-            ) ?: findNavController().navigate(R.id.action_mainFragment_to_memoriesFragment)
+            val bundle = android.os.Bundle().apply {
+                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, selectedTemplate.id)
+                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, selectedTemplate.title)
+                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, selectedTemplate.category)
+                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, selectedTemplate.safeImageUrl.orEmpty())
+            }
+            val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+            navController.navigate(R.id.action_mainFragment_to_createTemplateVideoFragment, bundle)
         }
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = templateAdapter

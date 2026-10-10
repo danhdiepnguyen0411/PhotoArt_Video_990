@@ -17,6 +17,14 @@ data class CategoryModel(
                 code.startsWith("MUSIC_", ignoreCase = true) ||
                 name.startsWith("MUSIC_", ignoreCase = true)
 
+    val isAiTool: Boolean
+        get() = code.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
+                name.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
+                code.equals("AI_TOOL", ignoreCase = true) ||
+                name.equals("AI_TOOL", ignoreCase = true) ||
+                groupCode.equals("AI_TOOL", ignoreCase = true) ||
+                groupName.equals("AI_TOOL", ignoreCase = true)
+
     val displayName: String
         get() {
             val raw = name.ifBlank { code }
