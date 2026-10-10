@@ -132,20 +132,49 @@
                 app:tint="@color/navy"
                 android:contentDescription="Play Preview" />
 
+            <ProgressBar
+                android:id="@+id/pbPreviewLoading"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
         </FrameLayout>
 
         <!-- Select / Apply Track Button -->
-        <TextView
-            android:id="@+id/btnSelectTrack"
+        <FrameLayout
+            android:id="@+id/btnSelectContainer"
             android:layout_width="wrap_content"
             android:layout_height="34dp"
             android:background="@drawable/bg_btn_music_select"
-            android:gravity="center"
-            android:paddingHorizontal="14dp"
-            android:text="Chọn"
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:clickable="true"
+            android:focusable="true"
+            android:minWidth="64dp">
+
+            <TextView
+                android:id="@+id/btnSelectTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:text="Chọn"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/pbSelectLoading"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/white"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

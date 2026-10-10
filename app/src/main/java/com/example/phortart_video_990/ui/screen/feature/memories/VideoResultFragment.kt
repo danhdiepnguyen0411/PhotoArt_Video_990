@@ -2,24 +2,24 @@ package com.example.phortart_video_990.ui.screen.feature.memories
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.Intent
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.widget.Toast
-import androidx.core.animation.doOnEnd
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.AudioCacheManager
+import com.example.phortart_video_990.core.utils.ShareUtils
 import com.example.phortart_video_990.core.utils.VideoGenerator
-import com.example.phortart_video_990.core.utils.VideoGenerator.TransitionType
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentVideoResultBinding
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -30,107 +30,70 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
 
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
+    private var videoPath: String? = null
     private var photoUris: List<String> = emptyList()
     private var musicTitle: String? = null
     private var musicAudioUrl: String? = null
+    private var musicAudioFilePath: String? = null
     private var musicImageUrl: String? = null
 
-    // Danh sách hiệu ứng chuyển cảnh ngẫu nhiên giữa các ảnh
-    private var randomTransitions: List<TransitionType> = emptyList()
-
-    // Video playback constants & state (Tính động theo số lượng ảnh: min 1.0s, max 2.5s mỗi ảnh)
+    // Video & Audio state
     private var videoDurationSec = 15f
-    private var secondsPerPhoto = 2.0f
     private var isPlaying = false
-    private var currentTimeSec = 0f
-    private var currentPhotoIndex = -1
-
-    private var playbackAnimator: ValueAnimator? = null
-    private var previewMediaPlayer: android.media.MediaPlayer? = null
+    private var videoMediaPlayer: MediaPlayer? = null
+    private var externalAudioPlayer: MediaPlayer? = null
+    private var progressPollingJob: Job? = null
     private var noteIconAnimator: ObjectAnimator? = null
 
-    // Lưu trữ file video: đã lưu vào App Documents hay file tạm trong Cache
+    // Track active playing video file & export
+    private var currentPlayingVideoFile: File? = null
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
     private var isExporting = false
 
     override fun initView() {
         val args = arguments
+        videoPath = args?.getString(ARG_VIDEO_PATH)
         photoUris = args?.getStringArrayList(ARG_PHOTOS) ?: emptyList()
         musicTitle = args?.getString(ARG_TRACK)
         musicAudioUrl = args?.getString(ARG_AUDIO_URL)
+        musicAudioFilePath = args?.getString(ARG_AUDIO_PATH)
         musicImageUrl = args?.getString(ARG_IMAGE_URL)
 
-        // Tính thời lượng video và thời gian mỗi ảnh:
-        // Đảm bảo chia đều mỗi ảnh trong khoảng [1.0s .. 2.5s]
-        videoDurationSec = VideoGenerator.calculateVideoDuration(photoUris.size)
-        secondsPerPhoto = VideoGenerator.calculateSecondsPerPhoto(videoDurationSec, photoUris.size)
-
-        // Sinh danh sách chuyển cảnh ngẫu nhiên cố định cho phiên video này
-        if (photoUris.isNotEmpty()) {
-            randomTransitions = VideoGenerator.generateRandomTransitions(photoUris.size)
-        }
-
         updateMusicInfoUi()
-
-        if (photoUris.isNotEmpty()) {
-            displayPhoto(0)
-        }
-
-        updateTimeUi(0f)
         updatePlayStateUi(false)
+        initializeVideo()
 
-        // Tự động phát video và nhạc xem trước khi vừa mở màn hình
-        if (photoUris.isNotEmpty()) {
-            binding.root.post {
-                startPlayback()
+        // Lắng nghe đổi bài hát mới từ MusicFragment
+        val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        stateHandle?.getLiveData<String>("selected_music_title")?.observe(viewLifecycleOwner) { title ->
+            if (!title.isNullOrBlank()) {
+                val newAudioUrl = stateHandle.get<String?>("selected_music_audio_url")
+                val newFilePath = stateHandle.get<String?>("selected_music_file_path")
+                val newImgUrl = stateHandle.get<String?>("selected_music_image_url")
+
+                // Clear keys ngay lập tức tránh trigger lặp lại
+                stateHandle.remove<String>("selected_music_title")
+                stateHandle.remove<String?>("selected_music_audio_url")
+                stateHandle.remove<String?>("selected_music_file_path")
+                stateHandle.remove<String?>("selected_music_image_url")
+
+                musicTitle = title
+                musicAudioUrl = newAudioUrl
+                musicAudioFilePath = newFilePath
+                musicImageUrl = newImgUrl
+
+                // Invalidate bản video đã xuất trước đó vì đã đổi nhạc mới
+                appDocumentVideoFile = null
+                tempShareCacheFile?.delete()
+                tempShareCacheFile = null
+
+                updateMusicInfoUi()
+                handleMusicChanged(newAudioUrl, newFilePath)
             }
         }
-
-        // Lắng nghe bài hát mới được chọn trả về từ MusicFragment
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<String>("selected_music_title")
-            ?.observe(viewLifecycleOwner) { newMusic ->
-                if (!newMusic.isNullOrBlank() && newMusic != musicTitle) {
-                    musicTitle = newMusic
-                    updateMusicInfoUi()
-                    invalidateRenderedVideos()
-                    resetPlaybackToStart()
-                    binding.root.post {
-                        startPlayback()
-                    }
-                }
-            }
-
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<String?>("selected_music_audio_url")
-            ?.observe(viewLifecycleOwner) { newAudioUrl ->
-                if (!newAudioUrl.isNullOrBlank() && newAudioUrl != musicAudioUrl) {
-                    musicAudioUrl = newAudioUrl
-                    invalidateRenderedVideos()
-                    resetPlaybackToStart()
-                    binding.root.post {
-                        startPlayback()
-                    }
-                }
-            }
-
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<String?>("selected_music_image_url")
-            ?.observe(viewLifecycleOwner) { newImageUrl ->
-                if (newImageUrl != musicImageUrl) {
-                    musicImageUrl = newImageUrl
-                    updateMusicInfoUi()
-                }
-            }
     }
 
-    /**
-     * Cập nhật thông tin nhạc nền:
-     * - Title hiển thị tên nhạc (hoặc "Chưa chọn nhạc")
-     * - Subtitle chỉ hiển thị số giây nhạc (ví dụ: "00:15")
-     * - Ảnh cover của bài nhạc
-     */
     private fun updateMusicInfoUi() {
         val title = musicTitle?.takeIf { it.isNotBlank() } ?: "Chưa chọn nhạc"
         binding.tvVideoTitle.text = title
@@ -149,11 +112,204 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         }
     }
 
-    /**
-     * Hiệu ứng chuyển động (nhịp nốt nhạc) khi video đang chạy và có bài hát
-     */
+    private fun initializeVideo() {
+        val path = videoPath
+        if (path.isNullOrBlank()) return
+
+        val localFile = File(path)
+        if (localFile.exists()) {
+            currentPlayingVideoFile = localFile
+            startVideoPlayback(localFile)
+        } else {
+            Toast.makeText(requireContext(), "Không tìm thấy file video!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun startVideoPlayback(videoFile: File) {
+        startVideoPlaybackFromUri(Uri.fromFile(videoFile))
+    }
+
+    private fun startVideoPlaybackFromUri(uri: Uri) {
+        binding.videoView.setVideoURI(uri)
+        binding.videoView.setOnPreparedListener { mp ->
+            videoMediaPlayer = mp
+            try {
+                mp.isLooping = true
+            } catch (_: Exception) {}
+
+            // Nếu người dùng chọn đổi nhạc ngoài -> Mute âm thanh video và phát nhạc ngoài
+            if (externalAudioPlayer != null || (!musicAudioUrl.isNullOrBlank() && musicAudioFilePath != null && currentPlayingVideoFile == null)) {
+                safeSetVideoVolume(0f, 0f)
+                playExternalAudioSync()
+            } else {
+                // Video đã được render sẵn nhạc từ MemoriesFragment
+                safeSetVideoVolume(1f, 1f)
+                stopExternalAudio()
+            }
+
+            val dur = mp.duration / 1000f
+            if (dur > 0) videoDurationSec = dur
+            binding.tvVideoSubtitle.text = formatTime(videoDurationSec)
+
+            binding.videoView.start()
+            isPlaying = true
+            updatePlayStateUi(true)
+            startProgressPolling()
+        }
+
+        binding.videoView.setOnCompletionListener {
+            binding.videoView.seekTo(0)
+            binding.videoView.start()
+            externalAudioPlayer?.let { ap ->
+                try {
+                    ap.seekTo(0)
+                    ap.start()
+                } catch (_: Exception) {}
+            }
+        }
+
+        binding.videoView.setOnErrorListener { _, _, _ ->
+            Toast.makeText(requireContext(), "Lỗi khi phát video", Toast.LENGTH_SHORT).show()
+            true
+        }
+    }
+
+    private fun safeSetVideoVolume(leftVolume: Float, rightVolume: Float) {
+        try {
+            videoMediaPlayer?.setVolume(leftVolume, rightVolume)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun handleMusicChanged(newAudioUrl: String?, newFilePath: String?) {
+        stopExternalAudio()
+
+        if (newAudioUrl.isNullOrBlank() && newFilePath.isNullOrBlank()) {
+            safeSetVideoVolume(1f, 1f)
+            stopNoteMusicAnimation()
+            return
+        }
+
+        safeSetVideoVolume(0f, 0f)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.pbVideoLoading.visibility = View.VISIBLE
+            val ctx = requireContext()
+            val audioFile = if (!newFilePath.isNullOrBlank() && File(newFilePath).exists()) {
+                File(newFilePath)
+            } else if (!newAudioUrl.isNullOrBlank()) {
+                AudioCacheManager.getOrDownloadAudio(ctx, newAudioUrl)
+            } else null
+            binding.pbVideoLoading.visibility = View.GONE
+
+            if (audioFile != null && audioFile.exists()) {
+                musicAudioFilePath = audioFile.absolutePath
+            }
+
+            safeSetVideoVolume(0f, 0f)
+            playExternalAudioSync()
+
+            if (!binding.videoView.isPlaying) {
+                binding.videoView.start()
+                isPlaying = true
+                updatePlayStateUi(true)
+                startProgressPolling()
+            }
+        }
+    }
+
+    private fun playExternalAudioSync() {
+        stopExternalAudio()
+        val audioPath = musicAudioFilePath
+        val audioUrl = musicAudioUrl
+
+        try {
+            val player = MediaPlayer().apply {
+                setAudioAttributes(
+                    android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+            }
+            externalAudioPlayer = player
+
+            if (!audioPath.isNullOrBlank() && File(audioPath).exists()) {
+                player.setDataSource(audioPath)
+            } else if (!audioUrl.isNullOrBlank()) {
+                player.setDataSource(audioUrl)
+            } else return
+
+            player.isLooping = true
+            player.setOnPreparedListener {
+                val currentPos = binding.videoView.currentPosition
+                if (currentPos > 0) {
+                    player.seekTo(currentPos)
+                }
+                player.start()
+                isPlaying = true
+                updatePlayStateUi(true)
+            }
+            player.prepareAsync()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopExternalAudio() {
+        try {
+            externalAudioPlayer?.stop()
+            externalAudioPlayer?.release()
+        } catch (_: Exception) {}
+        externalAudioPlayer = null
+    }
+
+    private fun startProgressPolling() {
+        progressPollingJob?.cancel()
+        progressPollingJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (isPlaying) {
+                if (binding.videoView.isPlaying) {
+                    val currentSec = binding.videoView.currentPosition / 1000f
+                    updateTimeUi(currentSec)
+                }
+                delay(200)
+            }
+        }
+    }
+
+    private fun togglePlayback() {
+        if (binding.videoView.isPlaying) {
+            binding.videoView.pause()
+            externalAudioPlayer?.pause()
+            isPlaying = false
+            updatePlayStateUi(false)
+        } else {
+            binding.videoView.start()
+            externalAudioPlayer?.start()
+            isPlaying = true
+            updatePlayStateUi(true)
+            startProgressPolling()
+        }
+    }
+
+    private fun updatePlayStateUi(playing: Boolean) {
+        val b = bindingOrNull ?: return
+        if (playing) {
+            b.btnPlayPause.alpha = 0f
+            b.btnPlayPause.isClickable = false
+            b.ivPlayPauseIcon.setImageResource(R.drawable.ic_pause_small)
+            startNoteMusicAnimation()
+        } else {
+            b.btnPlayPause.alpha = 1f
+            b.btnPlayPause.isClickable = true
+            b.ivPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+            stopNoteMusicAnimation()
+        }
+    }
+
     private fun startNoteMusicAnimation() {
-        if (!musicAudioUrl.isNullOrBlank()) {
+        if (!musicTitle.isNullOrBlank() || !musicAudioUrl.isNullOrBlank()) {
             if (noteIconAnimator == null) {
                 noteIconAnimator = ObjectAnimator.ofFloat(binding.flVideoNote, View.ROTATION, -15f, 15f).apply {
                     duration = 380
@@ -176,285 +332,10 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         bindingOrNull?.flVideoNote?.animate()?.rotation(0f)?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
     }
 
-    /**
-     * Dừng phát nhạc/video và reset về 00:00 cùng ảnh đầu tiên khi đổi bài hát
-     */
-    private fun resetPlaybackToStart() {
-        pausePlayback()
-        stopAudioPreview()
-        currentTimeSec = 0f
-        updateTimeUi(0f)
-        if (photoUris.isNotEmpty()) {
-            currentPhotoIndex = -1
-            displayPhoto(0)
-        }
-    }
-
-    private fun invalidateRenderedVideos() {
-        appDocumentVideoFile = null
-        tempShareCacheFile?.delete()
-        tempShareCacheFile = null
-    }
-
-    private fun displayPhoto(index: Int) {
-        if (index !in photoUris.indices) return
-        val prevIndex = currentPhotoIndex
-        currentPhotoIndex = index
-
-        val currentUri = Uri.parse(photoUris[index])
-
-        if (prevIndex != -1 && prevIndex != index && randomTransitions.isNotEmpty()) {
-            val transition = randomTransitions.getOrElse(prevIndex) { TransitionType.CROSS_FADE }
-            playTransitionAnimation(transition, currentUri)
-        } else {
-            resetPhotoTransformations()
-            binding.ivStagePhoto.load(currentUri) {
-                crossfade(true)
-            }
-        }
-    }
-
-    private fun resetPhotoTransformations() {
-        binding.ivStagePhoto.apply {
-            alpha = 1f
-            translationX = 0f
-            scaleX = 1f
-            scaleY = 1f
-        }
-        binding.ivStagePhotoNext.apply {
-            alpha = 0f
-            translationX = 0f
-            scaleX = 1f
-            scaleY = 1f
-        }
-    }
-
-    /**
-     * Mô phỏng hiệu ứng chuyển cảnh trực tiếp trên màn hình xem trước
-     */
-    private fun playTransitionAnimation(transition: TransitionType, nextPhotoUri: Uri) {
-        val stageWidth = binding.cardVideoStage.width.toFloat().coerceAtLeast(600f)
-
-        binding.ivStagePhotoNext.load(nextPhotoUri) {
-            crossfade(false)
-        }
-
-        when (transition) {
-            TransitionType.CROSS_FADE -> {
-                binding.ivStagePhotoNext.alpha = 0f
-                binding.ivStagePhotoNext.animate()
-                    .alpha(1f)
-                    .setDuration(450)
-                    .withEndAction {
-                        binding.ivStagePhoto.load(nextPhotoUri)
-                        resetPhotoTransformations()
-                    }
-                    .start()
-            }
-            TransitionType.SLIDE_LEFT -> {
-                binding.ivStagePhotoNext.translationX = stageWidth
-                binding.ivStagePhotoNext.alpha = 1f
-                binding.ivStagePhoto.animate()
-                    .translationX(-stageWidth)
-                    .setDuration(450)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .start()
-                binding.ivStagePhotoNext.animate()
-                    .translationX(0f)
-                    .setDuration(450)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .withEndAction {
-                        binding.ivStagePhoto.load(nextPhotoUri)
-                        resetPhotoTransformations()
-                    }
-                    .start()
-            }
-            TransitionType.ZOOM_IN -> {
-                binding.ivStagePhotoNext.alpha = 0f
-                binding.ivStagePhotoNext.scaleX = 0.85f
-                binding.ivStagePhotoNext.scaleY = 0.85f
-
-                binding.ivStagePhoto.animate()
-                    .scaleX(1.15f)
-                    .scaleY(1.15f)
-                    .alpha(0f)
-                    .setDuration(450)
-                    .start()
-
-                binding.ivStagePhotoNext.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(450)
-                    .withEndAction {
-                        binding.ivStagePhoto.load(nextPhotoUri)
-                        resetPhotoTransformations()
-                    }
-                    .start()
-            }
-            TransitionType.WIPE_DOWN, TransitionType.FLASH_PULSE -> {
-                binding.ivStagePhoto.animate()
-                    .alpha(0.15f)
-                    .setDuration(220)
-                    .withEndAction {
-                        binding.ivStagePhoto.load(nextPhotoUri)
-                        binding.ivStagePhoto.animate().alpha(1f).setDuration(220).start()
-                    }
-                    .start()
-            }
-        }
-    }
-
-    private fun startPlayback() {
-        if (photoUris.isEmpty() || isExporting) return
-        isPlaying = true
-        updatePlayStateUi(true)
-
-        val remainingTime = videoDurationSec - currentTimeSec
-        val remainingDurationMs = (remainingTime * 1000L).toLong()
-
-        playbackAnimator?.cancel()
-        playbackAnimator = ValueAnimator.ofFloat(currentTimeSec, videoDurationSec).apply {
-            duration = remainingDurationMs
-            interpolator = LinearInterpolator()
-            addUpdateListener { animator ->
-                val time = animator.animatedValue as Float
-                currentTimeSec = time
-                updateTimeUi(time)
-
-                val targetIndex = (time / secondsPerPhoto).toInt().coerceIn(0, photoUris.lastIndex)
-                if (targetIndex != currentPhotoIndex) {
-                    displayPhoto(targetIndex)
-                }
-            }
-            doOnEnd {
-                if (currentTimeSec >= videoDurationSec) {
-                    currentTimeSec = 0f
-                    isPlaying = false
-                    updatePlayStateUi(false)
-                    updateTimeUi(0f)
-                    displayPhoto(0)
-                    pauseAudioPreview()
-                }
-            }
-            start()
-        }
-        startAudioPreview()
-    }
-
-    private var isAudioPrepared = false
-
-    private fun startAudioPreview() {
-        val audioUrl = musicAudioUrl
-        if (audioUrl.isNullOrBlank()) return
-
-        try {
-            if (previewMediaPlayer == null) {
-                isAudioPrepared = false
-                previewMediaPlayer = android.media.MediaPlayer().apply {
-                    setAudioAttributes(
-                        android.media.AudioAttributes.Builder()
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                            .build()
-                    )
-                    setDataSource(audioUrl)
-                    isLooping = true
-                    setOnPreparedListener { mp ->
-                        isAudioPrepared = true
-                        if (isPlaying) {
-                            try {
-                                mp.seekTo((currentTimeSec * 1000).toInt())
-                                mp.start()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-                    setOnErrorListener { mp, what, extra ->
-                        isAudioPrepared = false
-                        try {
-                            mp.reset()
-                            mp.release()
-                        } catch (_: Exception) {}
-                        previewMediaPlayer = null
-                        true
-                    }
-                    prepareAsync()
-                }
-            } else {
-                previewMediaPlayer?.let { mp ->
-                    if (isAudioPrepared) {
-                        try {
-                            mp.seekTo((currentTimeSec * 1000).toInt())
-                            if (!mp.isPlaying) mp.start()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun pauseAudioPreview() {
-        try {
-            if (isAudioPrepared && previewMediaPlayer?.isPlaying == true) {
-                previewMediaPlayer?.pause()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun stopAudioPreview() {
-        try {
-            isAudioPrepared = false
-            previewMediaPlayer?.stop()
-            previewMediaPlayer?.release()
-            previewMediaPlayer = null
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun pausePlayback() {
-        isPlaying = false
-        updatePlayStateUi(false)
-        playbackAnimator?.cancel()
-        playbackAnimator = null
-        pauseAudioPreview()
-    }
-
-    private fun togglePlayback() {
-        if (isPlaying) {
-            pausePlayback()
-        } else {
-            startPlayback()
-        }
-    }
-
-    private fun updatePlayStateUi(playing: Boolean) {
-        val b = bindingOrNull ?: return
-        if (playing) {
-            b.btnPlayPause.alpha = 0f
-            b.btnPlayPause.isClickable = false
-            b.ivPlayPauseIcon.setImageResource(R.drawable.ic_pause_small)
-            startNoteMusicAnimation()
-        } else {
-            b.btnPlayPause.alpha = 1f
-            b.btnPlayPause.isClickable = true
-            b.ivPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
-            stopNoteMusicAnimation()
-        }
-    }
-
     private fun updateTimeUi(timeSec: Float) {
         val b = bindingOrNull ?: return
         b.tvVideoTime.text = "${formatTime(timeSec)} / ${formatTime(videoDurationSec)}"
-        val progress = ((timeSec / videoDurationSec) * 1000).toInt()
+        val progress = if (videoDurationSec > 0) ((timeSec / videoDurationSec) * 1000).toInt() else 0
         b.videoProgressBar.progress = progress
     }
 
@@ -466,74 +347,89 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     }
 
     private fun showExportLoading(show: Boolean, status: String = "Đang xuất video...", percent: Int = 0) {
-        binding.flExportLoadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
-        binding.tvExportStatus.text = status
-        binding.pbExportHorizontal.progress = percent
-        binding.tvExportPercent.text = "$percent%"
-    }
-
-    /**
-     * Render video MP4 với các hiệu ứng chuyển cảnh random và ghép nhạc
-     */
-    private suspend fun renderBaseVideoFile(statusText: String): File? {
-        showExportLoading(true, statusText, 0)
-        isExporting = true
-        pausePlayback()
-
-        return try {
-            VideoGenerator.generateMp4FromPhotos(
-                context = requireContext(),
-                photoUris = photoUris,
-                durationSec = videoDurationSec,
-                audioUrl = musicAudioUrl,
-                transitions = randomTransitions,
-                onProgress = { progress, statusMessage ->
-                    binding.pbExportHorizontal.progress = progress
-                    binding.tvExportStatus.text = statusMessage
-                    binding.tvExportPercent.text = "$progress%"
-                }
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "Tạo video thất bại: ${e.message}", Toast.LENGTH_SHORT).show()
-            null
-        } finally {
-            isExporting = false
-            showExportLoading(false)
+        val b = bindingOrNull ?: return
+        b.flExportLoadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
+        b.tvExportStatus.text = status
+        b.pbExportHorizontal.progress = percent
+        b.tvExportPercent.text = "$percent%"
+        if (show) {
+            b.flExportLoadingOverlay.bringToFront()
         }
     }
 
     /**
-     * Bấm LƯU: Lưu cả vào App Documents riêng và tạo bản sao sang Thư viện máy (Gallery).
+     * Chuẩn bị file video hoàn chỉnh: Nếu người dùng đã đổi nhạc tại màn này -> ghép nhạc mới vào video.
+     * Ngược lại dùng luôn file MP4 đã render từ trước.
+     */
+    private suspend fun prepareFinalVideoFile(status: String): File? {
+        showExportLoading(true, status, 15)
+        isExporting = true
+
+        val baseVideo = currentPlayingVideoFile
+        if (baseVideo == null || !baseVideo.exists()) {
+            showExportLoading(false)
+            isExporting = false
+            return null
+        }
+
+        // Nếu có đổi bài hát ngoài khác với bản base video
+        if (externalAudioPlayer != null) {
+            val audioSource = musicAudioFilePath?.takeIf { File(it).exists() } ?: musicAudioUrl
+            if (!audioSource.isNullOrBlank()) {
+                showExportLoading(true, "Đang ghép âm thanh mới vào video...", 60)
+                val mergedFile = File(requireContext().cacheDir, "merged_memories_${System.currentTimeMillis()}.mp4")
+                val success = VideoGenerator.mergeAudioIntoVideo(
+                    context = requireContext(),
+                    videoInputFile = baseVideo,
+                    audioSource = audioSource,
+                    outputFile = mergedFile
+                )
+                showExportLoading(false)
+                isExporting = false
+                return if (success && mergedFile.exists()) mergedFile else baseVideo
+            }
+        }
+
+        showExportLoading(false)
+        isExporting = false
+        return baseVideo
+    }
+
+    /**
+     * Bấm LƯU: Video MP4 đã sẵn sàng, lưu vào App Documents riêng và copy sang Thư viện máy (Gallery).
      */
     private fun handleSave() {
-        if (photoUris.isEmpty() || isExporting) return
+        if (isExporting) return
+        binding.videoView.pause()
+        externalAudioPlayer?.pause()
+        isPlaying = false
+        updatePlayStateUi(false)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val baseFile = appDocumentVideoFile ?: renderBaseVideoFile("Đang xuất video vào thư viện...")
-            if (baseFile != null && baseFile.exists()) {
+            val videoFile = appDocumentVideoFile ?: prepareFinalVideoFile("Đang chuẩn bị video để lưu...")
+            if (videoFile != null && videoFile.exists()) {
                 val videoTitle = if (!musicTitle.isNullOrBlank()) {
-                    "Video tạo từ ${photoUris.size} ảnh AI • Nhạc: $musicTitle"
+                    "Video tạo từ ${photoUris.size.coerceAtLeast(1)} ảnh AI • Nhạc: $musicTitle"
                 } else {
-                    "Video tạo từ ${photoUris.size} ảnh AI"
+                    "Video tạo từ ${photoUris.size.coerceAtLeast(1)} ảnh AI"
                 }
 
-                // 1. Lưu bản gốc vào App Documents riêng (được bảo tồn, chỉ xóa khi xóa ở Lịch sử)
+                // 1. Lưu bản gốc vào App Documents riêng
                 val docFile = if (appDocumentVideoFile == null) {
                     val savedDoc = VideoGenerator.saveVideoToAppDocuments(
                         context = requireContext(),
-                        sourceFile = baseFile,
-                        title = "Memories_${photoUris.size}_photos"
+                        sourceFile = videoFile,
+                        title = "Memories_${System.currentTimeMillis()}"
                     )
                     appDocumentVideoFile = savedDoc
                     savedDoc
                 } else appDocumentVideoFile!!
 
                 // 2. Tạo bản sao ra MediaStore Gallery (Album thiết bị)
-                val galleryUri = VideoGenerator.copyVideoToGallery(
+                VideoGenerator.copyVideoToGallery(
                     context = requireContext(),
                     videoFile = docFile,
-                    title = "Memories_${photoUris.size}_photos"
+                    title = "PhotoArt_Memories_Video"
                 )
 
                 // 3. Lưu vào Lịch sử (History) của app
@@ -548,61 +444,43 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                 )
                 historyRepository.addHistoryItem(historyItem)
 
-                Toast.makeText(requireContext(), "Đã lưu video thành công vào ứng dụng và thư viện ảnh!", Toast.LENGTH_LONG).show()
-
-                binding.root.postDelayed({
-                    findNavController().popBackStack()
-                }, 1000)
+                Toast.makeText(requireContext(), "Đã lưu video thành công vào ứng dụng và thư viện ảnh!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Không thể lưu video!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     /**
-     * Bấm SHARE: Sử dụng file trong App Documents (nếu đã lưu), hoặc file tạm trong cache.
-     * Xóa ngay file tạm trong cache sau khi hoàn tất chia sẻ.
+     * Bấm SHARE: Sử dụng file đã tạo sẵn, chia sẻ ngay lập tức
      */
     private fun handleShare() {
-        if (photoUris.isEmpty() || isExporting) return
+        if (isExporting) return
+        binding.videoView.pause()
+        externalAudioPlayer?.pause()
+        isPlaying = false
+        updatePlayStateUi(false)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            // Nếu đã lưu thì dùng luôn file App Documents, nếu chưa thì tạo file tạm trong cache
             val videoToShare = appDocumentVideoFile ?: run {
-                val temp = renderBaseVideoFile("Đang chuẩn bị video để chia sẻ...")
+                val temp = prepareFinalVideoFile("Đang chuẩn bị video để chia sẻ...")
                 tempShareCacheFile = temp
                 temp
             }
 
             if (videoToShare != null && videoToShare.exists()) {
-                try {
-                    val shareableUri = VideoGenerator.getShareableUri(requireContext(), videoToShare)
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "video/mp4"
-                        putExtra(Intent.EXTRA_STREAM, shareableUri)
-                        putExtra(Intent.EXTRA_SUBJECT, "Kỷ niệm của chúng ta")
-                        putExtra(Intent.EXTRA_TEXT, "Video kỷ niệm tạo bởi Photo AI")
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                    startActivity(Intent.createChooser(shareIntent, "Chia sẻ video"))
-                } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "Thiết bị chưa hỗ trợ chia sẻ: ${e.message}", Toast.LENGTH_SHORT).show()
+                val success = ShareUtils.shareVideo(
+                    context = requireContext(),
+                    filePath = videoToShare.absolutePath,
+                    chooserTitle = "Chia sẻ video kỷ niệm"
+                )
+                if (!success) {
+                    Toast.makeText(requireContext(), "Không thể chia sẻ video lúc này", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                Toast.makeText(requireContext(), "Video chưa sẵn sàng để chia sẻ", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Dọn sạch file tạm trong cache sau khi người dùng chia sẻ xong và quay lại app
-        cleanTempShareCache()
-    }
-
-    private fun cleanTempShareCache() {
-        tempShareCacheFile?.let { temp ->
-            if (temp.exists() && temp != appDocumentVideoFile) {
-                temp.delete()
-            }
-        }
-        tempShareCacheFile = null
     }
 
     override fun initListener() {
@@ -619,44 +497,76 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         }
 
         binding.btnSave.setOnClickListener {
-            handleSave()
+            it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
+                it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                handleSave()
+            }.start()
         }
 
         binding.btnShare.setOnClickListener {
-            handleShare()
+            it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
+                it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                handleShare()
+            }.start()
         }
 
         binding.cardVideoInfo.setOnClickListener {
-            pausePlayback()
+            binding.videoView.pause()
+            externalAudioPlayer?.pause()
+            isPlaying = false
+            updatePlayStateUi(false)
             findNavController().navigate(R.id.action_videoResultFragment_to_musicFragment)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayback()
+        binding.videoView.pause()
+        externalAudioPlayer?.pause()
+        isPlaying = false
+        updatePlayStateUi(false)
     }
 
     override fun onDestroyView() {
-        playbackAnimator?.cancel()
-        playbackAnimator = null
-        stopAudioPreview()
+        progressPollingJob?.cancel()
+        progressPollingJob = null
+        stopExternalAudio()
         stopNoteMusicAnimation()
-        cleanTempShareCache()
+        try {
+            bindingOrNull?.videoView?.stopPlayback()
+        } catch (_: Exception) {}
+        videoMediaPlayer = null
+        tempShareCacheFile?.let { temp ->
+            if (temp.exists() && temp != appDocumentVideoFile && temp != currentPlayingVideoFile) {
+                temp.delete()
+            }
+        }
+        tempShareCacheFile = null
         super.onDestroyView()
     }
 
     companion object {
+        const val ARG_VIDEO_PATH = "arg_video_path"
         const val ARG_PHOTOS = "arg_photos"
         const val ARG_TRACK = "arg_track"
         const val ARG_AUDIO_URL = "arg_audio_url"
+        const val ARG_AUDIO_PATH = "arg_audio_path"
         const val ARG_IMAGE_URL = "arg_image_url"
 
-        fun createBundle(photos: List<String>, track: String?, audioUrl: String? = null, imageUrl: String? = null): Bundle {
+        fun createBundle(
+            videoPath: String,
+            photos: List<String>,
+            track: String?,
+            audioUrl: String? = null,
+            audioPath: String? = null,
+            imageUrl: String? = null
+        ): Bundle {
             return Bundle().apply {
+                putString(ARG_VIDEO_PATH, videoPath)
                 putStringArrayList(ARG_PHOTOS, ArrayList(photos))
                 putString(ARG_TRACK, track)
                 putString(ARG_AUDIO_URL, audioUrl)
+                putString(ARG_AUDIO_PATH, audioPath)
                 putString(ARG_IMAGE_URL, imageUrl)
             }
         }

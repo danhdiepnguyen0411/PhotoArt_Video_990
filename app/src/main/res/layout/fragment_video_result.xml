@@ -59,20 +59,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Background Next Photo for Smooth Transitions -->
-            <ImageView
-                android:id="@+id/ivStagePhotoNext"
+            <!-- VideoView for Playing Rendered MP4 Video -->
+            <VideoView
+                android:id="@+id/videoView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                android:layout_gravity="center" />
 
-            <!-- Active Photo Display with Transition Animations -->
+            <!-- Loading indicator for video buffer / audio merge -->
+            <ProgressBar
+                android:id="@+id/pbVideoLoading"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <!-- Active Photo Display fallback if needed -->
             <ImageView
                 android:id="@+id/ivStagePhoto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
+                android:visibility="gone"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <!-- Dark gradient overlay at bottom for readable time text -->
@@ -318,21 +328,26 @@
     <!-- Overlay khi đang xuất video MP4 -->
     <FrameLayout
         android:id="@+id/flExportLoadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#99000000"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#A6000000"
         android:clickable="true"
         android:focusable="true"
+        android:elevation="50dp"
         android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="260dp"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="10dp">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
