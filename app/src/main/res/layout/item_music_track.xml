@@ -160,7 +160,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:paddingHorizontal="14dp"
-                android:text="Chọn"
+                android:text="@string/music_btn_choose"
                 android:textColor="@color/white"
                 android:textSize="13sp"
                 android:textStyle="bold" />

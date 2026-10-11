@@ -33,8 +33,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private lateinit var suggestionAdapter: HomeMediaAdapter
     private lateinit var hotTemplateAdapter: HomeMediaAdapter
 
-    private val bannerList by lazy {
-        listOf(
+    private fun getBannerList(): List<BannerItemModel> {
+        return listOf(
             BannerItemModel(
                 imageRes = R.drawable.banner_1,
                 chip = getString(R.string.banner_1_chip),
@@ -76,6 +76,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onResume() {
         super.onResume()
+        setupBanners()
         loadRecentHistory()
         checkCustomNotificationPermission()
     }
@@ -134,18 +135,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             (parentFragment as? MainFragment)?.selectTab(1)
         }
 
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            Color.parseColor("#4A7BFE"),
+            Color.parseColor("#9153EE")
+        )
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            setupBanners()
+            loadRecentHistory()
+            loadApiTemplates()
+        }
+
         binding.btnPro.setOnClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
     }
 
     private fun setupBanners() {
-        val bannerAdapter = BannerAdapter(bannerList) { banner ->
+        val banners = getBannerList()
+        val bannerAdapter = BannerAdapter(banners) { banner ->
             navigateToFeature(banner.targetFeature)
         }
         binding.vpBanners.adapter = bannerAdapter
 
-        binding.bannerIndicator.setDotCount(bannerList.size)
+        binding.bannerIndicator.setDotCount(banners.size)
         binding.bannerIndicator.setSelectedPage(0)
         binding.bannerIndicator.onDotClickListener = { index ->
             binding.vpBanners.setCurrentItem(index, true)
@@ -192,7 +204,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         autoScrollRunnable = object : Runnable {
             override fun run() {
                 val current = binding.vpBanners.currentItem
-                val next = (current + 1) % bannerList.size
+                val count = binding.vpBanners.adapter?.itemCount ?: 1
+                val next = if (count > 0) (current + 1) % count else 0
                 binding.vpBanners.setCurrentItem(next, true)
                 autoScrollHandler.postDelayed(this, 4500L)
             }
@@ -297,11 +310,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 val templates = templateRepository.getTemplates()
                 if (templates.isNotEmpty()) {
                     val flameColor = Color.parseColor("#FF7A2F")
-                    val hotList = templates.take(8).map {
+                    val figmaHot = getFigmaHotFallback()
+                    val figmaSuggestions = getFigmaSuggestionFallback()
+
+                    val hotList = templates.take(8).mapIndexed { idx, it ->
                         HomeMediaItemModel(
                             label = it.title,
                             category = it.category,
                             imageUrl = it.safeImageUrl,
+                            imageRes = figmaHot.getOrNull(idx % figmaHot.size)?.imageRes ?: R.drawable.template_selfie,
                             iconRes = R.drawable.ic_flame,
                             iconTint = flameColor
                         )
@@ -309,11 +326,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     hotTemplateAdapter.submitList(hotList)
 
                     val remaining = if (templates.size > 8) templates.drop(8) else templates
-                    val suggestionList = remaining.take(8).map {
+                    val suggestionList = remaining.take(8).mapIndexed { idx, it ->
                         HomeMediaItemModel(
                             label = it.title,
                             category = it.category,
                             imageUrl = it.safeImageUrl,
+                            imageRes = figmaSuggestions.getOrNull(idx % figmaSuggestions.size)?.imageRes ?: R.drawable.suggestion_ai_effect,
                             iconRes = R.drawable.ic_star_section
                         )
                     }
@@ -321,6 +339,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 }
             } catch (e: Exception) {
                 // Keep the Figma fallback items
+            } finally {
+                binding.swipeRefreshLayout.postDelayed({
+                    if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
+                }, 500L)
             }
         }
     }

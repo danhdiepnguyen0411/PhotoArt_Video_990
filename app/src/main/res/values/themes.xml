@@ -11,19 +11,23 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
     </style>
 
     <style name="BottomNavTextActive" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">11sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="BottomNavTextInactive" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">11sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
@@ -34,5 +38,11 @@
         <item name="android:statusBarColor">#CC000000</item>
         <item name="android:navigationBarColor">#CC000000</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="CircleImageView" parent="">
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

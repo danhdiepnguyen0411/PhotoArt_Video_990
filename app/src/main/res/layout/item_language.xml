@@ -4,26 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardLanguage"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="62dp"
     android:layout_marginBottom="10dp"
     android:background="@drawable/bg_item_language"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="14dp">
+    android:paddingStart="14dp"
+    android:paddingEnd="16dp">
 
-    <!-- Language Flag (Emoji or Icon) -->
-    <TextView
-        android:id="@+id/tvLanguageFlag"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:textSize="26sp"
+    <!-- Perfectly Circular Flag Icon (42dp matching src) -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imgFlag"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:strokeColor="#24283C82"
+        app:strokeWidth="0.8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="🇻🇳" />
+        tools:src="@tools:sample/avatars"
+        tools:ignore="ContentDescription" />
 
     <!-- Name & Subtitle -->
     <LinearLayout
+        android:id="@+id/llLanguageInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
@@ -31,15 +35,17 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ivRadio"
-        app:layout_constraintStart_toEndOf="@+id/tvLanguageFlag"
+        app:layout_constraintStart_toEndOf="@+id/imgFlag"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tvLanguageName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/navy"
-            android:textSize="16sp"
+            android:fontFamily="@font/inter_bold"
+            android:includeFontPadding="false"
+            android:textColor="#2A34C9"
+            android:textSize="15.5sp"
             android:textStyle="bold"
             tools:text="Tiếng Việt" />
 
@@ -47,13 +53,15 @@
             android:id="@+id/tvLanguageSub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/muted"
-            android:textSize="12sp"
+            android:layout_marginTop="2.5dp"
+            android:fontFamily="@font/inter_regular"
+            android:includeFontPadding="false"
+            android:textColor="#A3AACB"
+            android:textSize="12.5sp"
             tools:text="Vietnamese" />
     </LinearLayout>
 
-    <!-- Radio Button Indicator -->
+    <!-- Radio Indicator (22dp matching src) -->
     <ImageView
         android:id="@+id/ivRadio"
         android:layout_width="22dp"

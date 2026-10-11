@@ -43,7 +43,7 @@
                 android:paddingHorizontal="9dp"
                 android:textColor="@color/banner_chip_text"
                 android:textSize="11sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/inter_medium"
                 android:textStyle="bold"
                 tools:text="AI Photo &amp; Video" />
 
@@ -53,7 +53,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="sans-serif-black"
+                android:fontFamily="@font/inter_black"
+                app:fontFamily="@font/inter_black"
+                android:textStyle="bold"
                 android:includeFontPadding="false"
                 android:letterSpacing="-0.03"
                 android:lineSpacingMultiplier="1.15"
@@ -67,7 +69,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
-                android:fontFamily="sans-serif-black"
+                android:fontFamily="@font/inter_black"
+                app:fontFamily="@font/inter_black"
+                android:textStyle="bold"
                 android:includeFontPadding="false"
                 android:letterSpacing="-0.03"
                 android:lineSpacingMultiplier="1.15"
@@ -82,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/inter_medium"
                 android:includeFontPadding="false"
                 android:lineSpacingMultiplier="1.35"
                 android:maxLines="3"
@@ -106,7 +110,7 @@
                 android:paddingEnd="20dp"
                 android:textColor="@color/white"
                 android:textSize="15sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/inter_medium"
                 android:textStyle="bold"
                 tools:text="Thử ngay" />
 

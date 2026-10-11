@@ -108,7 +108,7 @@ class MusicAdapter(
             val cleanCategory = if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
                 track.category.substring(6)
             } else {
-                track.category.ifBlank { "Nhạc AI" }
+                track.category.ifBlank { binding.root.context.getString(R.string.music_original_sound) }
             }
             binding.tvTrackCategory.text = cleanCategory
 

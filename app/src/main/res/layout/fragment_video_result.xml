@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Gom kỷ niệm"
+            android:text="@string/video_result_title"
             android:textColor="@color/navy"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -210,7 +210,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Chưa chọn nhạc"
+                    android:text="@string/no_music_selected"
                     android:textColor="#2A34C9"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -277,7 +277,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lưu"
+                android:text="@string/btn_save"
                 android:textColor="#7188B5"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -311,7 +311,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chia sẻ"
+                    android:text="@string/btn_share"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -363,7 +363,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:gravity="center"
-                    android:text="Đang xuất video &amp; ghép nhạc..."
+                    android:text="@string/exporting_video_merging_music"
                     android:textColor="#193980"
                     android:textSize="15sp"
                     android:textStyle="bold" />

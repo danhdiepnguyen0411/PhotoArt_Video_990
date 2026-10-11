@@ -46,37 +46,37 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         }
 
         binding.btnFavorite.setOnClickListener {
-            Toast.makeText(requireContext(), "Đã lưu vào danh sách yêu thích", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_saved_to_favorites), Toast.LENGTH_SHORT).show()
         }
 
         // Suggestion chips
         binding.chipAnimeGirl.setOnClickListener {
-            binding.etPromptInput.setText("Anime girl xinh đẹp, phong cách truyện tranh Nhật Bản")
+            binding.etPromptInput.setText(getString(R.string.prompt_anime_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
         binding.chipFantasy.setOnClickListener {
-            binding.etPromptInput.setText("Lâu đài kỳ ảo bay giữa bầu trời thần tiên rực rỡ")
+            binding.etPromptInput.setText(getString(R.string.prompt_fantasy_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
         binding.chipCutePet.setOnClickListener {
-            binding.etPromptInput.setText("Mèo con dễ thương đội mũ len ngồi trong tách trà")
+            binding.etPromptInput.setText(getString(R.string.prompt_pet_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
         binding.chipCyberpunk.setOnClickListener {
-            binding.etPromptInput.setText("Chiến binh Cyberpunk neon rực sáng đêm mưa hiện đại")
+            binding.etPromptInput.setText(getString(R.string.prompt_cyberpunk_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
         binding.chipNature.setOnClickListener {
-            binding.etPromptInput.setText("Rừng cây phát sáng bên hồ nước trong vắt thơ mộng")
+            binding.etPromptInput.setText(getString(R.string.prompt_nature_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
         binding.chipPortrait.setOnClickListener {
-            binding.etPromptInput.setText("Chân dung thiếu nữ thanh tú với ánh sáng hoàng hôn dịu nhẹ")
+            binding.etPromptInput.setText(getString(R.string.prompt_portrait_full))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
@@ -89,12 +89,12 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         binding.btnGeneratePrompt.setOnClickListener {
             val userPrompt = binding.etPromptInput.text?.toString()?.trim().orEmpty()
             if (userPrompt.isBlank()) {
-                Toast.makeText(requireContext(), "Vui lòng nhập mô tả ý tưởng ảnh", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_enter_prompt_description), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             // Combine user prompt with chosen style
-            val fullPrompt = "$userPrompt, theo phong cách $selectedStyleName"
+            val fullPrompt = getString(R.string.prompt_style_suffix, userPrompt, selectedStyleName)
 
             findNavController().navigate(
                 R.id.action_enhanceFragment_to_enhanceLoadingFragment,

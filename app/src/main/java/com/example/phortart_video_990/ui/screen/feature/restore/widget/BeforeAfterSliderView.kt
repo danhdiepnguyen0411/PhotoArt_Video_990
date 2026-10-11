@@ -58,7 +58,7 @@ class BeforeAfterSliderView @JvmOverloads constructor(
     }
 
     private val badgeBefore = TextView(context).apply {
-        text = "Trước"
+        text = context.getString(R.string.badge_before)
         setTextColor(Color.WHITE)
         textSize = 11.5f
         setTypeface(null, android.graphics.Typeface.BOLD)
@@ -69,13 +69,13 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         background = ContextCompat.getDrawable(context, R.drawable.bg_badge_before)
         val margin = (12 * density).toInt()
         layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-            gravity = Gravity.BOTTOM or Gravity.START
+            gravity = Gravity.BOTTOM or Gravity.LEFT
             setMargins(margin, margin, margin, margin)
         }
     }
 
     private val badgeAfter = TextView(context).apply {
-        text = "Sau"
+        text = context.getString(R.string.badge_after)
         setTextColor(Color.WHITE)
         textSize = 11.5f
         setTypeface(null, android.graphics.Typeface.BOLD)
@@ -86,7 +86,7 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         background = ContextCompat.getDrawable(context, R.drawable.bg_badge_after)
         val margin = (12 * density).toInt()
         layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-            gravity = Gravity.BOTTOM or Gravity.END
+            gravity = Gravity.BOTTOM or Gravity.RIGHT
             setMargins(margin, margin, margin, margin)
         }
     }

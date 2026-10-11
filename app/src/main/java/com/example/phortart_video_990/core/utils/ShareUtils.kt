@@ -9,6 +9,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.example.phortart_video_990.R
 import java.io.File
 import java.io.FileOutputStream
 
@@ -17,9 +18,10 @@ object ShareUtils {
     fun shareVideo(
         context: Context,
         filePath: String?,
-        chooserTitle: String = "Chia sẻ video",
+        chooserTitle: String? = null,
         thumbnailPath: String? = null
     ): Boolean {
+        val effectiveTitle = chooserTitle ?: context.getString(R.string.share_video_ai_title)
         val cleanVideoPath = filePath?.removePrefix("file://")?.takeIf { it.isNotBlank() } ?: return false
         val videoFile = File(cleanVideoPath)
         if (!videoFile.exists()) return false
@@ -48,14 +50,14 @@ object ShareUtils {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "video/mp4"
                 putExtra(Intent.EXTRA_STREAM, contentUri)
-                putExtra(Intent.EXTRA_TITLE, chooserTitle)
+                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
                 val item = ClipData.Item(contentUri)
-                clipData = ClipData(chooserTitle, arrayOf("video/mp4"), item)
+                clipData = ClipData(effectiveTitle, arrayOf("video/mp4"), item)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
-            val chooserIntent = Intent.createChooser(sendIntent, chooserTitle).apply {
-                putExtra(Intent.EXTRA_TITLE, chooserTitle)
+            val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
+                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 if (context !is Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

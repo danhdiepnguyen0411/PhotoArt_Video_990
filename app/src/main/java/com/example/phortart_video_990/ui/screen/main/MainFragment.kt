@@ -80,7 +80,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
         } else {
             resources.displayMetrics.density * 24f
         }
-        val targetX = position * tabWidth + (tabWidth - indicatorWidth) / 2f
+        val isRtl = binding.root.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL
+        val effectivePosition = if (isRtl) (3 - position) else position
+        val targetX = effectivePosition * tabWidth + (tabWidth - indicatorWidth) / 2f
 
         if (animate) {
             binding.navIndicator.animate()

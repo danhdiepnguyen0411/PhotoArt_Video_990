@@ -58,6 +58,17 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     }
 
     override fun initListener() {
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            android.graphics.Color.parseColor("#4A7BFE"),
+            android.graphics.Color.parseColor("#9153EE")
+        )
+        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            binding.rvMusicTracks.canScrollVertically(-1)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadCategoriesAndTracks()
+        }
+
         binding.btnBack.setOnClickListener {
             stopAudio()
             findNavController().popBackStack()
@@ -66,7 +77,9 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
     private fun loadCategoriesAndTracks() {
         viewLifecycleOwner.lifecycleScope.launch {
-            binding.pbLoading.visibility = View.VISIBLE
+            if (!binding.swipeRefreshLayout.isRefreshing) {
+                binding.pbLoading.visibility = View.VISIBLE
+            }
             binding.llEmptyState.visibility = View.GONE
             try {
                 // Load music categories from API
@@ -85,6 +98,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 binding.llEmptyState.visibility = View.VISIBLE
             } finally {
                 binding.pbLoading.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
@@ -92,7 +106,9 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private fun loadMusicTracks(categoryCode: String) {
         stopAudio()
         viewLifecycleOwner.lifecycleScope.launch {
-            binding.pbLoading.visibility = View.VISIBLE
+            if (!binding.swipeRefreshLayout.isRefreshing) {
+                binding.pbLoading.visibility = View.VISIBLE
+            }
             binding.llEmptyState.visibility = View.GONE
             try {
                 val tracks = repository.getMusicTracks(categoryCode = categoryCode)
@@ -103,6 +119,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 binding.llEmptyState.visibility = View.VISIBLE
             } finally {
                 binding.pbLoading.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
@@ -129,7 +146,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private fun toggleAudioPreview(track: TemplateModel, position: Int) {
         val audioUrl = track.safeAudioUrl
         if (audioUrl.isNullOrBlank()) {
-            Toast.makeText(requireContext(), "Bản nhạc xem trước không khả dụng", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_music_preview_unavailable), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -158,7 +175,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
             if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
                 musicAdapter.clearAllLoading()
-                Toast.makeText(requireContext(), "Không thể tải bản nhạc xem trước", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_download_preview), Toast.LENGTH_SHORT).show()
                 return@launch
             }
 

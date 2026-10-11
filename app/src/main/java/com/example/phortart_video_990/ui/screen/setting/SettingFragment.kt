@@ -55,7 +55,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
         // IAP Upgrade Button
         binding.btnIapUpgrade.setOnClickListener {
-            Toast.makeText(requireContext(), "Tính năng Nâng cấp Premium đang mở", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.settings_iap_title), Toast.LENGTH_SHORT).show()
         }
 
         // Rate App -> Opens interactive 5-star rating popup
@@ -65,12 +65,12 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
         // Privacy Policy
         binding.rowPrivacy.setOnClickListener {
-            Toast.makeText(requireContext(), "Chính sách bảo mật Photo AI", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.setting_privacy), Toast.LENGTH_SHORT).show()
         }
 
         // About App
         binding.rowAboutApp.setOnClickListener {
-            Toast.makeText(requireContext(), "Photo AI phiên bản 1.0.0", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.setting_about_version), Toast.LENGTH_SHORT).show()
         }
     }
 }

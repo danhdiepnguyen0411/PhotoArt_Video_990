@@ -1,78 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Photo AI</string>
-    <string name="shortcut_uninstall">Uninstall</string>
-    <string name="shortcut_uninstall_desc">Uninstall Photo AI</string>
-
-    <!-- Splash Screen -->
+    <string name="shortcut_uninstall">Gỡ cài đặt</string>
+    <string name="shortcut_uninstall_desc">Gỡ cài đặt Photo AI</string>
     <string name="splash_title">Photo AI</string>
-    <string name="splash_subtitle">Make memories live again</string>
+    <string name="splash_subtitle">Hồi sinh những kỷ niệm</string>
     <string name="splash_loading">Đang tải %1$d%%...</string>
-
-    <!-- Language Screen -->
     <string name="language_title">Chọn ngôn ngữ</string>
     <string name="language_choose_desc">Vui lòng chọn ngôn ngữ bạn muốn sử dụng trong ứng dụng.</string>
     <string name="btn_confirm">Tiếp tục</string>
     <string name="btn_save_changes">Lưu thay đổi</string>
-
-    <!-- Intro / Onboarding -->
     <string name="btn_next">Tiếp tục</string>
     <string name="btn_skip">Bỏ qua</string>
     <string name="btn_get_started">Bắt đầu ngay</string>
-    
-    <string name="intro_1_title">Gom ảnh,\ntạo video</string>
-    <string name="intro_1_desc">Biến những khoảnh khắc yêu thích\nthành video sống động chỉ trong vài\ngiây.</string>
-    
-    <string name="intro_2_title">Tạo ảnh bằng\nprompt AI</string>
-    <string name="intro_2_desc">Mô tả điều bạn tưởng tượng,\nAI sẽ biến nó thành hình ảnh tuyệt đẹp.</string>
-    
-    <string name="intro_3_title">Hồi sinh những\nbức ảnh cũ</string>
-    <string name="intro_3_desc">Khôi phục ảnh mờ, ảnh cũ\nvà giữ lại những kỷ niệm đáng nhớ.</string>
-
-    <!-- Bottom Navigation -->
+    <string name="intro_1_title">Gom ảnh,
+tạo video</string>
+    <string name="intro_1_desc">Biến những khoảnh khắc yêu thích
+thành video sống động chỉ trong vài
+giây.</string>
+    <string name="intro_2_title">Tạo ảnh bằng
+prompt AI</string>
+    <string name="intro_2_desc">Mô tả điều bạn tưởng tượng,
+AI sẽ biến nó thành hình ảnh tuyệt đẹp.</string>
+    <string name="intro_3_title">Hồi sinh những
+bức ảnh cũ</string>
+    <string name="intro_3_desc">Khôi phục ảnh mờ, ảnh cũ
+và giữ lại những kỷ niệm đáng nhớ.</string>
     <string name="nav_home">Trang chủ</string>
     <string name="nav_template">Template</string>
     <string name="nav_history">Lịch sử</string>
     <string name="nav_setting">Cài đặt</string>
-
-    <!-- Home Screen -->
     <string name="home_brand_title">Photo AI</string>
     <string name="home_see_all">Xem tất cả</string>
     <string name="home_recent_history">Lịch sử gần đây</string>
     <string name="home_suggestions">Dành riêng cho bạn</string>
     <string name="home_hot_templates">Hot</string>
-
-    <!-- 3 Core Features -->
-    <string name="feature_video_title">Gom ảnh\ntạo video</string>
-    <string name="feature_prompt_title">Tạo ảnh bằng\nprompt AI</string>
-    <string name="feature_restore_title">Hồi sinh\nảnh cũ</string>
-
-    <!-- Legacy compatibility function names -->
+    <string name="feature_video_title">Gom ảnh
+tạo video</string>
+    <string name="feature_prompt_title">Tạo ảnh bằng
+prompt AI</string>
+    <string name="feature_restore_title">Hồi sinh
+ảnh cũ</string>
     <string name="func_01_memories">Gom ảnh tạo video</string>
     <string name="func_02_restore">Hồi sinh ảnh cũ</string>
     <string name="func_03_enhance">Tạo ảnh prompt AI</string>
     <string name="func_04_music">Ghép nhạc</string>
     <string name="func_05_upscale">Nâng cấp ảnh</string>
-
-    <!-- Banners -->
     <string name="banner_1_chip">AI Photo &amp; Video</string>
-    <string name="banner_1_title">Biến ảnh của bạn\nthành những</string>
-    <string name="banner_1_highlight">khoảnh khắc\ntuyệt vời</string>
+    <string name="banner_1_title">Biến ảnh của bạn
+thành những</string>
+    <string name="banner_1_highlight">khoảnh khắc
+tuyệt vời</string>
     <string name="banner_1_desc">Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây.</string>
     <string name="banner_1_btn">Thử ngay</string>
-
     <string name="banner_2_chip">AI Prompt</string>
-    <string name="banner_2_title">Chỉ cần mô tả,\nAI sẽ vẽ nên</string>
-    <string name="banner_2_highlight">bức ảnh\ntrong mơ</string>
+    <string name="banner_2_title">Chỉ cần mô tả,
+AI sẽ vẽ nên</string>
+    <string name="banner_2_highlight">bức ảnh
+trong mơ</string>
     <string name="banner_2_desc">Nhập ý tưởng của bạn và nhận ngay hình ảnh nghệ thuật độc đáo.</string>
     <string name="banner_2_btn">Tạo ngay</string>
-
     <string name="banner_3_chip">Khôi phục ảnh</string>
-    <string name="banner_3_title">Hồi sinh những\nbức ảnh cũ</string>
-    <string name="banner_3_highlight">như mới\ntinh khôi</string>
+    <string name="banner_3_title">Hồi sinh những
+bức ảnh cũ</string>
+    <string name="banner_3_highlight">như mới
+tinh khôi</string>
     <string name="banner_3_desc">Làm nét, xoá vết xước và phục hồi màu sắc chỉ với một chạm.</string>
     <string name="banner_3_btn">Khôi phục ngay</string>
-
-    <!-- Template Screen -->
     <string name="template_title">Template ✨</string>
     <string name="template_cat_all">Tất cả</string>
     <string name="template_cat_hot">Hot</string>
@@ -81,8 +75,67 @@
     <string name="template_cat_effect">Hiệu ứng</string>
     <string name="template_cat_portrait">Chân dung</string>
     <string name="template_cat_fantasy">Ảo ảnh</string>
-
-    <!-- History Screen -->
+    <string name="template_empty_category">Chưa có template nào trong mục này</string>
+    <string name="template_create_title">Tạo video từ mẫu</string>
+    <string name="upload_portrait_face">Tải ảnh khuôn mặt / chân dung</string>
+    <string name="required_1_photo">Bắt buộc: 1 ảnh</string>
+    <string name="tap_to_select_1_photo">Nhấn để chọn 1 ảnh từ thư viện</string>
+    <string name="select_1_clear_photo">Chỉ cần 1 bức ảnh rõ nét (JPG, PNG)</string>
+    <string name="change_other_photo">Đổi ảnh khác</string>
+    <string name="video_bg_music">Nhạc nền cho video</string>
+    <string name="optional_bracket">(Không bắt buộc)</string>
+    <string name="select_bg_song_optional">Chọn bài hát nền (Tùy chọn)</string>
+    <string name="tap_to_select_change_music">Nhấn để chọn hoặc đổi nhạc nền AI</string>
+    <string name="btn_select_music">Chọn nhạc</string>
+    <string name="btn_create_video_now">Tạo video ngay</string>
+    <string name="template_video_result_title">Video AI Tạo Mẫu</string>
+    <string name="original_audio">Âm thanh gốc</string>
+    <string name="tap_to_change_bg_music">Chạm để đổi nhạc nền</string>
+    <string name="btn_change_music">Đổi nhạc</string>
+    <string name="btn_save_to_device">Lưu vào máy</string>
+    <string name="btn_share">Chia sẻ</string>
+    <string name="processing_video">Đang xử lý video...</string>
+    <string name="memories_upload_title">Tải ảnh lên từ thư viện</string>
+    <string name="memories_photos_count">%1$d ảnh</string>
+    <string name="tap_to_select_photos">Nhấn để chọn ảnh từ thư viện</string>
+    <string name="select_multiple_photos">Chọn 1 hoặc nhiều ảnh (JPG, PNG)</string>
+    <string name="tap_to_manage_photos">Chạm vào để xem và quản lý ảnh</string>
+    <string name="btn_add_photos">Thêm ảnh</string>
+    <string name="btn_view_photos">Xem ảnh</string>
+    <string name="choose_bg_song">Chọn bài hát nền</string>
+    <string name="browse_ai_music_catalog">Nhấn để duyệt danh mục nhạc AI</string>
+    <string name="video_result_title">Gom kỷ niệm</string>
+    <string name="no_music_selected">Chưa chọn nhạc</string>
+    <string name="btn_save">Lưu</string>
+    <string name="exporting_video_merging_music">Đang xuất video &amp; ghép nhạc...</string>
+    <string name="music_title">Nhạc nền</string>
+    <string name="music_screen_subtitle">Chọn thể loại và bài hát phù hợp cho video của bạn</string>
+    <string name="music_empty_category">Chưa có bài hát trong danh mục này</string>
+    <string name="music_empty_try_other">Vui lòng thử chọn danh mục khác</string>
+    <string name="music_btn_choose">Chọn</string>
+    <string name="ai_create_title">AI Create</string>
+    <string name="enter_prompt_hint">Nhập mô tả (Prompt)</string>
+    <string name="prompt_suggestions">Gợi ý prompt</string>
+    <string name="btn_generate_image">Tạo ảnh</string>
+    <string name="loading_please_wait">Vui lòng đợi trong giây lát</string>
+    <string name="enhance_result_subtitle">Prompt của bạn đã được biến thành hình ảnh tuyệt đẹp!</string>
+    <string name="enhance_your_prompt">PROMPT CỦA BẠN</string>
+    <string name="btn_generate_again">Tạo lại</string>
+    <string name="restore_title">Khôi phục ảnh</string>
+    <string name="restore_main_desc">Biến những bức ảnh cũ, mờ, hư hỏng thành hình ảnh rõ nét, sống động hơn.</string>
+    <string name="restore_feature_1_title">Sửa ảnh mờ, nhòe</string>
+    <string name="restore_feature_1_desc">Làm rõ chi tiết, sắc nét hơn.</string>
+    <string name="restore_feature_2_title">Khôi phục ảnh cũ</string>
+    <string name="restore_feature_2_desc">Giảm nhiễu, cải thiện màu sắc.</string>
+    <string name="restore_feature_3_title">Tăng độ chân thực</string>
+    <string name="restore_feature_3_desc">Giữ nguyên vẻ tự nhiên của ảnh.</string>
+    <string name="btn_start_now">Bắt đầu ngay</string>
+    <string name="restoring_photo">Đang khôi phục ảnh</string>
+    <string name="restoring_photo_dots">Đang khôi phục ảnh...</string>
+    <string name="restore_result_title">Kết quả</string>
+    <string name="photo_restored">Ảnh đã được khôi phục</string>
+    <string name="photo_restored_details">Chi tiết và màu sắc rõ hơn</string>
+    <string name="btn_save_photo">Lưu ảnh</string>
     <string name="history_title">Lịch sử</string>
     <string name="history_subtitle">Xem lại những bức ảnh bạn đã chỉnh sửa và lưu giữ tại đây.</string>
     <string name="history_tab_all">Tất cả</string>
@@ -91,12 +144,23 @@
     <string name="history_tab_restore">Khôi phục</string>
     <string name="history_empty_title">Chưa có bản lưu nào</string>
     <string name="history_empty_desc">Các tác phẩm bạn tạo sẽ được lưu giữ tại đây.</string>
-
-    <!-- Settings Screen -->
+    <string name="history_detail_title">Chi tiết lịch sử</string>
+    <string name="history_detail_ai_image">Ảnh AI</string>
+    <string name="history_detail_prompt_used">Prompt câu lệnh đã tạo</string>
+    <string name="btn_copy">Sao chép</string>
+    <string name="history_detail_beat_sync">Tự động khớp nhịp beat • 120 BPM</string>
+    <string name="history_detail_restore_high">Khôi phục ảnh chất lượng cao</string>
+    <string name="history_detail_restore_desc">AI Face Restoration v2.4 • Tái tạo độ nét 4K</string>
+    <string name="btn_create_similar">Tạo tương tự</string>
+    <string name="delete_history_title">Xoá mục lịch sử</string>
+    <string name="delete_history_message">Bạn có chắc chắn muốn xoá tác phẩm này khỏi danh sách lịch sử không? Hành động này không thể hoàn tác.</string>
+    <string name="btn_delete">Xoá</string>
     <string name="settings_title">Cài đặt</string>
     <string name="settings_iap_title">Nâng cấp Premium</string>
-    <string name="settings_iap_desc">Mở khóa toàn bộ công cụ AI và trải nghiệm\ntốt hơn.</string>
+    <string name="settings_iap_desc">Mở khóa toàn bộ công cụ AI và trải nghiệm
+tốt hơn.</string>
     <string name="settings_iap_btn">Nâng cấp ngay</string>
+    <string name="btn_upgrade_now_arrow">Nâng cấp ngay →</string>
     <string name="settings_group_options">Tùy chọn</string>
     <string name="setting_language">Ngôn ngữ</string>
     <string name="setting_notification">Thông báo</string>
@@ -112,42 +176,30 @@
     <string name="setting_privacy">Chính sách bảo mật</string>
     <string name="setting_terms">Điều khoản sử dụng</string>
     <string name="setting_app_version">Phiên bản ứng dụng</string>
-
     <string name="btn_back">Quay lại</string>
     <string name="placeholder_description">Tính năng đang được hoàn thiện.</string>
-
-    <!-- Popups Strings -->
     <string name="enable_notifications_title">Bật thông báo</string>
     <string name="enable_notifications_desc">Nhận thông báo khi tác phẩm AI tạo xong và cập nhật các phong cách ảnh &amp; video mới nhất.</string>
     <string name="btn_go_to_settings">Cài đặt</string>
     <string name="btn_cancel">Hủy</string>
-
     <string name="save_success_title">Lưu thành công</string>
     <string name="save_success_desc">Tác phẩm của bạn đã được lưu vào bộ sưu tập thiết bị.</string>
     <string name="btn_done">Hoàn tất</string>
-
     <string name="restore_error_title">Khôi phục ảnh không thành công</string>
     <string name="restore_error_desc">Đã xảy ra lỗi trong quá trình xử lý ảnh. Vui lòng kiểm tra lại ảnh hoặc thử lại sau.</string>
     <string name="btn_try_again">Thử lại</string>
-
     <string name="ai_gen_error_title">Tạo ảnh AI không thành công</string>
     <string name="ai_gen_error_desc">Hệ thống đang bận hoặc prompt chưa phù hợp. Vui lòng thử lại với prompt khác.</string>
-
     <string name="no_internet_title">Mất kết nối Internet</string>
     <string name="no_internet_desc">Vui lòng kiểm tra kết nối mạng của bạn để tiếp tục sử dụng các tính năng AI.</string>
     <string name="btn_dismiss">Đóng</string>
-
     <string name="exit_title">Thoát ứng dụng</string>
     <string name="exit_desc">Bạn có chắc chắn muốn thoát khỏi ứng dụng không?</string>
     <string name="btn_exit">Thoát</string>
-
-    <!-- Rate App -->
     <string name="rate_title">Đánh giá ứng dụng</string>
     <string name="rate_subtitle">Bạn cảm thấy trải nghiệm tạo ảnh với Photo AI như thế nào?</string>
     <string name="btn_rate_submit">Gửi đánh giá</string>
     <string name="btn_rate_not_now">Để sau</string>
-
-    <!-- Uninstall Survey -->
     <string name="uninstall_step1_title">Bạn gặp vấn đề gì khi sử dụng Photo AI?</string>
     <string name="uninstall_card1_title">Không thể lưu hoặc chất lượng ảnh chưa tốt</string>
     <string name="uninstall_card1_desc">Thử lại với các chế độ AI khác hoặc xem mẹo tạo ảnh đẹp</string>
@@ -158,6 +210,7 @@
     <string name="uninstall_btn_dont_uninstall">Không muốn gỡ cài đặt</string>
     <string name="uninstall_btn_still_uninstall">Vẫn muốn gỡ cài đặt</string>
     <string name="uninstall_step2_title">Tại sao bạn muốn gỡ cài đặt?</string>
+    <string name="uninstall_step2_subtitle">Chúng tôi rất tiếc khi bạn rời đi. Vui lòng cho chúng tôi biết cách cải thiện ứng dụng.</string>
     <string name="uninstall_opt_1">Ứng dụng phản hồi chậm hoặc bị đơ</string>
     <string name="uninstall_opt_2">Lỗi không tạo được ảnh hoặc khôi phục ảnh</string>
     <string name="uninstall_opt_3">Thiếu tính năng hoặc phong cách AI tôi cần</string>
@@ -165,4 +218,106 @@
     <string name="uninstall_opt_5">Chất lượng ảnh chưa như mong đợi</string>
     <string name="uninstall_opt_6">Lý do khác</string>
     <string name="uninstall_hint_other">Vui lòng chia sẻ thêm ý kiến của bạn...</string>
+    <string name="toast_select_portrait_first">Vui lòng chọn 1 ảnh chân dung trước khi tạo video!</string>
+    <string name="toast_cannot_read_image">Không thể đọc file ảnh đã chọn!</string>
+    <string name="toast_create_video_failed">Tạo video thất bại: %1$s</string>
+    <string name="toast_process_video_failed">Xử lý video thất bại: %1$s</string>
+    <string name="toast_error_occurred">Đã xảy ra lỗi: %1$s</string>
+    <string name="toast_video_play_error">Lỗi khi phát video</string>
+    <string name="toast_cannot_export_video">Không thể xuất video!</string>
+    <string name="toast_cannot_share_video">Không thể chia sẻ video lúc này</string>
+    <string name="toast_video_not_ready">Video chưa sẵn sàng để chia sẻ</string>
+    <string name="toast_saved_to_favorites">Đã lưu vào danh sách yêu thích</string>
+    <string name="toast_enter_prompt_description">Vui lòng nhập mô tả ý tưởng ảnh</string>
+    <string name="toast_no_image_to_save">Không có ảnh để lưu</string>
+    <string name="toast_cannot_open_share">Không thể mở ứng dụng chia sẻ</string>
+    <string name="toast_select_at_least_1_photo">Vui lòng chọn ít nhất 1 ảnh để tạo video</string>
+    <string name="toast_cannot_create_video_file">Không thể tạo file video. Vui lòng thử lại!</string>
+    <string name="toast_video_file_not_found">Không tìm thấy file video!</string>
+    <string name="toast_cannot_save_video">Không thể lưu video!</string>
+    <string name="toast_music_preview_unavailable">Bản nhạc xem trước không khả dụng</string>
+    <string name="toast_cannot_download_preview">Không thể tải bản nhạc xem trước</string>
+    <string name="toast_image_not_found">Không tìm thấy ảnh đã chọn</string>
+    <string name="toast_deleted_from_history">Đã xoá khỏi lịch sử</string>
+    <string name="toast_prompt_copied">Đã sao chép Prompt vào bộ nhớ tạm!</string>
+    <string name="toast_feature_in_progress">Tính năng đang được hoàn thiện</string>
+
+    <!-- Auto-added localized feature keys -->
+    <string name="prompt_hint">Ví dụ: Cô gái anime, mặc váy trắng, đứng giữa cánh đồng hoa...</string>
+    <string name="prompt_chip_anime">Anime girl</string>
+    <string name="prompt_chip_fantasy">Fantasy ...</string>
+    <string name="prompt_chip_pet">Cute pet</string>
+    <string name="prompt_chip_cyberpunk">Cyberpunk</string>
+    <string name="prompt_chip_nature">Nature</string>
+    <string name="prompt_chip_portrait">Portrait</string>
+    <string name="prompt_style">Phong cách</string>
+    <string name="prompt_badge_hot">🔥 Hot</string>
+    <string name="prompt_anime_full">Anime girl xinh đẹp, phong cách truyện tranh Nhật Bản</string>
+    <string name="prompt_fantasy_full">Lâu đài kỳ ảo bay giữa bầu trời thần tiên rực rỡ</string>
+    <string name="prompt_pet_full">Mèo con dễ thương đội mũ len ngồi trong tách trà</string>
+    <string name="prompt_cyberpunk_full">Chiến binh Cyberpunk neon rực sáng đêm mưa hiện đại</string>
+    <string name="prompt_nature_full">Rừng cây phát sáng bên hồ nước trong vắt thơ mộng</string>
+    <string name="prompt_portrait_full">Chân dung thiếu nữ thanh tú với ánh sáng hoàng hôn dịu nhẹ</string>
+    <string name="prompt_style_suffix">%1$s, theo phong cách %2$s</string>
+    <string name="badge_before">Trước</string>
+    <string name="badge_after">Sau</string>
+    <string name="detail_default_title">Tác phẩm sáng tạo</string>
+    <string name="detail_recently_created">Vừa tạo gần đây</string>
+    <string name="detail_header_restore">Chi tiết Khôi phục</string>
+    <string name="detail_badge_restore">Khôi phục 4K</string>
+    <string name="detail_btn_restore_another">Phục hồi ảnh khác</string>
+    <string name="detail_header_prompt">Chi tiết Prompt AI</string>
+    <string name="detail_badge_prompt">Prompt AI Art</string>
+    <string name="detail_btn_reuse_prompt">Dùng lại Prompt này</string>
+    <string name="detail_header_memories">Chi tiết Gom ảnh</string>
+    <string name="detail_badge_memories">Video Gom ảnh</string>
+    <string name="detail_music_label">Nhạc: %1$s</string>
+    <string name="detail_btn_new_video">Tạo video mới</string>
+    <string name="detail_header_template">Chi tiết Template Video</string>
+    <string name="detail_badge_template">Trend Template</string>
+    <string name="detail_btn_use_template">Dùng Template này</string>
+    <string name="share_artwork_title">Chia sẻ tác phẩm</string>
+    <string name="share_artwork_message">Xem tác phẩm sáng tạo AI: %1$s</string>
+    <string name="template_requirement_one_photo">Mẫu: %1$s • Yêu cầu 1 ảnh</string>
+    <string name="music_chosen_as_bg">Đã chọn làm nhạc nền</string>
+    <string name="music_change_action">Đổi nhạc</string>
+    <string name="music_original_sound">Âm thanh gốc</string>
+    <string name="music_tap_to_choose">Chạm để chọn nhạc nền AI</string>
+    <string name="music_currently_playing">Đang phát bài này làm nhạc nền</string>
+    <string name="music_none_selected">Chưa chọn nhạc</string>
+    <string name="loading_preparing_image">Đang chuẩn bị ảnh...</string>
+    <string name="loading_downloading_music">Đang tải nhạc nền...</string>
+    <string name="loading_processing_input_image">Đang xử lý ảnh đầu vào...</string>
+    <string name="loading_compressing_optimizing">Đang nén và tối ưu độ phân giải</string>
+    <string name="loading_sending_video_request">Đang gửi yêu cầu tạo video...</string>
+    <string name="loading_backend_ai_processing">Backend AI đang xử lý (10%)</string>
+    <string name="loading_generating_video_ai">Đang tạo video bằng AI...</string>
+    <string name="loading_processing_progress">Đang xử lý (%1$d%%)...</string>
+    <string name="loading_timeout_error">Quá thời gian xử lý</string>
+    <string name="loading_preparing_video">Đang chuẩn bị video...</string>
+    <string name="loading_storing_local">Đang lưu trữ cục bộ...</string>
+    <string name="loading_merging_music">Đang ghép nhạc nền...</string>
+    <string name="loading_creating_video">Đang tạo video...</string>
+    <string name="loading_preparing_images">Đang chuẩn bị hình ảnh và hiệu ứng...</string>
+    <string name="loading_merging_audio_to_video">Đang ghép âm thanh mới vào video...</string>
+    <string name="loading_preparing_save_video">Đang chuẩn bị video để lưu...</string>
+    <string name="loading_preparing_share_video">Đang chuẩn bị chia sẻ video...</string>
+    <string name="video_title_with_music">Video tạo từ %1$d ảnh AI • Nhạc: %2$s</string>
+    <string name="video_title_no_music">Video tạo từ %1$d ảnh AI</string>
+    <string name="share_video_ai_title">Chia sẻ video AI</string>
+    <string name="share_video_memories_title">Chia sẻ video kỷ niệm</string>
+    <string name="lang_sub_vi">Tiếng Việt</string>
+    <string name="lang_sub_en">Tiếng Anh</string>
+    <string name="lang_sub_ja">Tiếng Nhật</string>
+    <string name="lang_sub_ko">Tiếng Hàn</string>
+    <string name="lang_sub_zh">Tiếng Trung</string>
+    <string name="lang_sub_fr">Tiếng Pháp</string>
+    <string name="lang_sub_es">Tiếng Tây Ban Nha</string>
+    <string name="lang_sub_de">Tiếng Đức</string>
+    <string name="lang_sub_it">Tiếng Ý</string>
+    <string name="lang_sub_ar">Tiếng Ả Rập</string>
+    <string name="lang_sub_pt">Tiếng Bồ Đào Nha</string>
+    <string name="lang_sub_ru">Tiếng Nga</string>
+    <string name="lang_sub_hi">Tiếng Hindi</string>
+    <string name="lang_sub_id">Tiếng Indonesia</string>
 </resources>
