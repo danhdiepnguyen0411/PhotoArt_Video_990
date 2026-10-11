@@ -69,7 +69,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Tải ảnh lên từ thư viện"
+                    android:text="@string/memories_upload_title"
                     android:textColor="@color/navy"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -81,11 +81,11 @@
                     android:background="@drawable/bg_category_chip_unselected"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="0 ảnh"
                     android:textColor="@color/primary"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:visibility="gone"
+                    tools:text="0 photos"
                     tools:visibility="visible" />
             </LinearLayout>
 
@@ -122,7 +122,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Nhấn để chọn ảnh từ thư viện"
+                        android:text="@string/tap_to_select_photos"
                         android:textColor="@color/navy"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -131,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Chọn 1 hoặc nhiều ảnh (JPG, PNG)"
+                        android:text="@string/select_multiple_photos"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
 
@@ -259,7 +259,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Chạm vào để xem và quản lý ảnh"
+                    android:text="@string/tap_to_manage_photos"
                     android:textColor="@color/muted"
                     android:textSize="13sp" />
 
@@ -294,7 +294,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Thêm ảnh"
+                            android:text="@string/btn_add_photos"
                             android:textColor="@color/primary"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -324,7 +324,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Xem ảnh"
+                            android:text="@string/btn_view_photos"
                             android:textColor="@color/primary"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -339,7 +339,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Nhạc nền cho video"
+                android:text="@string/video_bg_music"
                 android:textColor="@color/navy"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -384,7 +384,7 @@
                             android:id="@+id/tvSelectedMusicTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn bài hát nền"
+                            android:text="@string/choose_bg_song"
                             android:textColor="@color/navy"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -394,7 +394,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Nhấn để duyệt danh mục nhạc AI"
+                            android:text="@string/browse_ai_music_catalog"
                             android:textColor="@color/muted"
                             android:textSize="12sp" />
 
@@ -406,7 +406,7 @@
                         android:background="@drawable/bg_category_chip_unselected"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="6dp"
-                        android:text="Đổi nhạc"
+                        android:text="@string/btn_change_music"
                         android:textColor="@color/primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -428,7 +428,7 @@
         android:background="@drawable/bg_btn_primary"
         android:drawableEnd="@drawable/ic_arrow_right"
         android:paddingHorizontal="24dp"
-        android:text="Tạo video ngay"
+        android:text="@string/btn_create_video_now"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp"

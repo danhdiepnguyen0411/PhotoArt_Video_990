@@ -80,6 +80,17 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     }
 
     override fun initListener() {
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            Color.parseColor("#4A7BFE"),
+            Color.parseColor("#9153EE")
+        )
+        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            binding.rvTemplates.canScrollVertically(-1)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadData()
+        }
+
         binding.btnTemplatePro.setOnClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
@@ -107,11 +118,18 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                 }
                 launch {
                     viewModel.isLoading.collect { loading ->
-                        binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
-                        if (loading) {
-                            binding.llEmptyState.visibility = View.GONE
+                        if (!binding.swipeRefreshLayout.isRefreshing) {
+                            binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
                         } else {
+                            binding.pbLoading.visibility = View.GONE
+                        }
+                        if (!loading) {
+                            binding.swipeRefreshLayout.postDelayed({
+                                if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
+                            }, 500L)
                             binding.llEmptyState.visibility = if (viewModel.templates.value.isEmpty()) View.VISIBLE else View.GONE
+                        } else {
+                            binding.llEmptyState.visibility = View.GONE
                         }
                     }
                 }

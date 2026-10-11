@@ -69,16 +69,16 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
     }
 
     private fun bindItemData(item: HistoryItemModel) {
-        binding.tvDetailTitle.text = item.title.ifBlank { "Tác phẩm sáng tạo" }
-        binding.tvDetailDate.text = item.date.ifBlank { "Vừa tạo gần đây" }
+        binding.tvDetailTitle.text = item.title.ifBlank { getString(R.string.detail_default_title) }
+        binding.tvDetailDate.text = item.date.ifBlank { getString(R.string.detail_recently_created) }
 
         val type = item.type.lowercase()
 
         when {
             // 1. KHÔI PHỤC ẢNH CŨ
             type.contains("khôi phục") || type.contains("restore") -> {
-                binding.tvHeaderTitle.text = "Chi tiết Khôi phục"
-                binding.tvMediaTypeBadge.text = "Khôi phục 4K"
+                binding.tvHeaderTitle.text = getString(R.string.detail_header_restore)
+                binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_restore)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_after)
 
                 binding.sliderView.visibility = View.VISIBLE
@@ -107,7 +107,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.cardPromptSection.visibility = View.GONE
                 binding.cardMusicSection.visibility = View.GONE
 
-                binding.btnRecreate.text = "Phục hồi ảnh khác"
+                binding.btnRecreate.text = getString(R.string.detail_btn_restore_another)
                 binding.btnRecreate.setOnClickListener {
                     findNavController().navigateSafe(R.id.action_historyDetailFragment_to_restoreFragment)
                 }
@@ -115,8 +115,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 2. PROMPT AI
             type.contains("prompt") -> {
-                binding.tvHeaderTitle.text = "Chi tiết Prompt AI"
-                binding.tvMediaTypeBadge.text = "Prompt AI Art"
+                binding.tvHeaderTitle.text = getString(R.string.detail_header_prompt)
+                binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_prompt)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge_capsule)
 
                 binding.sliderView.visibility = View.GONE
@@ -132,14 +132,14 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.cardRestoreSection.visibility = View.GONE
                 binding.cardMusicSection.visibility = View.GONE
 
-                val promptText = item.title.ifBlank { "Lâu đài kỳ ảo bay giữa bầu trời thần tiên rực rỡ" }
+                val promptText = item.title.ifBlank { getString(R.string.prompt_fantasy_full) }
                 binding.tvPromptContent.text = promptText
 
                 binding.btnCopyPrompt.setOnClickListener {
                     copyToClipboard("Prompt", promptText)
                 }
 
-                binding.btnRecreate.text = "Dùng lại Prompt này"
+                binding.btnRecreate.text = getString(R.string.detail_btn_reuse_prompt)
                 binding.btnRecreate.setOnClickListener {
                     findNavController().navigateSafe(R.id.action_historyDetailFragment_to_enhanceFragment)
                 }
@@ -147,8 +147,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 3. GOM ẢNH / VIDEO GHÉP NHẠC
             type.contains("gom") || type.contains("music") || type.contains("video") -> {
-                binding.tvHeaderTitle.text = "Chi tiết Gom ảnh"
-                binding.tvMediaTypeBadge.text = "Video Gom ảnh"
+                binding.tvHeaderTitle.text = getString(R.string.detail_header_memories)
+                binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_memories)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge)
 
                 binding.sliderView.visibility = View.GONE
@@ -165,14 +165,14 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.cardPromptSection.visibility = View.GONE
                 binding.cardRestoreSection.visibility = View.GONE
 
-                val trackName = if (item.title.contains("Nhạc:")) {
-                    item.title.substringAfter("Nhạc:").trim()
+                val trackName = if (item.title.contains("Nhạc:") || item.title.contains("Music:")) {
+                    item.title.substringAfter(":").trim()
                 } else {
                     "Lumen Phonk (Slowed)"
                 }
-                binding.tvMusicTrackTitle.text = "Nhạc: $trackName"
+                binding.tvMusicTrackTitle.text = getString(R.string.detail_music_label, trackName)
 
-                binding.btnRecreate.text = "Tạo video mới"
+                binding.btnRecreate.text = getString(R.string.detail_btn_new_video)
                 binding.btnRecreate.setOnClickListener {
                     findNavController().navigateSafe(R.id.action_historyDetailFragment_to_memoriesFragment)
                 }
@@ -187,8 +187,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 4. TEMPLATE / WAACKING
             else -> {
-                binding.tvHeaderTitle.text = "Chi tiết Template Video"
-                binding.tvMediaTypeBadge.text = "Trend Template"
+                binding.tvHeaderTitle.text = getString(R.string.detail_header_template)
+                binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_template)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_hot)
 
                 binding.sliderView.visibility = View.GONE
@@ -203,9 +203,9 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.cardMusicSection.visibility = View.VISIBLE
                 binding.cardPromptSection.visibility = View.GONE
                 binding.cardRestoreSection.visibility = View.GONE
-                binding.tvMusicTrackTitle.text = "Template: ${item.title}"
+                binding.tvMusicTrackTitle.text = item.title
 
-                binding.btnRecreate.text = "Dùng Template này"
+                binding.btnRecreate.text = getString(R.string.detail_btn_use_template)
                 binding.btnRecreate.setOnClickListener {
                     findNavController().navigateSafe(R.id.action_historyDetailFragment_to_createTemplateVideoFragment)
                 }
@@ -250,7 +250,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
             val item = historyItem ?: return@setOnClickListener
             AppDialogHelper.showDeleteHistoryDialog(requireActivity()) {
                 historyRepository.deleteHistoryItem(item)
-                Toast.makeText(requireContext(), "Đã xóa khỏi lịch sử", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_deleted_from_history), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
         }
@@ -271,20 +271,20 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         val path = item.imageUri ?: item.imageUrl
 
         if (!path.isNullOrBlank() && (path.endsWith(".mp4", ignoreCase = true) || item.type.contains("Gom", ignoreCase = true))) {
-            ShareUtils.shareVideo(requireContext(), path, "Chia sẻ tác phẩm")
+            ShareUtils.shareVideo(requireContext(), path, getString(R.string.share_artwork_title))
         } else {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Xem tác phẩm sáng tạo AI: ${item.title}")
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_artwork_message, item.title))
             }
-            startActivity(Intent.createChooser(sendIntent, "Chia sẻ tác phẩm"))
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_artwork_title)))
         }
     }
 
     private fun playVideoOrPreview(item: HistoryItemModel) {
         val videoUrlOrPath = item.imageUri ?: item.imageUrl
         if (videoUrlOrPath.isNullOrBlank()) {
-            Toast.makeText(requireContext(), "Không tìm thấy video!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_video_file_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -397,7 +397,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         } catch (_: Exception) {
-            Toast.makeText(requireContext(), "Không thể phát video này", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_video_play_error), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -417,6 +417,6 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
     private fun copyToClipboard(label: String, text: String) {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
         clipboard?.setPrimaryClip(ClipData.newPlainText(label, text))
-        Toast.makeText(requireContext(), "Đã sao chép Prompt vào bộ nhớ tạm!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.toast_prompt_copied), Toast.LENGTH_SHORT).show()
     }
 }

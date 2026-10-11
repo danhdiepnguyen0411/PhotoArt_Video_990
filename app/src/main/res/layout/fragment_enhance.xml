@@ -52,7 +52,7 @@
                 android:id="@+id/tvTopTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI Create"
+                android:text="@string/ai_create_title"
                 android:textColor="#3250C9"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -145,7 +145,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Nhập mô tả (Prompt)"
+                            android:text="@string/enter_prompt_hint"
                             android:textColor="#3250C9"
                             android:textSize="15.5sp"
                             android:textStyle="bold" />
@@ -163,7 +163,7 @@
                             android:layout_height="match_parent"
                             android:background="@null"
                             android:gravity="top|start"
-                            android:hint="Ví dụ: Cô gái anime, mặc váy trắng, đứng giữa cánh đồng hoa..."
+                            android:hint="@string/prompt_hint"
                             android:importantForAutofill="no"
                             android:inputType="textMultiLine"
                             android:paddingHorizontal="14dp"
@@ -204,7 +204,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Gợi ý prompt"
+                            android:text="@string/prompt_suggestions"
                             android:textColor="#3250C9"
                             android:textSize="15.5sp"
                             android:textStyle="bold" />
@@ -229,7 +229,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Anime girl"
+                            android:text="@string/prompt_chip_anime"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -246,7 +246,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Fantasy ..."
+                            android:text="@string/prompt_chip_fantasy"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -262,7 +262,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Cute pet"
+                            android:text="@string/prompt_chip_pet"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -287,7 +287,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Cyberpunk"
+                            android:text="@string/prompt_chip_cyberpunk"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -304,7 +304,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Nature"
+                            android:text="@string/prompt_chip_nature"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -320,7 +320,7 @@
                             android:drawableTint="#5373F2"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
-                            android:text="Portrait"
+                            android:text="@string/prompt_chip_portrait"
                             android:textColor="#3250C9"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -348,7 +348,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:text="Style"
+                    android:text="@string/prompt_style"
                     android:textColor="#3250C9"
                     android:textSize="17.5sp"
                     android:textStyle="bold" />
@@ -413,7 +413,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="🔥 Hot"
+                                    android:text="@string/prompt_badge_hot"
                                     android:textColor="@color/white"
                                     android:textSize="10.5sp"
                                     android:textStyle="bold" />
@@ -545,7 +545,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:text="Tạo ảnh"
+            android:text="@string/btn_generate_image"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />

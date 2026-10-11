@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Video AI Tạo Mẫu"
+            android:text="@string/template_video_result_title"
             android:textColor="@color/navy"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -190,7 +190,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Âm thanh gốc"
+                    android:text="@string/original_audio"
                     android:textColor="@color/navy"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -200,7 +200,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Chạm để đổi nhạc nền"
+                    android:text="@string/tap_to_change_bg_music"
                     android:textColor="@color/muted"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -211,7 +211,7 @@
                 android:background="@drawable/bg_category_chip_unselected"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:text="Đổi nhạc"
+                android:text="@string/btn_change_music"
                 android:textColor="@color/primary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -239,7 +239,7 @@
             android:background="@drawable/bg_btn_primary"
             android:drawableStart="@drawable/ic_download"
             android:paddingHorizontal="20dp"
-            android:text="Lưu vào máy"
+            android:text="@string/btn_save_to_device"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15sp"
@@ -254,7 +254,7 @@
             android:background="@drawable/bg_btn_primary"
             android:drawableStart="@drawable/ic_share_line"
             android:paddingHorizontal="20dp"
-            android:text="Chia sẻ"
+            android:text="@string/btn_share"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15sp"
@@ -305,7 +305,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:text="Đang xử lý video..."
+                    android:text="@string/processing_video"
                     android:textColor="@color/navy"
                     android:textSize="15sp"
                     android:textStyle="bold" />

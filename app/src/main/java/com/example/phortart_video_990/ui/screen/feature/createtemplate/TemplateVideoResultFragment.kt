@@ -102,9 +102,9 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     }
 
     private fun updateMusicInfoUi() {
-        val title = musicTitle?.takeIf { it.isNotBlank() } ?: "Âm thanh gốc"
+        val title = musicTitle?.takeIf { it.isNotBlank() } ?: getString(R.string.music_original_sound)
         binding.tvMusicTitle.text = title
-        binding.tvMusicSubtitle.text = if (musicTitle.isNullOrBlank()) "Chạm để chọn nhạc nền AI" else "Đang phát bài này làm nhạc nền"
+        binding.tvMusicSubtitle.text = if (musicTitle.isNullOrBlank()) getString(R.string.music_tap_to_choose) else getString(R.string.music_currently_playing)
 
         if (!musicImageUrl.isNullOrBlank()) {
             binding.ivMusicCover.visibility = View.VISIBLE
@@ -185,7 +185,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         }
 
         binding.videoView.setOnErrorListener { _, _, _ ->
-            Toast.makeText(requireContext(), "Lỗi khi phát video", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_video_play_error), Toast.LENGTH_SHORT).show()
             true
         }
     }
@@ -393,7 +393,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         }
 
         // Có chọn nhạc ngoài -> Mux ghép nhạc vào video
-        showExportLoading(true, "Đang ghép âm thanh mới vào video...", 60)
+        showExportLoading(true, getString(R.string.loading_merging_audio_to_video), 60)
         val mergedFile = File(requireContext().cacheDir, "merged_template_${System.currentTimeMillis()}.mp4")
         val success = VideoGenerator.mergeAudioIntoVideo(
             context = requireContext(),
@@ -415,7 +415,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         updatePlayStateUi(false)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val videoFile = appDocumentVideoFile ?: prepareFinalVideoFile("Đang chuẩn bị video để lưu...")
+            val videoFile = appDocumentVideoFile ?: prepareFinalVideoFile(getString(R.string.loading_preparing_save_video))
 
             if (videoFile != null && videoFile.exists()) {
                 // 1. Lưu bản gốc vào App Documents
@@ -438,7 +438,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
 
                 AppDialogHelper.showSaveSuccessDialog(requireActivity())
             } else {
-                Toast.makeText(requireContext(), "Không thể xuất video!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_export_video), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -452,7 +452,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
 
         viewLifecycleOwner.lifecycleScope.launch {
             val videoToShare = appDocumentVideoFile ?: run {
-                val temp = prepareFinalVideoFile("Đang chuẩn bị chia sẻ video...")
+                val temp = prepareFinalVideoFile(getString(R.string.loading_preparing_share_video))
                 tempShareCacheFile = temp
                 temp
             }
@@ -461,20 +461,21 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
                 val success = ShareUtils.shareVideo(
                     context = requireContext(),
                     filePath = videoToShare.absolutePath,
-                    chooserTitle = "Chia sẻ video AI"
+                    chooserTitle = getString(R.string.share_video_ai_title)
                 )
                 if (!success) {
-                    Toast.makeText(requireContext(), "Không thể chia sẻ video lúc này", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_cannot_share_video), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(requireContext(), "Video chưa sẵn sàng để chia sẻ", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_video_not_ready), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun showExportLoading(show: Boolean, status: String = "Đang xử lý video...", percent: Int = 0) {
+    private fun showExportLoading(show: Boolean, status: String? = null, percent: Int = 0) {
+        val resolvedStatus = status ?: getString(R.string.loading_creating_video)
         binding.flExportLoadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
-        binding.tvExportStatus.text = status
+        binding.tvExportStatus.text = resolvedStatus
         binding.pbExportHorizontal.progress = percent
         binding.tvExportPercent.text = "$percent%"
         if (show) {

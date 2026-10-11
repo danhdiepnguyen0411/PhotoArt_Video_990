@@ -38,16 +38,13 @@ class HomeMediaAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HomeMediaItemModel) {
-            val source: Any? = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null } ?: if (item.imageRes != 0) item.imageRes else null
+            val fallbackRes = if (item.imageRes != 0) item.imageRes else R.drawable.template_selfie
+            val source: Any = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null } ?: fallbackRes
 
-            if (source != null) {
-                binding.ivMediaThumb.load(source) {
-                    crossfade(true)
-                    placeholder(R.drawable.bg_card_white)
-                    error(R.drawable.bg_card_white)
-                }
-            } else {
-                binding.ivMediaThumb.setImageResource(R.drawable.bg_card_white)
+            binding.ivMediaThumb.load(source) {
+                crossfade(true)
+                placeholder(fallbackRes)
+                error(fallbackRes)
             }
 
 

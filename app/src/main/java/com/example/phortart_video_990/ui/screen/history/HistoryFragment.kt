@@ -17,14 +17,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
     private lateinit var filterAdapter: HistoryFilterAdapter
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var historyRepository: HistoryRepository
-    private var currentFilter = "Tất cả"
+    private var currentFilterKey = "ALL"
 
-    private val filterTabs = listOf(
-        HistoryFilterItem("Tất cả", R.drawable.ic_filter_all),
-        HistoryFilterItem("Gom ảnh", R.drawable.ic_filter_music),
-        HistoryFilterItem("Prompt AI", R.drawable.ic_filter_sparkle),
-        HistoryFilterItem("Khôi phục", R.drawable.ic_filter_restore)
-    )
+    private val filterTabs by lazy {
+        listOf(
+            HistoryFilterItem("ALL", getString(R.string.history_tab_all), R.drawable.ic_filter_all),
+            HistoryFilterItem("VIDEO", getString(R.string.history_tab_video), R.drawable.ic_filter_music),
+            HistoryFilterItem("PROMPT", getString(R.string.history_tab_prompt), R.drawable.ic_filter_sparkle),
+            HistoryFilterItem("RESTORE", getString(R.string.history_tab_restore), R.drawable.ic_filter_restore)
+        )
+    }
 
     private var userHistoryItems: List<HistoryItemModel> = emptyList()
 
@@ -32,8 +34,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
         historyRepository = HistoryRepository(requireContext())
 
         // Filter chips
-        filterAdapter = HistoryFilterAdapter(filterTabs, currentFilter) { selectedFilter ->
-            currentFilter = selectedFilter
+        filterAdapter = HistoryFilterAdapter(filterTabs, currentFilterKey) { selectedKey ->
+            currentFilterKey = selectedKey
             applyFilter()
         }
         binding.rvHistoryFilter.layoutManager =
@@ -53,6 +55,20 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
         )
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvHistory.adapter = historyAdapter
+
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            android.graphics.Color.parseColor("#4A7BFE"),
+            android.graphics.Color.parseColor("#9153EE")
+        )
+        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            binding.rvHistory.canScrollVertically(-1)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadHistory()
+            binding.swipeRefreshLayout.postDelayed({
+                if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
+            }, 500L)
+        }
     }
 
     override fun onResume() {
@@ -66,10 +82,17 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
     }
 
     private fun applyFilter() {
-        val filtered = if (currentFilter == "Tất cả") {
-            userHistoryItems
-        } else {
-            userHistoryItems.filter { it.type.equals(currentFilter, ignoreCase = true) }
+        val filtered = when (currentFilterKey) {
+            "VIDEO" -> userHistoryItems.filter {
+                it.type.contains("video", ignoreCase = true) || it.type.contains("Gom", ignoreCase = true)
+            }
+            "PROMPT" -> userHistoryItems.filter {
+                it.type.contains("prompt", ignoreCase = true)
+            }
+            "RESTORE" -> userHistoryItems.filter {
+                it.type.contains("phục", ignoreCase = true) || it.type.contains("restore", ignoreCase = true)
+            }
+            else -> userHistoryItems
         }
 
         historyAdapter.updateData(filtered)

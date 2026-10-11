@@ -1,23 +1,68 @@
 package com.example.phortart_video_990.ui.screen.language
 
+import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.data.model.LanguageModel
 import com.example.phortart_video_990.databinding.ItemLanguageBinding
 
 class LanguageAdapter(
-    private val items: List<LanguageModel>,
     private val onItemSelected: (LanguageModel) -> Unit
 ) : RecyclerView.Adapter<LanguageAdapter.LanguageViewHolder>() {
 
-    private var selectedPosition = items.indexOfFirst { it.isSelected }.let { if (it >= 0) it else 0 }
+    private val items = mutableListOf<LanguageModel>()
+    private var imageLoader: ImageLoader? = null
 
-    init {
-        if (items.isNotEmpty()) {
-            items[selectedPosition].isSelected = true
+    private fun getImageLoader(context: Context): ImageLoader {
+        return imageLoader ?: ImageLoader.Builder(context.applicationContext)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build().also { imageLoader = it }
+    }
+
+    fun submitList(newList: List<LanguageModel>) {
+        items.clear()
+        items.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedItem(): LanguageModel? {
+        return items.find { it.isSelected }
+    }
+
+    fun getLanguageAt(position: Int): LanguageModel? {
+        return if (position in items.indices) items[position] else null
+    }
+
+    fun selectLanguage(code: String) {
+        val oldIndex = items.indexOfFirst { it.isSelected }
+        val newIndex = items.indexOfFirst { it.code == code }
+        if (oldIndex == newIndex) return
+        if (oldIndex != -1) {
+            items[oldIndex].isSelected = false
+            notifyItemChanged(oldIndex)
         }
+        if (newIndex != -1) {
+            items[newIndex].isSelected = true
+            notifyItemChanged(newIndex)
+        }
+    }
+
+    fun updateSubNames(context: Context, isRtl: Boolean) {
+        items.forEach { item ->
+            if (item.subResId != 0) {
+                item.subName = context.getString(item.subResId)
+            }
+        }
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LanguageViewHolder {
@@ -26,41 +71,52 @@ class LanguageAdapter(
     }
 
     override fun onBindViewHolder(holder: LanguageViewHolder, position: Int) {
-        holder.bind(items[position], position == selectedPosition)
+        holder.bind(items[position])
     }
 
     override fun getItemCount(): Int = items.size
 
-    fun getSelectedItem(): LanguageModel? {
-        return if (selectedPosition in items.indices) items[selectedPosition] else null
-    }
-
-    inner class LanguageViewHolder(private val binding: ItemLanguageBinding) :
+    inner class LanguageViewHolder(val binding: ItemLanguageBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: LanguageModel, isSelected: Boolean) {
-            binding.tvLanguageFlag.text = item.flag
+        fun bind(item: LanguageModel) {
+            val context = binding.root.context
+            val isRtl = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL ||
+                    context.resources.configuration.locale?.language?.lowercase() == "ar"
+            val dir = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+
+            binding.root.layoutDirection = dir
+            binding.cardLanguage.layoutDirection = dir
+            binding.tvLanguageName.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+            binding.tvLanguageSub.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+
+            // Load SVG flag from assets/flags using Coil SvgDecoder
+            if (binding.imgFlag.tag != item.flagAsset) {
+                binding.imgFlag.tag = item.flagAsset
+                val request = ImageRequest.Builder(context)
+                    .data("file:///android_asset/${item.flagAsset}")
+                    .target(binding.imgFlag)
+                    .build()
+                getImageLoader(context).enqueue(request)
+            }
+
             binding.tvLanguageName.text = item.name
             binding.tvLanguageSub.text = item.subName
 
-            if (isSelected) {
+            if (item.isSelected) {
                 binding.cardLanguage.setBackgroundResource(R.drawable.bg_item_language_selected)
                 binding.ivRadio.setImageResource(R.drawable.bg_radio_selected)
+                binding.tvLanguageName.setTextColor(Color.parseColor("#5A2BD6"))
             } else {
                 binding.cardLanguage.setBackgroundResource(R.drawable.bg_item_language)
                 binding.ivRadio.setImageResource(R.drawable.bg_radio_unselected)
+                binding.tvLanguageName.setTextColor(Color.parseColor("#2A34C9"))
             }
 
             binding.root.setOnClickListener {
-                val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION && pos != selectedPosition) {
-                    val previousPosition = selectedPosition
-                    selectedPosition = pos
-                    items[previousPosition].isSelected = false
-                    items[selectedPosition].isSelected = true
-                    notifyItemChanged(previousPosition)
-                    notifyItemChanged(selectedPosition)
-                    onItemSelected(items[selectedPosition])
+                if (!item.isSelected) {
+                    selectLanguage(item.code)
+                    onItemSelected(item)
                 }
             }
         }

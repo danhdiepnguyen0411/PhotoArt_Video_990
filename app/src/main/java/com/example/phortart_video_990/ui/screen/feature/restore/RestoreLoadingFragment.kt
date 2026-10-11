@@ -76,7 +76,7 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
     private fun startSdkRestoreProcess() {
         val uriStr = originalUriString
         if (uriStr.isNullOrBlank()) {
-            Toast.makeText(requireContext(), "Không tìm thấy ảnh đã chọn", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_image_not_found), Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
             return
         }
@@ -86,7 +86,7 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
         viewLifecycleOwner.lifecycleScope.launch {
             val file = restoreRepository.createTempFileFromUri(uri)
             if (file == null) {
-                Toast.makeText(requireContext(), "Không thể đọc file ảnh", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
                 return@launch
             }
@@ -132,11 +132,11 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
 
             // Tự động lưu vào lịch sử ngay khi gen ra thành công
             try {
-                val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
                 val currentDate = dateFormat.format(Date())
                 val historyItem = HistoryItemModel(
                     type = "Khôi phục",
-                    title = "Khôi phục ảnh cũ",
+                    title = getString(R.string.func_02_restore),
                     date = currentDate,
                     imageUri = finalOutputUrl,
                     imageUrl = finalOutputUrl,

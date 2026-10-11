@@ -19,6 +19,11 @@ abstract class BaseActivity<VB : ViewBinding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.layoutDirection = if (LocaleHelper.isRtl(this)) {
+            android.view.View.LAYOUT_DIRECTION_RTL
+        } else {
+            android.view.View.LAYOUT_DIRECTION_LTR
+        }
         binding = bindingInflater(layoutInflater)
         setContentView(binding.root)
         initView()

@@ -45,7 +45,12 @@ class CategoryAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: CategoryModel) {
-            binding.tvCategoryName.text = category.displayName
+            val displayName = if (category.code.equals("ALL", ignoreCase = true) || category.name.equals("Tất cả", ignoreCase = true)) {
+                binding.root.context.getString(R.string.template_cat_all)
+            } else {
+                category.displayName
+            }
+            binding.tvCategoryName.text = displayName
             val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
                     (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))
 

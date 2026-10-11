@@ -108,11 +108,11 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
 
                 // Tự động lưu vào lịch sử ngay khi gen ra thành công
                 try {
-                    val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
                     val currentDate = dateFormat.format(Date())
                     val historyItem = HistoryItemModel(
                         type = "Prompt AI",
-                        title = userPrompt.ifBlank { "Tạo ảnh AI" },
+                        title = userPrompt.ifBlank { getString(R.string.func_03_enhance) },
                         date = currentDate,
                         imageUri = outputUrl,
                         imageUrl = outputUrl

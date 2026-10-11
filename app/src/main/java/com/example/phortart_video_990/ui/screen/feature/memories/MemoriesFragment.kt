@@ -50,7 +50,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             if (musicTitle.isNotBlank()) {
                 selectedMusicTitle = musicTitle
                 binding.tvSelectedMusicTitle.text = musicTitle
-                binding.tvSelectedMusicSubtitle.text = "Đã chọn nhạc nền cho video"
+                binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
             }
         }
         stateHandle?.get<String?>("selected_music_audio_url")?.let { audioUrl ->
@@ -78,7 +78,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 if (!musicTitle.isNullOrBlank()) {
                     selectedMusicTitle = musicTitle
                     binding.tvSelectedMusicTitle.text = musicTitle
-                    binding.tvSelectedMusicSubtitle.text = "Đã chọn nhạc nền cho video"
+                    binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
                 }
             }
 
@@ -113,7 +113,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             binding.cardUploadPhoto.visibility = View.GONE
             binding.llSelectedPhotosContainer.visibility = View.VISIBLE
             binding.tvSelectedCount.visibility = View.VISIBLE
-            binding.tvSelectedCount.text = "$count ảnh đã chọn"
+            binding.tvSelectedCount.text = getString(R.string.memories_photos_count, count)
 
             // Layer 1 (Top image)
             binding.ivStackImage1.load(selectedPhotos[0]) {
@@ -196,7 +196,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
         binding.btnCreateVideo.setOnClickListener {
             if (selectedPhotos.isEmpty()) {
-                Toast.makeText(requireContext(), "Vui lòng chọn ít nhất 1 ảnh để tạo video", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_select_at_least_1_photo), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -208,8 +208,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
             binding.btnCreateVideo.isEnabled = false
             showLoading(
-                title = "Đang tạo video...",
-                subtitle = "Đang chuẩn bị hình ảnh và hiệu ứng..."
+                title = getString(R.string.loading_creating_video),
+                subtitle = getString(R.string.loading_preparing_images)
             )
 
             viewLifecycleOwner.lifecycleScope.launch {
@@ -219,8 +219,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     val hasValidAudioFile = !resolvedAudioPath.isNullOrBlank() && File(resolvedAudioPath).let { it.exists() && it.length() > 0 }
                     if (!hasValidAudioFile && !finalAudioUrl.isNullOrBlank()) {
                         showLoading(
-                            title = "Đang tải nhạc nền...",
-                            subtitle = "Vui lòng chờ trong giây lát"
+                            title = getString(R.string.loading_downloading_music),
+                            subtitle = getString(R.string.loading_please_wait)
                         )
                         val downloaded = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
                             requireContext(),
@@ -248,10 +248,10 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         durationSec = videoDurationSec,
                         audioUrl = audioSource,
                         transitions = transitions,
-                        onProgress = { progress, status ->
+                        onProgress = { progress, _ ->
                             showLoading(
-                                title = "Đang tạo video...",
-                                subtitle = "$status ($progress%)"
+                                title = getString(R.string.loading_creating_video),
+                                subtitle = getString(R.string.loading_processing_progress, progress)
                             )
                         }
                     )
@@ -269,13 +269,13 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             finalImageUrl = finalImageUrl
                         )
                     } else {
-                        Toast.makeText(requireContext(), "Không thể tạo file video. Vui lòng thử lại!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_cannot_create_video_file), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     if (!isAdded || view == null) return@launch
                     hideLoading()
                     binding.btnCreateVideo.isEnabled = true
-                    Toast.makeText(requireContext(), "Lỗi khi tạo video: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -24,6 +24,10 @@ import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 
 class UninstallActivity : AppCompatActivity() {
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.example.phortart_video_990.core.utils.LocaleHelper.onAttach(newBase))
+    }
+
     override fun dispatchTouchEvent(ev: android.view.MotionEvent): Boolean {
         KeyboardUtils.handleTouchToDismissKeyboard(this, ev)
         return super.dispatchTouchEvent(ev)
@@ -36,6 +40,11 @@ class UninstallActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.layoutDirection = if (com.example.phortart_video_990.core.utils.LocaleHelper.isRtl(this)) {
+            android.view.View.LAYOUT_DIRECTION_RTL
+        } else {
+            android.view.View.LAYOUT_DIRECTION_LTR
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
@@ -277,8 +286,8 @@ class UninstallActivity : AppCompatActivity() {
         val selectedBg = R.drawable.bg_uninstall_card_selected
 
         val density = resources.displayMetrics.density
-        val boldTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.manrope_bold)
-        val regularTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.manrope_regular)
+        val boldTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter_bold)
+        val regularTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter_regular)
 
         for (i in cards.indices) {
             val isSelected = (i + 1 == optionIndex)
