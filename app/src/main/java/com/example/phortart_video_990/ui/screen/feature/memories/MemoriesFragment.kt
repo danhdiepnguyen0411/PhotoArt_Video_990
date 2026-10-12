@@ -22,12 +22,31 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
     private var selectedAspectRatio: String = "9:16"
+    private var maxPhotoLimit: Int = 10
+    private var templateDurationSec: Float? = null
 
     private val pickMultipleImagesLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             val newUris = uris.filter { it !in selectedPhotos }
-            if (newUris.isNotEmpty()) {
-                selectedPhotos.addAll(newUris)
+            val remainingSlots = maxPhotoLimit - selectedPhotos.size
+            if (remainingSlots <= 0) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@registerForActivityResult
+            }
+            val toAdd = newUris.take(remainingSlots)
+            if (toAdd.isNotEmpty()) {
+                selectedPhotos.addAll(toAdd)
+                if (newUris.size > remainingSlots) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 updatePhotosUi()
             }
         }
@@ -72,6 +91,18 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             ?: stateHandle?.get<String?>("selected_music_image_url")
         updateMusicCoverUi(initialImageUrl)
 
+        val initialDuration = args?.getFloat("selected_template_duration_sec", 0f)?.takeIf { it > 0f }
+            ?: stateHandle?.get<Float>("selected_template_duration_sec")?.takeIf { it > 0f }
+        if (initialDuration != null) {
+            templateDurationSec = initialDuration
+        }
+
+        val initialPhotoLimit = args?.getInt("selected_template_photo_count", 0)?.takeIf { it > 0 }
+            ?: stateHandle?.get<Int>("selected_template_photo_count")?.takeIf { it > 0 }
+        if (initialPhotoLimit != null) {
+            maxPhotoLimit = initialPhotoLimit
+        }
+
         // Observe returned music selection from MusicFragment
         stateHandle?.getLiveData<String>("selected_music_title")
             ?.observe(viewLifecycleOwner) { musicTitle ->
@@ -95,6 +126,25 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         stateHandle?.getLiveData<String?>("selected_music_image_url")
             ?.observe(viewLifecycleOwner) { imageUrl ->
                 updateMusicCoverUi(imageUrl)
+            }
+
+        stateHandle?.getLiveData<Float>("selected_template_duration_sec")
+            ?.observe(viewLifecycleOwner) { dur ->
+                if (dur != null && dur > 0f) {
+                    templateDurationSec = dur
+                }
+            }
+
+        stateHandle?.getLiveData<Int>("selected_template_photo_count")
+            ?.observe(viewLifecycleOwner) { limit ->
+                if (limit != null && limit > 0) {
+                    maxPhotoLimit = limit
+                    if (selectedPhotos.size > limit) {
+                        val toRemove = selectedPhotos.drop(limit)
+                        selectedPhotos.removeAll(toRemove)
+                        updatePhotosUi()
+                    }
+                }
             }
     }
 
@@ -259,7 +309,15 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 updatePhotosUi()
             },
             onAddMoreRequested = {
-                pickMultipleImagesLauncher.launch("image/*")
+                if (selectedPhotos.size >= maxPhotoLimit) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    pickMultipleImagesLauncher.launch("image/*")
+                }
             }
         ).show()
     }
@@ -270,7 +328,15 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
 
         binding.btnAddPhotos.setOnClickListener {
-            pickMultipleImagesLauncher.launch("image/*")
+            if (selectedPhotos.size >= maxPhotoLimit) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                pickMultipleImagesLauncher.launch("image/*")
+            }
         }
 
         binding.cardPhotoStackContainer.setOnClickListener {
@@ -362,7 +428,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
                     // 2. Tính toán thời lượng và sinh hiệu ứng chuyển cảnh
                     val photoCount = selectedPhotos.size
-                    val videoDurationSec = VideoGenerator.calculateVideoDuration(photoCount)
+                    val videoDurationSec = templateDurationSec ?: VideoGenerator.calculateVideoDuration(photoCount)
                     val transitions = VideoGenerator.generateRandomTransitions(photoCount)
                     val photoUriStrings = selectedPhotos.map { it.toString() }
 

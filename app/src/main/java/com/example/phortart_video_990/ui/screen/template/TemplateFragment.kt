@@ -56,6 +56,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                     putString("selected_music_title", selectedMusic.title)
                     putString("selected_music_audio_url", selectedMusic.safeAudioUrl)
                     putString("selected_music_image_url", selectedMusic.safeImageUrl)
+                    putFloat("selected_template_duration_sec", selectedMusic.durationSeconds.toFloat())
+                    putInt("selected_template_photo_count", selectedMusic.targetPhotoCount)
                 }
                 val navController = parentFragment?.parentFragment?.findNavController()
                     ?: parentFragment?.findNavController()
