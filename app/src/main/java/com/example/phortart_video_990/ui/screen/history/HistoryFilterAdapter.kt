@@ -10,7 +10,7 @@ import com.example.phortart_video_990.databinding.ItemHistoryFilterChipBinding
 
 class HistoryFilterAdapter(
     private val filterList: List<HistoryFilterItem>,
-    private var selectedTitle: String,
+    private var selectedKey: String,
     private val onFilterSelected: (String) -> Unit
 ) : RecyclerView.Adapter<HistoryFilterAdapter.ViewHolder>() {
 
@@ -31,7 +31,7 @@ class HistoryFilterAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HistoryFilterItem) {
-            val isSelected = item.title == selectedTitle
+            val isSelected = item.key == selectedKey
 
             binding.tvChipTitle.text = item.title
             binding.ivChipIcon.setImageResource(item.iconRes)
@@ -48,10 +48,10 @@ class HistoryFilterAdapter(
             }
 
             binding.root.setOnClickListener {
-                if (selectedTitle != item.title) {
-                    selectedTitle = item.title
+                if (selectedKey != item.key) {
+                    selectedKey = item.key
                     notifyDataSetChanged()
-                    onFilterSelected(item.title)
+                    onFilterSelected(item.key)
                 }
             }
         }

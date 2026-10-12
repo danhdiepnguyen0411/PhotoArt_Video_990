@@ -17,7 +17,7 @@
     <FrameLayout
         android:id="@+id/cardBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="68dp"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -30,10 +30,13 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top"
             android:background="@color/white"
             app:elevation="0dp"
-            app:itemIconSize="26dp"
+            app:itemIconSize="22dp"
+            app:itemPaddingTop="4dp"
+            app:itemPaddingBottom="0dp"
             app:itemIconTint="@color/bottom_nav_color_selector"
             app:itemTextColor="@color/bottom_nav_color_selector"
             app:itemTextAppearanceActive="@style/BottomNavTextActive"
@@ -44,10 +47,10 @@
 
         <View
             android:id="@+id/navIndicator"
-            android:layout_width="24dp"
+            android:layout_width="26dp"
             android:layout_height="3dp"
             android:layout_gravity="bottom|start"
-            android:layout_marginBottom="3dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/bg_nav_indicator" />
 
     </FrameLayout>

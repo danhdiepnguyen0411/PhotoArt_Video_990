@@ -17,7 +17,7 @@
         android:focusable="true"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="999dp"
-        app:cardElevation="3dp"
+        app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:strokeWidth="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +74,6 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="10dp"
                     android:rotation="7"
-                    android:elevation="4dp"
                     android:background="@drawable/bg_restore_illustration"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -96,7 +95,6 @@
                     android:layout_marginBottom="-4dp"
                     android:rotation="0"
                     android:background="@drawable/bg_restore_compare_badge"
-                    android:elevation="6dp"
                     app:layout_constraintBottom_toBottomOf="@+id/cardFront"
                     app:layout_constraintEnd_toEndOf="@+id/cardFront">
 
@@ -117,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="Khôi phục ảnh"
+                android:text="@string/restore_title"
                 android:textColor="#17327C"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -131,7 +129,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
-                android:text="Biến những bức ảnh cũ, mờ, hư hỏng thành\nhình ảnh rõ nét, sống động hơn."
+                android:text="@string/restore_main_desc"
                 android:textColor="#7A8FB8"
                 android:textSize="14sp" />
 
@@ -155,7 +153,7 @@
                         android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
-                        app:cardElevation="3dp"
+                        app:cardElevation="0dp"
                         app:cardPreventCornerOverlap="false"
                         app:strokeWidth="0dp">
 
@@ -177,7 +175,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sửa ảnh mờ, nhòe"
+                            android:text="@string/restore_feature_1_title"
                             android:textColor="#1B2A8C"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -186,7 +184,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
-                            android:text="Làm rõ chi tiết, sắc nét hơn."
+                            android:text="@string/restore_feature_1_desc"
                             android:textColor="#8296BC"
                             android:textSize="12.5sp" />
                     </LinearLayout>
@@ -206,7 +204,7 @@
                         android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
-                        app:cardElevation="3dp"
+                        app:cardElevation="0dp"
                         app:cardPreventCornerOverlap="false"
                         app:strokeWidth="0dp">
 
@@ -228,7 +226,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Khôi phục ảnh cũ"
+                            android:text="@string/restore_feature_2_title"
                             android:textColor="#1B2A8C"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -237,7 +235,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
-                            android:text="Giảm nhiễu, cải thiện màu sắc."
+                            android:text="@string/restore_feature_2_desc"
                             android:textColor="#8296BC"
                             android:textSize="12.5sp" />
                     </LinearLayout>
@@ -257,7 +255,7 @@
                         android:layout_height="48dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="999dp"
-                        app:cardElevation="3dp"
+                        app:cardElevation="0dp"
                         app:cardPreventCornerOverlap="false"
                         app:strokeWidth="0dp">
 
@@ -279,7 +277,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tăng độ chân thực"
+                            android:text="@string/restore_feature_3_title"
                             android:textColor="#1B2A8C"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -288,7 +286,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
-                            android:text="Giữ nguyên vẻ tự nhiên của ảnh."
+                            android:text="@string/restore_feature_3_desc"
                             android:textColor="#8296BC"
                             android:textSize="12.5sp" />
                     </LinearLayout>
@@ -300,7 +298,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Action Button: Bắt đầu ngay -> -->
+    <!-- Bottom Action Button: Bắt đầu ngay -->
     <LinearLayout
         android:id="@+id/btnStartRestore"
         android:layout_width="match_parent"
@@ -317,17 +315,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bắt đầu ngay"
+            android:text="@string/btn_start_now"
             android:textColor="@color/white"
             android:textSize="17sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Next"
-            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

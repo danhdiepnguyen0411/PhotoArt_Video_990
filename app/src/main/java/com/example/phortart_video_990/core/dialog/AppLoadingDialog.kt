@@ -11,8 +11,8 @@ import com.example.phortart_video_990.databinding.DialogAppLoadingBinding
 
 class AppLoadingDialog(
     context: Context,
-    private var titleText: String = "Đang xử lý...",
-    private var subtitleText: String? = "Vui lòng chờ trong giây lát",
+    private var titleText: String? = null,
+    private var subtitleText: String? = null,
     private val isCancelableByUser: Boolean = false
 ) : Dialog(context) {
 
@@ -46,20 +46,19 @@ class AppLoadingDialog(
     }
 
     private fun updateTexts() {
-        binding.tvLoadingTitle.text = titleText
-        if (!subtitleText.isNullOrBlank()) {
-            binding.tvLoadingSubtitle.text = subtitleText
-            binding.tvLoadingSubtitle.visibility = View.VISIBLE
-        } else {
-            binding.tvLoadingSubtitle.visibility = View.GONE
-        }
+        val effectiveTitle = titleText?.ifBlank { null } ?: context.getString(com.example.phortart_video_990.R.string.loading_creating_video)
+        val effectiveSubtitle = subtitleText?.ifBlank { null } ?: context.getString(com.example.phortart_video_990.R.string.loading_please_wait)
+
+        binding.tvLoadingTitle.text = effectiveTitle
+        binding.tvLoadingSubtitle.text = effectiveSubtitle
+        binding.tvLoadingSubtitle.visibility = View.VISIBLE
     }
 
     companion object {
         fun show(
             context: Context,
-            title: String = "Đang xử lý...",
-            subtitle: String? = "Vui lòng chờ trong giây lát",
+            title: String? = null,
+            subtitle: String? = null,
             cancelable: Boolean = false
         ): AppLoadingDialog {
             val dialog = AppLoadingDialog(context, title, subtitle, cancelable)

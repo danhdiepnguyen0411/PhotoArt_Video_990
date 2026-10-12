@@ -35,7 +35,12 @@ class HistoryAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HistoryItemModel) {
-            val source: Any? = item.imageUri ?: item.imageUrl ?: if (item.imageRes != 0) item.imageRes else null
+            val rawSource: Any? = item.imageUrl ?: item.imageUri ?: if (item.imageRes != 0) item.imageRes else null
+            val source: Any? = when {
+                rawSource is String && rawSource.startsWith("/") -> java.io.File(rawSource)
+                rawSource is String && rawSource.startsWith("content://") -> android.net.Uri.parse(rawSource)
+                else -> rawSource
+            }
 
             if (source != null) {
                 binding.ivHistoryThumb.load(source) {

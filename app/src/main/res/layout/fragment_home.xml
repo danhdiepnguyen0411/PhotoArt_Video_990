@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/screen_bg"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/screen_bg"
+        android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,7 +51,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.04"
                     android:text="Photo"
@@ -58,7 +65,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.04"
                     android:text="AI"
@@ -74,13 +83,9 @@
                 android:background="@drawable/bg_btn_pro"
                 android:clickable="true"
                 android:focusable="true"
-                android:elevation="4dp"
                 android:gravity="center"
                 android:paddingStart="18dp"
                 android:paddingEnd="20dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#606E64EB"
-                android:outlineSpotShadowColor="#706E64EB"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -95,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/inter_medium"
                     android:includeFontPadding="false"
                     android:letterSpacing="0.02"
                     android:text="PRO"
@@ -141,7 +146,6 @@
                 android:layout_marginBottom="12dp"
                 android:paddingVertical="4dp"
                 android:paddingHorizontal="6dp"
-                android:elevation="12dp"
                 app:layout_constraintBottom_toBottomOf="@+id/cvBannerWrapper"
                 app:layout_constraintEnd_toEndOf="@+id/cvBannerWrapper"
                 app:layout_constraintStart_toStartOf="@+id/cvBannerWrapper" />
@@ -168,10 +172,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -194,7 +194,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.02"
                     android:lineSpacingMultiplier="1.15"
@@ -211,10 +213,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"
@@ -243,10 +241,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -269,7 +263,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.02"
                     android:lineSpacingMultiplier="1.15"
@@ -286,10 +282,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"
@@ -318,10 +310,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:elevation="4dp"
-                tools:targetApi="p"
-                android:outlineAmbientShadowColor="#256E78C8"
-                android:outlineSpotShadowColor="#356E78C8"
                 android:padding="8dp">
 
                 <!-- 3D Art Icon Centered at Top -->
@@ -344,7 +332,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.02"
                     android:lineSpacingMultiplier="1.15"
@@ -361,10 +351,6 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:background="@drawable/bg_feature_arrow"
-                    android:elevation="4dp"
-                    tools:targetApi="p"
-                    android:outlineAmbientShadowColor="#305A64C8"
-                    android:outlineSpotShadowColor="#405A64C8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginBottom="2dp"
@@ -416,7 +402,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:fontFamily="sans-serif-black"
+                        android:fontFamily="@font/inter_black"
+                        app:fontFamily="@font/inter_black"
+                        android:textStyle="bold"
                         android:includeFontPadding="false"
                         android:letterSpacing="-0.02"
                         android:text="@string/home_recent_history"
@@ -440,7 +428,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-bold"
+                        android:fontFamily="@font/inter_bold"
                         android:includeFontPadding="false"
                         android:text="@string/home_see_all"
                         android:textColor="#3D6FE8"
@@ -502,7 +490,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:fontFamily="sans-serif-black"
+                        android:fontFamily="@font/inter_black"
+                        app:fontFamily="@font/inter_black"
+                        android:textStyle="bold"
                         android:includeFontPadding="false"
                         android:letterSpacing="-0.02"
                         android:text="@string/home_suggestions"
@@ -526,7 +516,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-bold"
+                        android:fontFamily="@font/inter_bold"
                         android:includeFontPadding="false"
                         android:text="@string/home_see_all"
                         android:textColor="#3D6FE8"
@@ -588,7 +578,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:fontFamily="sans-serif-black"
+                        android:fontFamily="@font/inter_black"
+                        app:fontFamily="@font/inter_black"
+                        android:textStyle="bold"
                         android:includeFontPadding="false"
                         android:letterSpacing="-0.02"
                         android:text="@string/home_hot_templates"
@@ -612,7 +604,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-bold"
+                        android:fontFamily="@font/inter_bold"
                         android:includeFontPadding="false"
                         android:text="@string/home_see_all"
                         android:textColor="#3D6FE8"
@@ -645,4 +637,6 @@
 
     </LinearLayout>
 
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -17,7 +17,7 @@
         android:focusable="true"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="999dp"
-        app:cardElevation="3dp"
+        app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:strokeWidth="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:text="Kết quả"
+        android:text="@string/restore_result_title"
         android:textColor="#17327C"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -54,7 +54,7 @@
         android:layout_marginTop="14dp"
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="28dp"
-        app:cardElevation="2dp"
+        app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:strokeWidth="0dp"
         app:layout_constraintBottom_toTopOf="@+id/layoutBottomDetails"
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="Ảnh đã được khôi phục"
+            android:text="@string/photo_restored"
             android:textColor="#17327C"
             android:textSize="17.5sp"
             android:textStyle="bold" />
@@ -124,13 +124,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Chi tiết và màu sắc rõ hơn"
+            android:text="@string/photo_restored_details"
             android:textColor="#7B8EB6"
             android:textSize="12.5sp" />
 
     </LinearLayout>
 
-    <!-- Bottom Action Button: Lưu ảnh -> -->
+    <!-- Bottom Action Button: Lưu ảnh -->
     <LinearLayout
         android:id="@+id/btnSaveImage"
         android:layout_width="match_parent"
@@ -147,17 +147,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lưu ảnh"
+            android:text="@string/btn_save_photo"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Save"
-            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

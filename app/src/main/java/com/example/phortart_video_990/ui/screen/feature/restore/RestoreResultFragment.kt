@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
@@ -64,25 +65,13 @@ class RestoreResultFragment : BaseFragment<FragmentRestoreResultBinding>(Fragmen
     private fun saveImageToDevice() {
         val targetSource = restoredUrl ?: originalUri
         if (targetSource.isNullOrBlank()) {
-            Toast.makeText(requireContext(), "Không có ảnh để lưu", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_no_image_to_save), Toast.LENGTH_SHORT).show()
             return
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnSaveImage.isEnabled = false
-            val savedUri = restoreRepository.saveImageToGallery(targetSource)
-
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val historyItem = HistoryItemModel(
-                type = "Khôi phục",
-                title = "Khôi phục ảnh cũ",
-                date = currentDate,
-                imageUri = savedUri?.toString() ?: targetSource
-            )
-            historyRepository.addHistoryItem(historyItem)
-
+            restoreRepository.saveImageToGallery(targetSource)
             binding.btnSaveImage.isEnabled = true
             com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
         }

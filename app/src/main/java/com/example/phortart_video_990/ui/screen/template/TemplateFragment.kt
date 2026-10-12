@@ -41,13 +41,13 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         // Setup Template Grid (2 Columns)
         templateAdapter = TemplateAdapter(emptyList()) { selectedTemplate ->
             val bundle = android.os.Bundle().apply {
-                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, selectedTemplate.id)
-                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, selectedTemplate.title)
-                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, selectedTemplate.category)
-                putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, selectedTemplate.safeImageUrl.orEmpty())
+                putString("template_code", selectedTemplate.id)
+                putString("template_title", selectedTemplate.title)
+                putString("template_category", selectedTemplate.category)
+                putString("template_thumb", selectedTemplate.safeImageUrl.orEmpty())
             }
             val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
-            navController.navigateSafe(R.id.action_mainFragment_to_createTemplateVideoFragment, bundle)
+            navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
         }
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = templateAdapter
@@ -72,7 +72,25 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::templateAdapter.isInitialized && templateAdapter.itemCount > 0) {
+            templateAdapter.notifyDataSetChanged()
+        }
+    }
+
     override fun initListener() {
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            Color.parseColor("#4A7BFE"),
+            Color.parseColor("#9153EE")
+        )
+        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            binding.rvTemplates.canScrollVertically(-1)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadData()
+        }
+
         binding.btnTemplatePro.setOnClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
@@ -100,11 +118,18 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                 }
                 launch {
                     viewModel.isLoading.collect { loading ->
-                        binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
-                        if (loading) {
-                            binding.llEmptyState.visibility = View.GONE
+                        if (!binding.swipeRefreshLayout.isRefreshing) {
+                            binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
                         } else {
+                            binding.pbLoading.visibility = View.GONE
+                        }
+                        if (!loading) {
+                            binding.swipeRefreshLayout.postDelayed({
+                                if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
+                            }, 500L)
                             binding.llEmptyState.visibility = if (viewModel.templates.value.isEmpty()) View.VISIBLE else View.GONE
+                        } else {
+                            binding.llEmptyState.visibility = View.GONE
                         }
                     }
                 }

@@ -17,7 +17,7 @@
         android:focusable="true"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="999dp"
-        app:cardElevation="3dp"
+        app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:strokeWidth="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +35,7 @@
         android:id="@+id/tvHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AI Create"
+        android:text="@string/ai_create_title"
         android:textColor="#102148"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -82,7 +82,6 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:rotation="7"
-                android:elevation="4dp"
                 android:background="@drawable/bg_restore_illustration"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -104,7 +103,6 @@
                 android:layout_marginBottom="-4dp"
                 android:rotation="0"
                 android:background="@drawable/bg_restore_compare_badge"
-                android:elevation="6dp"
                 app:layout_constraintBottom_toBottomOf="@+id/cardFront"
                 app:layout_constraintEnd_toEndOf="@+id/cardFront">
 
@@ -148,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="38dp"
             android:gravity="center"
-            android:text="AI Create"
+            android:text="@string/ai_create_title"
             android:textColor="#102148"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -159,7 +157,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:gravity="center"
-            android:text="Vui lòng đợi trong giây lát"
+            android:text="@string/loading_please_wait"
             android:textColor="#6F7E94"
             android:textSize="13.5sp" />
 

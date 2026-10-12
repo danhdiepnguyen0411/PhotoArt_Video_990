@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.example.phortart_video_990.R
 
 abstract class BaseFragment<VB : ViewBinding>(
     private val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
@@ -41,8 +42,8 @@ abstract class BaseFragment<VB : ViewBinding>(
      * Hiển thị loading dialog chuẩn chung cho toàn bộ app
      */
     fun showLoading(
-        title: String = "Đang xử lý...",
-        subtitle: String? = "Vui lòng chờ trong giây lát",
+        title: String? = null,
+        subtitle: String? = null,
         cancelable: Boolean = false
     ) {
         val ctx = context ?: return
@@ -54,7 +55,7 @@ abstract class BaseFragment<VB : ViewBinding>(
                 cancelable = cancelable
             )
         } else {
-            appLoadingDialog?.updateMessage(title, subtitle)
+            appLoadingDialog?.updateMessage(title ?: getString(R.string.loading_creating_video), subtitle)
             if (appLoadingDialog?.isShowing != true) {
                 try {
                     appLoadingDialog?.show()

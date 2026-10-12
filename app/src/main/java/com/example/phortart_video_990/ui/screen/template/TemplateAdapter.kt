@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.core.utils.TemplateViewsHelper
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.databinding.ItemTemplateCardBinding
 
@@ -35,8 +36,9 @@ class TemplateAdapter(
         fun bind(item: TemplateModel) {
             binding.tvTemplateTitle.text = item.title
             binding.tvDuration.text = item.duration
-            binding.tvViews.text = item.views
-            binding.tvPhotoCount.text = item.photoCount
+
+            val templateKey = item.id.ifBlank { item.title }
+            binding.tvViews.text = TemplateViewsHelper.getOrIncrementViews(binding.root.context, templateKey)
 
             // Load thumbnail image using Coil
             val imageSource = item.safeImageUrl ?: item.localImageRes ?: R.drawable.template_trendy

@@ -11,6 +11,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.AIPromptRepository
@@ -78,25 +79,13 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
 
     private fun saveImageToDevice() {
         if (imageUrl.isBlank()) {
-            Toast.makeText(requireContext(), "Không có ảnh để lưu", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_no_image_to_save), Toast.LENGTH_SHORT).show()
             return
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnDownload.isEnabled = false
-            val savedUri = promptRepository.saveImageToGallery(imageUrl)
-
-            val dateFormat = SimpleDateFormat("d 'thg' M, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val historyItem = HistoryItemModel(
-                type = "Prompt AI",
-                title = userPrompt.ifBlank { "Tạo ảnh AI" },
-                date = currentDate,
-                imageUri = savedUri?.toString() ?: imageUrl
-            )
-            historyRepository.addHistoryItem(historyItem)
-
+            promptRepository.saveImageToGallery(imageUrl)
             binding.btnDownload.isEnabled = true
             com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
         }
@@ -106,11 +95,11 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
         try {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Xem ảnh AI nghệ thuật tôi vừa tạo với prompt: \"$userPrompt\"\n$imageUrl")
+                putExtra(Intent.EXTRA_TEXT, "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl")
             }
-            startActivity(Intent.createChooser(shareIntent, "Chia sẻ ảnh"))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_artwork_title)))
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Không thể mở ứng dụng chia sẻ", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
         }
     }
 

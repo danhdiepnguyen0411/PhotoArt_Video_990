@@ -24,6 +24,10 @@ import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 
 class UninstallActivity : AppCompatActivity() {
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.example.phortart_video_990.core.utils.LocaleHelper.onAttach(newBase))
+    }
+
     override fun dispatchTouchEvent(ev: android.view.MotionEvent): Boolean {
         KeyboardUtils.handleTouchToDismissKeyboard(this, ev)
         return super.dispatchTouchEvent(ev)
@@ -36,6 +40,11 @@ class UninstallActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.layoutDirection = if (com.example.phortart_video_990.core.utils.LocaleHelper.isRtl(this)) {
+            android.view.View.LAYOUT_DIRECTION_RTL
+        } else {
+            android.view.View.LAYOUT_DIRECTION_LTR
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
@@ -277,8 +286,8 @@ class UninstallActivity : AppCompatActivity() {
         val selectedBg = R.drawable.bg_uninstall_card_selected
 
         val density = resources.displayMetrics.density
-        val boldTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.manrope_bold)
-        val regularTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.manrope_regular)
+        val boldTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter_bold)
+        val regularTypeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter_regular)
 
         for (i in cards.indices) {
             val isSelected = (i + 1 == optionIndex)
@@ -289,19 +298,7 @@ class UninstallActivity : AppCompatActivity() {
             )
             texts[i]?.typeface = if (isSelected) boldTypeface else regularTypeface
             texts[i]?.setTextColor(android.graphics.Color.parseColor(if (isSelected) "#111827" else "#39403D"))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                if (isSelected) {
-                    card.elevation = 3f * density
-                    card.outlineAmbientShadowColor = android.graphics.Color.parseColor("#14000000")
-                    card.outlineSpotShadowColor = android.graphics.Color.parseColor("#14000000")
-                } else {
-                    card.elevation = 4f * density
-                    card.outlineAmbientShadowColor = android.graphics.Color.parseColor("#0D131B2E")
-                    card.outlineSpotShadowColor = android.graphics.Color.parseColor("#0D131B2E")
-                }
-            } else {
-                card.elevation = if (isSelected) 3f * density else 4f * density
-            }
+            card.elevation = 0f
         }
 
         val etOtherDetails = findViewById<EditText>(R.id.etOtherDetails)

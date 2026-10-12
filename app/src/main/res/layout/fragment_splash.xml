@@ -44,7 +44,7 @@
             android:textColor="@color/navy"
             android:textSize="34sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-black" />
+            android:fontFamily="@font/inter_black" />
 
         <TextView
             android:id="@+id/tvSubtitle"
@@ -55,7 +55,7 @@
             android:text="@string/splash_subtitle"
             android:textColor="@color/splash_subtitle"
             android:textSize="15sp"
-            android:fontFamily="sans-serif-medium" />
+            android:fontFamily="@font/inter_medium" />
     </LinearLayout>
 
     <!-- Bottom Progress Bar -->

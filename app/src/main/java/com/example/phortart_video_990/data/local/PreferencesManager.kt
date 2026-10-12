@@ -45,6 +45,10 @@ class PreferencesManager(context: Context) {
         get() = prefs.getString("user_history_json", null)
         set(value) = prefs.edit().putString("user_history_json", value).apply()
 
+    var isNotificationEnabled: Boolean
+        get() = prefs.getBoolean("is_notification_enabled", true)
+        set(value) = prefs.edit().putBoolean("is_notification_enabled", value).apply()
+
     fun saveLanguage(code: String, name: String) {
         prefs.edit()
             .putString(KEY_LANGUAGE_CODE, code)

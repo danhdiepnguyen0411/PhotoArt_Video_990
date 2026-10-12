@@ -66,7 +66,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         templateThumbnailUrl = args?.getString(ARG_TEMPLATE_THUMB).orEmpty()
 
         binding.tvTemplateTitle.text = templateTitle
-        binding.tvTemplateCategory.text = "Mẫu: $templateCategory • Yêu cầu 1 ảnh"
+        binding.tvTemplateCategory.text = getString(R.string.template_requirement_one_photo, templateCategory)
 
         if (templateThumbnailUrl.isNotBlank()) {
             binding.ivTemplateThumb.load(templateThumbnailUrl) {
@@ -86,8 +86,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             if (title.isNotBlank()) {
                 selectedMusicTitle = title
                 binding.tvSelectedMusicTitle.text = title
-                binding.tvSelectedMusicSubtitle.text = "Đã chọn làm nhạc nền"
-                binding.tvMusicAction.text = "Đổi nhạc"
+                binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
+                binding.tvMusicAction.text = getString(R.string.music_change_action)
             }
         }
         stateHandle?.get<String?>("selected_music_audio_url")?.let { selectedMusicAudioUrl = it }
@@ -107,8 +107,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             if (!title.isNullOrBlank()) {
                 selectedMusicTitle = title
                 binding.tvSelectedMusicTitle.text = title
-                binding.tvSelectedMusicSubtitle.text = "Đã chọn làm nhạc nền"
-                binding.tvMusicAction.text = "Đổi nhạc"
+                binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
+                binding.tvMusicAction.text = getString(R.string.music_change_action)
             }
         }
         stateHandle?.getLiveData<String?>("selected_music_audio_url")?.observe(viewLifecycleOwner) {
@@ -163,7 +163,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         binding.btnCreateVideo.setOnClickListener {
             val photoUri = selectedPhotoUri
             if (photoUri == null) {
-                Toast.makeText(requireContext(), "Vui lòng chọn 1 ảnh chân dung trước khi tạo video!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_select_portrait_first), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -173,7 +173,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
     private fun processAndGenerateVideo(photoUri: Uri) {
         binding.btnCreateVideo.isEnabled = false
-        showLoadingDialog("Đang chuẩn bị ảnh...", "Vui lòng chờ giây lát")
+        showLoadingDialog(getString(R.string.loading_preparing_image), getString(R.string.loading_please_wait))
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -181,7 +181,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val audioUrl = selectedMusicAudioUrl
                 var audioPath = selectedMusicAudioFilePath
                 if (!audioUrl.isNullOrBlank() && (audioPath.isNullOrBlank() || !File(audioPath).exists())) {
-                    loadingDialog?.updateMessage("Đang tải nhạc nền...", "Vui lòng chờ giây lát")
+                    loadingDialog?.updateMessage(getString(R.string.loading_downloading_music), getString(R.string.loading_please_wait))
                     val downloaded = AudioCacheManager.getOrDownloadAudio(requireContext(), audioUrl)
                     if (downloaded != null && downloaded.exists()) {
                         audioPath = downloaded.absolutePath
@@ -190,12 +190,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
                 // 2. Chuyển Uri thành File và nén qua ImageCompressor
-                loadingDialog?.updateMessage("Đang xử lý ảnh đầu vào...", "Đang nén và tối ưu độ phân giải")
+                loadingDialog?.updateMessage(getString(R.string.loading_processing_input_image), getString(R.string.loading_compressing_optimizing))
                 val rawFile = withContext(Dispatchers.IO) { copyUriToFile(photoUri) }
                 if (rawFile == null || !rawFile.exists()) {
                     hideLoadingDialog()
                     binding.btnCreateVideo.isEnabled = true
-                    Toast.makeText(requireContext(), "Không thể đọc file ảnh đã chọn!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
                     return@launch
                 }
 
@@ -204,7 +204,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
                 // 3. Gọi backend processImageEditing
-                loadingDialog?.updateMessage("Đang gửi yêu cầu tạo video...", "Backend AI đang xử lý (10%)")
+                loadingDialog?.updateMessage(getString(R.string.loading_sending_video_request), getString(R.string.loading_backend_ai_processing))
                 val codeToUse = templateCode.ifBlank { "ai_effect_default" }
 
                 val processResult = templateRepository.processImageEditing(
@@ -214,13 +214,13 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 )
 
                 if (processResult.isFailure) {
-                    val errorMsg = processResult.exceptionOrNull()?.message ?: "Lỗi gọi AI"
+                    val errorMsg = processResult.exceptionOrNull()?.message ?: "AI Error"
                     // Nếu lỗi mạng / timeout thử lấy requestId từ error nếu có
                     val reqId = templateRepository.extractRequestId(null)
                     if (reqId.isNullOrBlank()) {
                         hideLoadingDialog()
                         binding.btnCreateVideo.isEnabled = true
-                        Toast.makeText(requireContext(), "Tạo video thất bại: $errorMsg", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_LONG).show()
                         return@launch
                     }
                 }
@@ -233,15 +233,15 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                 // 4. Nếu chưa có video trực tiếp mà có requestId -> Poll kết quả
                 if (videoUrl.isNullOrBlank() && !requestId.isNullOrBlank()) {
-                    loadingDialog?.updateMessage("Đang tạo video bằng AI...", "Đang xử lý (30%)...")
+                    loadingDialog?.updateMessage(getString(R.string.loading_generating_video_ai), getString(R.string.loading_processing_progress, 30))
                     val pollResult = templateRepository.pollImageEditingResult(
                         requestId = requestId,
                         intervalMillis = 5_000L,
                         timeoutMillis = 180_000L,
                         onProgress = { progress ->
                             loadingDialog?.updateMessage(
-                                "Đang tạo video bằng AI...",
-                                "Đang xử lý ($progress%)..."
+                                getString(R.string.loading_generating_video_ai),
+                                getString(R.string.loading_processing_progress, progress)
                             )
                         }
                     )
@@ -249,54 +249,70 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     if (pollResult.isSuccess) {
                         videoUrl = templateRepository.extractVideoUrl(pollResult.getOrNull())
                     } else {
-                        val pollError = pollResult.exceptionOrNull()?.message ?: "Quá thời gian xử lý"
+                        val pollError = pollResult.exceptionOrNull()?.message ?: getString(R.string.loading_timeout_error)
                         hideLoadingDialog()
                         binding.btnCreateVideo.isEnabled = true
-                        Toast.makeText(requireContext(), "Xử lý video thất bại: $pollError", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_process_video_failed, pollError), Toast.LENGTH_LONG).show()
                         return@launch
                     }
                 }
 
-                // 5. Nếu có chọn nhạc: Tải video về và mux ghép nhạc vào video
-                var finalVideoToPlay = videoUrl
-                if (!videoUrl.isNullOrBlank() && (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank())) {
-                    loadingDialog?.updateMessage("Đang ghép nhạc nền vào video...", "Vui lòng chờ giây lát (95%)")
-                    val downloadedRawVideo = File(requireContext().cacheDir, "raw_ai_${System.currentTimeMillis()}.mp4")
-                    val downloadSuccess = VideoGenerator.downloadVideoFile(videoUrl, downloadedRawVideo)
+                // 5. Nếu video từ URL hoặc có chọn nhạc: tải về/ghép nhạc và lưu vào local App Documents
+                var finalLocalVideoPath: String? = null
 
-                    if (downloadSuccess && downloadedRawVideo.exists()) {
-                        val mergedOutputFile = File(requireContext().cacheDir, "final_ai_${System.currentTimeMillis()}.mp4")
-                        val audioSource = audioPath?.takeIf { File(it).exists() } ?: audioUrl.orEmpty()
-                        val muxSuccess = VideoGenerator.mergeAudioIntoVideo(
-                            context = requireContext(),
-                            videoInputFile = downloadedRawVideo,
-                            audioSource = audioSource,
-                            outputFile = mergedOutputFile
-                        )
-                        downloadedRawVideo.delete()
-                        if (muxSuccess && mergedOutputFile.exists()) {
-                            finalVideoToPlay = mergedOutputFile.absolutePath
+                if (!videoUrl.isNullOrBlank()) {
+                    loadingDialog?.updateMessage(getString(R.string.loading_preparing_video), getString(R.string.loading_storing_local))
+                    val rawVideoFile = if (File(videoUrl).exists()) {
+                        File(videoUrl)
+                    } else {
+                        val downloadedRawVideo = File(requireContext().cacheDir, "raw_ai_${System.currentTimeMillis()}.mp4")
+                        val downloadSuccess = VideoGenerator.downloadVideoFile(videoUrl, downloadedRawVideo)
+                        if (downloadSuccess && downloadedRawVideo.exists()) downloadedRawVideo else null
+                    }
+
+                    if (rawVideoFile != null && rawVideoFile.exists()) {
+                        val mergedFile = if (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank()) {
+                            loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
+                            val outMerged = File(requireContext().cacheDir, "merged_ai_${System.currentTimeMillis()}.mp4")
+                            val audioSource = audioPath?.takeIf { File(it).exists() } ?: audioUrl.orEmpty()
+                            val muxSuccess = VideoGenerator.mergeAudioIntoVideo(
+                                context = requireContext(),
+                                videoInputFile = rawVideoFile,
+                                audioSource = audioSource,
+                                outputFile = outMerged
+                            )
+                            if (muxSuccess && outMerged.exists()) outMerged else rawVideoFile
+                        } else {
+                            rawVideoFile
                         }
+
+                        // Lưu bản cố định vào App Documents để lưu vào lịch sử xem offline vĩnh viễn
+                        val permanentDoc = VideoGenerator.saveVideoToAppDocuments(
+                            context = requireContext(),
+                            sourceFile = mergedFile,
+                            title = "Template_AI_${System.currentTimeMillis()}"
+                        )
+                        finalLocalVideoPath = permanentDoc.absolutePath
+                    } else {
+                        finalLocalVideoPath = videoUrl
                     }
                 }
 
                 hideLoadingDialog()
                 binding.btnCreateVideo.isEnabled = true
 
-                // 6. Điều hướng sang màn xem video kết quả
-                val finalVideo = finalVideoToPlay
-                if (!finalVideo.isNullOrBlank()) {
-                    saveToHistory(finalVideo, photoUri.toString())
-                    navigateToResult(finalVideo, photoUri.toString(), audioPath)
+                // 6. Điều hướng sang màn xem video kết quả và tự động lưu vào Lịch sử
+                if (!finalLocalVideoPath.isNullOrBlank()) {
+                    saveToHistory(finalLocalVideoPath, photoUri.toString())
+                    navigateToResult(finalLocalVideoPath, photoUri.toString(), audioPath)
                 } else {
-                    // Nếu backend trả về kết quả thành công nhưng không có direct video url, fallback điều hướng với ảnh
                     navigateToResult(null, photoUri.toString(), audioPath)
                 }
 
             } catch (e: Exception) {
                 hideLoadingDialog()
                 binding.btnCreateVideo.isEnabled = true
-                Toast.makeText(requireContext(), "Đã xảy ra lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_error_occurred, e.message ?: ""), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -312,18 +328,26 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         findNavController().navigate(R.id.action_createTemplateVideoFragment_to_templateVideoResultFragment, bundle)
     }
 
-    private fun saveToHistory(videoUrl: String, photoUri: String) {
+    private fun saveToHistory(localVideoPath: String, photoUri: String) {
         try {
-            val dateStr = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+            val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
+            val dateStr = dateFormat.format(Date())
+            val title = if (!selectedMusicTitle.isNullOrBlank()) {
+                "$templateTitle • ${getString(R.string.detail_music_label, selectedMusicTitle)}"
+            } else {
+                templateTitle
+            }
             val item = HistoryItemModel(
-                title = templateTitle,
+                title = title,
                 date = dateStr,
-                type = "Mẫu AI",
+                type = "Template",
                 imageUrl = templateThumbnailUrl.ifBlank { photoUri },
-                imageUri = photoUri
+                imageUri = localVideoPath
             )
             historyRepository.addHistoryItem(item)
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun copyUriToFile(uri: Uri): File? {

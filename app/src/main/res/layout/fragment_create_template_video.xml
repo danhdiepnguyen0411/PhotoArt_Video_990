@@ -35,7 +35,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Tạo video từ mẫu"
+            android:text="@string/template_create_title"
             android:textColor="@color/navy"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
@@ -127,7 +127,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Tải ảnh khuôn mặt / chân dung"
+                    android:text="@string/upload_portrait_face"
                     android:textColor="@color/navy"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -138,7 +138,7 @@
                     android:background="@drawable/bg_category_chip_unselected"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="Bắt buộc: 1 ảnh"
+                    android:text="@string/required_1_photo"
                     android:textColor="@color/primary"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -154,7 +154,7 @@
                 android:focusable="true"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
@@ -176,7 +176,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Nhấn để chọn 1 ảnh từ thư viện"
+                        android:text="@string/tap_to_select_1_photo"
                         android:textColor="@color/navy"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -185,7 +185,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Chỉ cần 1 bức ảnh rõ nét (JPG, PNG)"
+                        android:text="@string/select_1_clear_photo"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
 
@@ -201,7 +201,7 @@
                 android:visibility="gone"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="3dp"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp"
                 tools:visibility="visible">
@@ -241,7 +241,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Đổi ảnh khác"
+                            android:text="@string/change_other_photo"
                             android:textColor="@color/white"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -262,7 +262,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Nhạc nền cho video"
+                    android:text="@string/video_bg_music"
                     android:textColor="@color/navy"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -270,7 +270,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="(Không bắt buộc)"
+                    android:text="@string/optional_bracket"
                     android:textColor="@color/muted"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -284,7 +284,7 @@
                 android:focusable="true"
                 app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
@@ -315,7 +315,7 @@
                             android:id="@+id/tvSelectedMusicTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn bài hát nền (Tuỳ chọn)"
+                            android:text="@string/select_bg_song_optional"
                             android:textColor="@color/navy"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -325,7 +325,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Nhấn để chọn hoặc đổi nhạc nền AI"
+                            android:text="@string/tap_to_select_change_music"
                             android:textColor="@color/muted"
                             android:textSize="12sp" />
 
@@ -338,7 +338,7 @@
                         android:background="@drawable/bg_category_chip_unselected"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="6dp"
-                        android:text="Chọn nhạc"
+                        android:text="@string/btn_select_music"
                         android:textColor="@color/primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -357,9 +357,8 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="28dp"
         android:background="@drawable/bg_btn_primary"
-        android:drawableEnd="@drawable/ic_arrow_right"
         android:paddingHorizontal="24dp"
-        android:text="Tạo video ngay"
+        android:text="@string/btn_create_video_now"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp"
