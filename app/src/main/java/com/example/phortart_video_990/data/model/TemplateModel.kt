@@ -5,15 +5,16 @@ import com.google.gson.annotations.SerializedName
 
 data class TemplateModel(
     @SerializedName(value = "id", alternate = ["code"]) val id: String = "",
-    @SerializedName(value = "title", alternate = ["name"]) val title: String = "",
+    @SerializedName(value = "title", alternate = ["name", "musicTitle", "music_title", "musicName", "music_name"]) val title: String = "",
     @SerializedName("description") val description: String? = null,
-    @SerializedName("duration") val duration: String = "00:16",
-    @SerializedName("views") val views: String = "892,4K",
-    @SerializedName(value = "photoCount", alternate = ["photo_count", "imageCount", "image_count", "numImages", "photos", "count"]) val photoCount: String = "6",
+    @SerializedName("duration") val duration: String? = null,
+    @SerializedName("views") val views: String? = null,
+    @SerializedName(value = "photoCount", alternate = ["photo_count", "imageCount", "image_count", "numImages", "photos", "count"]) val photoCount: String? = null,
     @SerializedName("source") val source: String = "Photo AI",
     @SerializedName(value = "category", alternate = ["categoryCode"]) val category: String = "",
-    @SerializedName(value = "imageUrl", alternate = ["image_url"]) val imageUrl: String? = null,
+    @SerializedName(value = "imageUrl", alternate = ["image_url", "coverUrl", "cover_url"]) val imageUrl: String? = null,
     @SerializedName(value = "videoUrl", alternate = ["video_url"]) val videoUrl: String? = null,
+    @SerializedName(value = "audioUrl", alternate = ["audio_url", "musicUrl", "music_url", "soundUrl", "sound_url"]) val audioUrl: String? = null,
     @SerializedName("videoThumbnailUrl") val videoThumbnailUrl: String? = null,
     @SerializedName("templateType") val templateType: String? = null,
     @SerializedName("premium") val premium: Boolean = false,
@@ -24,15 +25,51 @@ data class TemplateModel(
 
     val safeAudioUrl: String?
         get() = when {
-            videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true -> videoUrl?.trim()
-            imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true -> imageUrl?.trim()
-            else -> videoUrl?.trim() ?: imageUrl?.trim()
+            audioUrl?.isNotBlank() == true -> audioUrl.trim()
+            videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true -> videoUrl.trim()
+            imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true -> imageUrl.trim()
+            else -> audioUrl?.trim() ?: videoUrl?.trim() ?: imageUrl?.trim()
         }
 
     val isMusic: Boolean
         get() = category.startsWith("MUSIC_", ignoreCase = true) ||
                 templateType.equals("MUSIC", ignoreCase = true) ||
                 templateType.equals("AUDIO", ignoreCase = true) ||
+                !audioUrl.isNullOrBlank() ||
                 videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true ||
                 imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true
+
+    val displayDuration: String
+        get() {
+            if (!duration.isNullOrBlank() && duration != "00:16") {
+                return duration
+            }
+            val key = id.ifBlank { title }
+            val hash = kotlin.math.abs(key.hashCode())
+            val seconds = 15 + (hash % 10)
+            return String.format(java.util.Locale.US, "00:%02d", seconds)
+        }
+
+    val displayViews: String
+        get() {
+            if (!views.isNullOrBlank()) {
+                return views
+            }
+            val key = id.ifBlank { title }
+            val hash = kotlin.math.abs(key.hashCode())
+            val viewCount = 300 + (hash % 680)
+            val decimal = (hash / 7) % 10
+            return "${viewCount},${decimal}K"
+        }
+
+    val displayPhotoCount: String
+        get() {
+            if (!photoCount.isNullOrBlank()) {
+                return photoCount
+            }
+            val key = id.ifBlank { title }
+            val hash = kotlin.math.abs(key.hashCode())
+            val count = 2 + (hash % 5)
+            return count.toString()
+        }
 }

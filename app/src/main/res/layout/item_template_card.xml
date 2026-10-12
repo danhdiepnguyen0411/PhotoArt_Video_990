@@ -46,6 +46,7 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
+                    android:id="@+id/ivPlayIcon"
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:contentDescription="Play"
@@ -115,6 +116,22 @@
                         android:textColor="#8E9BB0"
                         android:textSize="11sp"
                         tools:text="892,4K" />
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="Photos"
+                        android:src="@drawable/ic_template_images" />
+
+                    <TextView
+                        android:id="@+id/tvPhotoCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textColor="#8E9BB0"
+                        android:textSize="11sp"
+                        tools:text="6" />
                 </LinearLayout>
 
                 <ImageView

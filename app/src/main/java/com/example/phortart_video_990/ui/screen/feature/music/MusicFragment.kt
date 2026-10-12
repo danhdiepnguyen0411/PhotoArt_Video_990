@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.TemplateRepository
@@ -25,9 +26,24 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private var mediaPlayer: MediaPlayer? = null
     private var currentPlayingPosition: Int = -1
     private var audioActionJob: kotlinx.coroutines.Job? = null
+    private var isStartMergeFlow: Boolean = false
+
+    private val isTabMode: Boolean
+        get() = (parentFragment is com.example.phortart_video_990.ui.screen.main.MainFragment) ||
+                (parentFragment?.parentFragment is com.example.phortart_video_990.ui.screen.main.MainFragment)
 
     override fun initView() {
-        binding.tvTopTitle.text = getString(R.string.func_04_music)
+        isStartMergeFlow = arguments?.getBoolean("is_start_merge_flow", false) ?: false
+
+        if (isTabMode) {
+            binding.btnBack.visibility = View.GONE
+            binding.btnSkip.visibility = View.GONE
+            binding.tvTopTitle.text = getString(R.string.music_title)
+        } else {
+            binding.btnBack.visibility = View.VISIBLE
+            binding.btnSkip.visibility = if (isStartMergeFlow) View.VISIBLE else View.GONE
+            binding.tvTopTitle.text = getString(R.string.func_04_music)
+        }
 
         // Setup horizontal category chips
         categoryAdapter = MusicCategoryAdapter(
@@ -72,6 +88,11 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         binding.btnBack.setOnClickListener {
             stopAudio()
             findNavController().popBackStack()
+        }
+
+        binding.btnSkip.setOnClickListener {
+            stopAudio()
+            findNavController().navigateSafe(R.id.action_musicFragment_to_memoriesFragment)
         }
     }
 
@@ -240,25 +261,46 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     }
 
     private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
-        // Return selected music title, audio URL, cached local path, and cover image to parent screen
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            "selected_music_title",
-            track.title
-        )
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            "selected_music_audio_url",
-            track.safeAudioUrl
-        )
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            "selected_music_file_path",
-            cachedFilePath
-        )
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            "selected_music_image_url",
-            track.safeImageUrl
-        )
+        if (isTabMode) {
+            val bundle = android.os.Bundle().apply {
+                putString("selected_music_title", track.title)
+                putString("selected_music_audio_url", track.safeAudioUrl)
+                putString("selected_music_file_path", cachedFilePath)
+                putString("selected_music_image_url", track.safeImageUrl)
+            }
+            val navController = parentFragment?.parentFragment?.findNavController()
+                ?: parentFragment?.findNavController()
+                ?: findNavController()
+            navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
+        } else if (isStartMergeFlow) {
+            val bundle = android.os.Bundle().apply {
+                putString("selected_music_title", track.title)
+                putString("selected_music_audio_url", track.safeAudioUrl)
+                putString("selected_music_file_path", cachedFilePath)
+                putString("selected_music_image_url", track.safeImageUrl)
+            }
+            findNavController().navigateSafe(R.id.action_musicFragment_to_memoriesFragment, bundle)
+        } else {
+            // Return selected music title, audio URL, cached local path, and cover image to parent screen
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_music_title",
+                track.title
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_music_audio_url",
+                track.safeAudioUrl
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_music_file_path",
+                cachedFilePath
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_music_image_url",
+                track.safeImageUrl
+            )
 
-        findNavController().popBackStack()
+            findNavController().popBackStack()
+        }
     }
 
     private fun stopAudio() {

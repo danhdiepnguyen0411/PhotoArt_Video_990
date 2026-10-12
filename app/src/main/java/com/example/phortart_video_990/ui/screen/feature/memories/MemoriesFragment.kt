@@ -1,5 +1,6 @@
 package com.example.phortart_video_990.ui.screen.feature.memories
 
+import android.graphics.Color
 import android.net.Uri
 import android.view.View
 import android.widget.Toast
@@ -10,19 +11,17 @@ import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.utils.VideoGenerator
-import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesBinding::inflate) {
 
     private val selectedPhotos = mutableListOf<Uri>()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
+
+    private var selectedAspectRatio: String = "9:16"
 
     private val pickMultipleImagesLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
@@ -40,37 +39,38 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private var selectedMusicImageUrl: String? = null
 
     override fun initView() {
-        binding.tvTopTitle.text = getString(R.string.feature_video_title).replace("\n", " ")
+        binding.tvTopTitle.text = getString(R.string.memories_title)
 
         updatePhotosUi()
+        updateRatioUi()
 
-        // Read any already set music selection immediately from savedStateHandle (for first-time navigation)
+        // Read music selection from arguments or savedStateHandle
+        val args = arguments
         val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        stateHandle?.get<String>("selected_music_title")?.let { musicTitle ->
-            if (musicTitle.isNotBlank()) {
-                selectedMusicTitle = musicTitle
-                binding.tvSelectedMusicTitle.text = musicTitle
-                binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
-            }
+
+        val initialTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
+            ?: stateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
+        if (!initialTitle.isNullOrBlank()) {
+            selectedMusicTitle = initialTitle
+            binding.tvSelectedMusicTitle.text = initialTitle
+            binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
         }
-        stateHandle?.get<String?>("selected_music_audio_url")?.let { audioUrl ->
-            selectedMusicAudioUrl = audioUrl
+
+        val initialAudioUrl = args?.getString("selected_music_audio_url")
+            ?: stateHandle?.get<String?>("selected_music_audio_url")
+        if (!initialAudioUrl.isNullOrBlank()) {
+            selectedMusicAudioUrl = initialAudioUrl
         }
-        stateHandle?.get<String?>("selected_music_file_path")?.let { filePath ->
-            selectedMusicAudioFilePath = filePath
+
+        val initialFilePath = args?.getString("selected_music_file_path")
+            ?: stateHandle?.get<String?>("selected_music_file_path")
+        if (!initialFilePath.isNullOrBlank()) {
+            selectedMusicAudioFilePath = initialFilePath
         }
-        stateHandle?.get<String?>("selected_music_image_url")?.let { imageUrl ->
-            selectedMusicImageUrl = imageUrl
-            if (!imageUrl.isNullOrBlank()) {
-                binding.ivMusicIcon.load(imageUrl) {
-                    crossfade(true)
-                    error(R.drawable.ic_func_music)
-                    placeholder(R.drawable.ic_func_music)
-                }
-            } else {
-                binding.ivMusicIcon.setImageResource(R.drawable.ic_func_music)
-            }
-        }
+
+        val initialImageUrl = args?.getString("selected_music_image_url")
+            ?: stateHandle?.get<String?>("selected_music_image_url")
+        updateMusicCoverUi(initialImageUrl)
 
         // Observe returned music selection from MusicFragment
         stateHandle?.getLiveData<String>("selected_music_title")
@@ -94,68 +94,163 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
         stateHandle?.getLiveData<String?>("selected_music_image_url")
             ?.observe(viewLifecycleOwner) { imageUrl ->
-                selectedMusicImageUrl = imageUrl
-                if (!imageUrl.isNullOrBlank()) {
-                    binding.ivMusicIcon.load(imageUrl) {
-                        crossfade(true)
-                        error(R.drawable.ic_func_music)
-                        placeholder(R.drawable.ic_func_music)
-                    }
-                } else {
-                    binding.ivMusicIcon.setImageResource(R.drawable.ic_func_music)
-                }
+                updateMusicCoverUi(imageUrl)
             }
+    }
+
+    private fun updateMusicCoverUi(imageUrl: String?) {
+        selectedMusicImageUrl = imageUrl
+        if (!imageUrl.isNullOrBlank()) {
+            binding.ivMusicCover.visibility = View.VISIBLE
+            binding.ivMusicIcon.visibility = View.GONE
+            binding.ivMusicCover.load(imageUrl) {
+                crossfade(true)
+                error(R.drawable.ic_music_note)
+            }
+        } else {
+            binding.ivMusicCover.visibility = View.GONE
+            binding.ivMusicIcon.visibility = View.VISIBLE
+        }
     }
 
     private fun updatePhotosUi() {
         val count = selectedPhotos.size
-        if (count > 0) {
-            binding.cardUploadPhoto.visibility = View.GONE
-            binding.llSelectedPhotosContainer.visibility = View.VISIBLE
-            binding.tvSelectedCount.visibility = View.VISIBLE
-            binding.tvSelectedCount.text = getString(R.string.memories_photos_count, count)
+        val density = resources.displayMetrics.density
 
-            // Layer 1 (Top image)
-            binding.ivStackImage1.load(selectedPhotos[0]) {
-                crossfade(true)
-            }
-
-            // Layer 2 (Middle image)
-            if (count > 1) {
-                binding.cardStack2.visibility = View.VISIBLE
-                binding.ivStackImage2.load(selectedPhotos[1]) {
-                    crossfade(true)
-                }
-            } else {
-                binding.cardStack2.visibility = View.GONE
-            }
-
-            // Layer 3 (Bottom image)
-            if (count > 2) {
-                binding.cardStack3.visibility = View.VISIBLE
-                binding.ivStackImage3.load(selectedPhotos[2]) {
-                    crossfade(true)
-                }
-            } else {
-                binding.cardStack3.visibility = View.GONE
-            }
-
-            // Badge overlay text on top image (+N or count)
-            if (count > 1) {
-                binding.tvStackCountBadge.visibility = View.VISIBLE
-                binding.tvStackCountBadge.text = "+${count - 1}"
-            } else {
-                binding.tvStackCountBadge.visibility = View.GONE
-            }
-        } else {
-            binding.cardUploadPhoto.visibility = View.VISIBLE
-            binding.llSelectedPhotosContainer.visibility = View.GONE
+        if (count == 0) {
+            binding.tvPhotosSectionTitle.text = getString(R.string.memories_upload_title)
             binding.tvSelectedCount.visibility = View.GONE
+            binding.btnAddPhotos.visibility = View.GONE
+            binding.cardPhotoStackContainer.setBackgroundResource(R.drawable.bg_photo_box_empty)
+
+            binding.llEmptyPhotosPrompt.visibility = View.VISIBLE
+            binding.flPolaroidStack.visibility = View.GONE
+        } else {
+            binding.tvPhotosSectionTitle.text = getString(R.string.your_photos)
+            binding.tvSelectedCount.visibility = View.VISIBLE
+            binding.btnAddPhotos.visibility = View.VISIBLE
+            binding.cardPhotoStackContainer.setBackgroundResource(R.drawable.bg_dashed_photo_box)
+
+            binding.llEmptyPhotosPrompt.visibility = View.GONE
+            binding.flPolaroidStack.visibility = View.VISIBLE
+            binding.tvSelectedCount.text = getString(R.string.selected_x_photos, count)
+
+            when (count) {
+                1 -> {
+                    // Only 1 photo selected: show 1 upright card centered
+                    binding.cardPolaroidCenter.visibility = View.VISIBLE
+                    binding.cardPolaroidCenter.translationX = 0f
+                    binding.cardPolaroidCenter.rotation = 0f
+                    binding.cardPolaroidCenter.cardElevation = 6 * density
+                    binding.ivPolaroidCenter.load(selectedPhotos[0]) {
+                        crossfade(true)
+                    }
+
+                    binding.cardPolaroidLeft.visibility = View.GONE
+                    binding.cardPolaroidRight.visibility = View.GONE
+                }
+                2 -> {
+                    // 2 photos selected: show 2 cards slightly fanned
+                    binding.cardPolaroidLeft.visibility = View.VISIBLE
+                    binding.cardPolaroidLeft.translationX = -32 * density
+                    binding.cardPolaroidLeft.rotation = -6f
+                    binding.cardPolaroidLeft.cardElevation = 3 * density
+                    binding.ivPolaroidLeft.load(selectedPhotos[0]) {
+                        crossfade(true)
+                    }
+
+                    binding.cardPolaroidCenter.visibility = View.VISIBLE
+                    binding.cardPolaroidCenter.translationX = 32 * density
+                    binding.cardPolaroidCenter.rotation = 6f
+                    binding.cardPolaroidCenter.cardElevation = 6 * density
+                    binding.ivPolaroidCenter.load(selectedPhotos[1]) {
+                        crossfade(true)
+                    }
+
+                    binding.cardPolaroidRight.visibility = View.GONE
+                }
+                else -> {
+                    // 3 or more photos: show 3 fanned cards (Image 1 style)
+                    binding.cardPolaroidLeft.visibility = View.VISIBLE
+                    binding.cardPolaroidLeft.translationX = -42 * density
+                    binding.cardPolaroidLeft.rotation = -11f
+                    binding.cardPolaroidLeft.cardElevation = 3 * density
+                    binding.ivPolaroidLeft.load(selectedPhotos[1]) {
+                        crossfade(true)
+                    }
+
+                    binding.cardPolaroidRight.visibility = View.VISIBLE
+                    binding.cardPolaroidRight.translationX = 42 * density
+                    binding.cardPolaroidRight.rotation = 11f
+                    binding.cardPolaroidRight.cardElevation = 3 * density
+                    binding.ivPolaroidRight.load(selectedPhotos[2]) {
+                        crossfade(true)
+                    }
+
+                    binding.cardPolaroidCenter.visibility = View.VISIBLE
+                    binding.cardPolaroidCenter.translationX = 0f
+                    binding.cardPolaroidCenter.rotation = 0f
+                    binding.cardPolaroidCenter.cardElevation = 8 * density
+                    binding.ivPolaroidCenter.load(selectedPhotos[0]) {
+                        crossfade(true)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateRatioUi() {
+        val activeColor = Color.parseColor("#4A6BF8")
+        val inactiveColor = Color.parseColor("#506584")
+
+        when (selectedAspectRatio) {
+            "9:16" -> {
+                binding.btnRatio916.setBackgroundResource(R.drawable.bg_aspect_ratio_selected)
+                binding.ivRatio916.setColorFilter(activeColor)
+                binding.tvRatio916.setTextColor(activeColor)
+
+                binding.btnRatio11.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio11.setColorFilter(inactiveColor)
+                binding.tvRatio11.setTextColor(inactiveColor)
+
+                binding.btnRatio169.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio169.setColorFilter(inactiveColor)
+                binding.tvRatio169.setTextColor(inactiveColor)
+            }
+            "1:1" -> {
+                binding.btnRatio916.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio916.setColorFilter(inactiveColor)
+                binding.tvRatio916.setTextColor(inactiveColor)
+
+                binding.btnRatio11.setBackgroundResource(R.drawable.bg_aspect_ratio_selected)
+                binding.ivRatio11.setColorFilter(activeColor)
+                binding.tvRatio11.setTextColor(activeColor)
+
+                binding.btnRatio169.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio169.setColorFilter(inactiveColor)
+                binding.tvRatio169.setTextColor(inactiveColor)
+            }
+            "16:9" -> {
+                binding.btnRatio916.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio916.setColorFilter(inactiveColor)
+                binding.tvRatio916.setTextColor(inactiveColor)
+
+                binding.btnRatio11.setBackgroundResource(R.drawable.bg_aspect_ratio_unselected)
+                binding.ivRatio11.setColorFilter(inactiveColor)
+                binding.tvRatio11.setTextColor(inactiveColor)
+
+                binding.btnRatio169.setBackgroundResource(R.drawable.bg_aspect_ratio_selected)
+                binding.ivRatio169.setColorFilter(activeColor)
+                binding.tvRatio169.setTextColor(activeColor)
+            }
         }
     }
 
     private fun openPhotoViewer(initialPosition: Int = 0) {
-        if (selectedPhotos.isEmpty()) return
+        if (selectedPhotos.isEmpty()) {
+            pickMultipleImagesLauncher.launch("image/*")
+            return
+        }
         PhotoViewerDialog(
             context = requireContext(),
             photos = selectedPhotos,
@@ -174,11 +269,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             findNavController().popBackStack()
         }
 
-        binding.cardUploadPhoto.setOnClickListener {
-            pickMultipleImagesLauncher.launch("image/*")
-        }
-
-        binding.btnAddMorePhotos.setOnClickListener {
+        binding.btnAddPhotos.setOnClickListener {
             pickMultipleImagesLauncher.launch("image/*")
         }
 
@@ -186,11 +277,48 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             openPhotoViewer(0)
         }
 
-        binding.btnViewAllPhotos.setOnClickListener {
-            openPhotoViewer(0)
+        binding.cardPolaroidLeft.setOnClickListener {
+            if (selectedPhotos.size == 2) {
+                openPhotoViewer(0)
+            } else if (selectedPhotos.size >= 3) {
+                openPhotoViewer(1)
+            }
+        }
+
+        binding.cardPolaroidCenter.setOnClickListener {
+            if (selectedPhotos.size == 2) {
+                openPhotoViewer(1)
+            } else {
+                openPhotoViewer(0)
+            }
+        }
+
+        binding.cardPolaroidRight.setOnClickListener {
+            if (selectedPhotos.size >= 3) {
+                openPhotoViewer(2)
+            }
+        }
+
+        binding.btnRatio916.setOnClickListener {
+            selectedAspectRatio = "9:16"
+            updateRatioUi()
+        }
+
+        binding.btnRatio11.setOnClickListener {
+            selectedAspectRatio = "1:1"
+            updateRatioUi()
+        }
+
+        binding.btnRatio169.setOnClickListener {
+            selectedAspectRatio = "16:9"
+            updateRatioUi()
         }
 
         binding.cardSelectMusic.setOnClickListener {
+            findNavController().navigate(R.id.action_memoriesFragment_to_musicFragment)
+        }
+
+        binding.btnChangeMusic.setOnClickListener {
             findNavController().navigate(R.id.action_memoriesFragment_to_musicFragment)
         }
 
@@ -241,13 +369,14 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     // Nguồn âm thanh (ưu tiên file nội bộ đã tải)
                     val audioSource = resolvedAudioPath?.takeIf { File(it).exists() } ?: finalAudioUrl
 
-                    // 3. Render video MP4 hoàn chỉnh (ảnh + chuyển cảnh + ghép nhạc)
+                    // 3. Render video MP4 hoàn chỉnh (ảnh + chuyển cảnh + ghép nhạc + tỷ lệ khung hình)
                     val generatedVideoFile = VideoGenerator.generateMp4FromPhotos(
                         context = requireContext(),
                         photoUris = photoUriStrings,
                         durationSec = videoDurationSec,
                         audioUrl = audioSource,
                         transitions = transitions,
+                        aspectRatio = selectedAspectRatio,
                         onProgress = { progress, _ ->
                             showLoading(
                                 title = getString(R.string.loading_creating_video),

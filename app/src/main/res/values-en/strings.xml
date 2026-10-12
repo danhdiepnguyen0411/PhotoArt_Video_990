@@ -28,13 +28,14 @@ Blurry Photos</string>
 and preserve unforgettable memories.</string>
     <string name="nav_home">Home</string>
     <string name="nav_template">Template</string>
+    <string name="nav_music">Music</string>
     <string name="nav_history">History</string>
     <string name="nav_setting">Settings</string>
     <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">See all</string>
     <string name="home_recent_history">Recent History</string>
-    <string name="home_suggestions">For You</string>
-    <string name="home_hot_templates">Hot</string>
+    <string name="home_suggestions">Trending Music</string>
+    <string name="home_hot_templates">Hot Music</string>
     <string name="feature_video_title">Merge Photos
 To Video</string>
     <string name="feature_prompt_title">Generate Image
@@ -95,6 +96,12 @@ as new</string>
     <string name="btn_save_to_device">Save to Device</string>
     <string name="btn_share">Share</string>
     <string name="processing_video">Processing video...</string>
+    <string name="memories_title">Gom ảnh tạo Video</string>
+    <string name="your_photos">Ảnh của bạn</string>
+    <string name="selected_x_photos">Đã chọn %1$d ảnh</string>
+    <string name="no_photos_selected">Chưa chọn ảnh nào</string>
+    <string name="add_photos_pill">+ Thêm ảnh</string>
+    <string name="aspect_ratio_title">Tỷ lệ khung hình</string>
     <string name="memories_upload_title">Upload photos from gallery</string>
     <string name="memories_photos_count">%1$d photos</string>
     <string name="tap_to_select_photos">Tap to select photos from gallery</string>

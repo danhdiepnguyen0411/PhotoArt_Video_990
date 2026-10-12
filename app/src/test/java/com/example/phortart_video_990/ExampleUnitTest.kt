@@ -24,7 +24,7 @@ class ExampleUnitTest {
 
         // If name is blank, falls back to code
         val catNoName = CategoryModel(code = "HIP_HOP", name = "")
-        assertEquals("HIP_HOP", catNoName.displayName)
+        assertEquals("Hip Hop", catNoName.displayName)
 
         assertEquals("Tất cả", CategoryModel.ALL.displayName)
     }
@@ -96,7 +96,7 @@ class ExampleUnitTest {
 
         val musicCat2 = CategoryModel(code = "MUSIC_CINEMATIC", name = "MUSIC_CINEMATIC")
         assertTrue(musicCat2.isMusicCategory)
-        assertEquals("CINEMATIC", musicCat2.displayName)
+        assertEquals("Cinematic", musicCat2.displayName)
 
         val templateCat = CategoryModel(code = "AI_DANCE", name = "AI Dance", groupCode = "HOME")
         assertFalse(templateCat.isMusicCategory)

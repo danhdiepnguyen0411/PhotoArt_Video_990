@@ -25,6 +25,79 @@ class TemplateRepository(
 
     fun getDefaultTemplates(): List<TemplateModel> = emptyList()
 
+    fun getDefaultMusicCategories(): List<CategoryModel> = listOf(
+        CategoryModel.ALL,
+        CategoryModel(code = "MUSIC_LOFI", name = "Lofi", active = true),
+        CategoryModel(code = "MUSIC_POP", name = "Pop", active = true),
+        CategoryModel(code = "MUSIC_EDM", name = "EDM", active = true),
+        CategoryModel(code = "MUSIC_CHILL", name = "Chill", active = true),
+        CategoryModel(code = "MUSIC_HIPHOP", name = "Hip Hop", active = true),
+        CategoryModel(code = "MUSIC_CINEMATIC", name = "Cinematic", active = true)
+    )
+
+    fun getDefaultMusicTracks(): List<TemplateModel> = listOf(
+        TemplateModel(
+            id = "mus_lofi_01",
+            title = "Chill Lofi Beat",
+            category = "MUSIC_LOFI",
+            duration = "00:28",
+            views = "450,2K",
+            photoCount = "4",
+            imageUrl = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"
+        ),
+        TemplateModel(
+            id = "mus_pop_01",
+            title = "Upbeat Summer Vibes",
+            category = "MUSIC_POP",
+            duration = "00:22",
+            views = "820,5K",
+            photoCount = "6",
+            imageUrl = "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=summer-walk-152722.mp3"
+        ),
+        TemplateModel(
+            id = "mus_edm_01",
+            title = "Electronic Sunset",
+            category = "MUSIC_EDM",
+            duration = "00:25",
+            views = "934,1K",
+            photoCount = "5",
+            imageUrl = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=electronic-future-beats-117997.mp3"
+        ),
+        TemplateModel(
+            id = "mus_chill_01",
+            title = "Acoustic Morning Breeze",
+            category = "MUSIC_CHILL",
+            duration = "00:30",
+            views = "612,9K",
+            photoCount = "3",
+            imageUrl = "https://images.unsplash.com/photo-1445985543469-433ecdd62977?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f792cb.mp3?filename=acoustic-guitars-ambient-124483.mp3"
+        ),
+        TemplateModel(
+            id = "mus_hiphop_01",
+            title = "Urban Street Rhythm",
+            category = "MUSIC_HIPHOP",
+            duration = "00:20",
+            views = "780,3K",
+            photoCount = "5",
+            imageUrl = "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/01/26/audio_d0c6ff1e01.mp3?filename=street-dance-beat-118837.mp3"
+        ),
+        TemplateModel(
+            id = "mus_cinematic_01",
+            title = "Emotional Memory Trail",
+            category = "MUSIC_CINEMATIC",
+            duration = "00:35",
+            views = "540,6K",
+            photoCount = "6",
+            imageUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
+            audioUrl = "https://cdn.pixabay.com/download/audio/2022/03/24/audio_3d1ef9b2c5.mp3?filename=cinematic-atmosphere-score-115321.mp3"
+        )
+    )
+
     /**
      * Fetch all categories from API.
      */
@@ -80,12 +153,46 @@ class TemplateRepository(
     suspend fun getMusicCategories(): List<CategoryModel> {
         val all = getCategories()
         val musicCats = mutableListOf(CategoryModel.ALL)
-        musicCats.addAll(all.filter { it.code != "ALL" && it.isMusicCategory && !it.isAiTool })
+        val fromApi = all.filter { it.code != "ALL" && it.isMusicCategory && !it.isAiTool }
+        if (fromApi.isNotEmpty()) {
+            musicCats.addAll(fromApi)
+        } else {
+            musicCats.addAll(getDefaultMusicCategories().filter { it.code != "ALL" })
+        }
         return musicCats
     }
 
     /**
-     * Fetch visual templates from API (excludes music tracks and AI TOOL).
+     * Fetch ALL real template items from API (both visual templates and music templates).
+     */
+    suspend fun getAllTemplateApps(): List<TemplateModel> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val client = getClient()
+            if (client == null) {
+                if (continuation.isActive) continuation.resume(emptyList())
+                return@suspendCancellableCoroutine
+            }
+            client.getTemplateApps(page = 0, size = 100, category = "") { jsonElement, throwable ->
+                if (!continuation.isActive) return@getTemplateApps
+                if (throwable != null || jsonElement == null) {
+                    Log.e(TAG, "Failed to fetch all templates: ${throwable?.message}")
+                    continuation.resume(emptyList())
+                } else {
+                    try {
+                        val allTemplates = parseTemplates(jsonElement)
+                        Log.d(TAG, "getAllTemplateApps: loaded ${allTemplates.size} real templates from API")
+                        continuation.resume(allTemplates)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error in getAllTemplateApps: ${e.message}", e)
+                        continuation.resume(emptyList())
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch ONLY template categories (excludes MUSIC and AI TOOL categories).
      */
     suspend fun getTemplates(
         categoryCode: String? = null,
@@ -147,7 +254,7 @@ class TemplateRepository(
         suspendCancellableCoroutine { continuation ->
             val client = getClient()
             if (client == null) {
-                if (continuation.isActive) continuation.resume(emptyList())
+                if (continuation.isActive) continuation.resume(getDefaultMusicTracks())
                 return@suspendCancellableCoroutine
             }
 
@@ -159,25 +266,26 @@ class TemplateRepository(
                 if (!continuation.isActive) return@getTemplateApps
 
                 if (throwable != null || jsonElement == null) {
-                    continuation.resume(emptyList())
+                    continuation.resume(getDefaultMusicTracks())
                 } else {
                     try {
                         val allItems = parseTemplates(jsonElement)
                         val musicItems = allItems.filter { it.isMusic }
+                        val pool = if (musicItems.isNotEmpty()) musicItems else getDefaultMusicTracks()
 
                         if (!isAll && !categoryCode.isNullOrBlank()) {
                             val target = categoryCode.trim()
                             val cleanTarget = target.removePrefix("MUSIC_").lowercase()
-                            val filtered = musicItems.filter {
+                            val filtered = pool.filter {
                                 it.category.equals(target, ignoreCase = true) ||
                                         it.category.removePrefix("MUSIC_").lowercase() == cleanTarget
                             }
-                            continuation.resume(if (filtered.isNotEmpty()) filtered else musicItems)
+                            continuation.resume(if (filtered.isNotEmpty()) filtered else pool)
                         } else {
-                            continuation.resume(musicItems)
+                            continuation.resume(pool)
                         }
                     } catch (e: Exception) {
-                        continuation.resume(emptyList())
+                        continuation.resume(getDefaultMusicTracks())
                     }
                 }
             }
