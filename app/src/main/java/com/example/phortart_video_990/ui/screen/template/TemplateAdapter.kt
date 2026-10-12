@@ -64,6 +64,13 @@ class TemplateAdapter(
             binding.ivPlayIcon.setImageResource(
                 if (isPlaying) R.drawable.ic_pause_small else R.drawable.ic_play_small
             )
+            val playColor = if (isPlaying) {
+                android.graphics.Color.parseColor("#4A6BF8")
+            } else {
+                android.graphics.Color.parseColor("#8E9BB0")
+            }
+            binding.ivPlayIcon.setColorFilter(playColor)
+            binding.tvDuration.setTextColor(playColor)
 
             val progressDrawable = androidx.swiperefreshlayout.widget.CircularProgressDrawable(binding.root.context).apply {
                 strokeWidth = 5f

@@ -239,6 +239,7 @@ a premium experience.</string>
     <string name="toast_no_image_to_save">No image to save</string>
     <string name="toast_cannot_open_share">Cannot open sharing app</string>
     <string name="toast_select_at_least_1_photo">Please select at least 1 photo to create video</string>
+    <string name="toast_max_photos_limit">You can only select up to %1$d photos for this video</string>
     <string name="toast_cannot_create_video_file">Cannot create video file. Please try again!</string>
     <string name="toast_video_file_not_found">Video file not found!</string>
     <string name="toast_cannot_save_video">Cannot save video!</string>
