@@ -13,6 +13,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 object SystemBarInsetsHelper {
 
     fun setupNormalSystemBars(window: Window) {
+        hideSystemBars(window)
+    }
+
+    fun hideSystemBars(window: Window) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -22,33 +26,33 @@ object SystemBarInsetsHelper {
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
 
         val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.isAppearanceLightStatusBars = true
-        controller.show(WindowInsetsCompat.Type.statusBars())
-        controller.hide(WindowInsetsCompat.Type.navigationBars())
+        controller.isAppearanceLightNavigationBars = true
+        controller.hide(WindowInsetsCompat.Type.systemBars())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
             window.isStatusBarContrastEnforced = false
         }
-    }
 
-    fun hideSystemBars(window: Window) {
-        setupNormalSystemBars(window)
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            window.decorView.systemUiVisibility = (
+                window.decorView.systemUiVisibility
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            )
+        }
     }
 
     fun setupEdgeToEdgeTransparent(window: Window) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
-
-        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        insetsController.isAppearanceLightStatusBars = true
-        insetsController.isAppearanceLightNavigationBars = true
+        hideSystemBars(window)
     }
 
     fun hideSystemNavigationBar(window: Window) {

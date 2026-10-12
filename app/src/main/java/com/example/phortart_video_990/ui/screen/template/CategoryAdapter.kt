@@ -33,9 +33,9 @@ class CategoryAdapter(
     }
 
     fun setSelected(catCode: String) {
-        val prevIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+        val prevIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
         selectedCategoryCode = catCode
-        val nextIndex = categories.indexOfFirst { it.code == selectedCategoryCode }
+        val nextIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
 
         if (prevIndex != -1) notifyItemChanged(prevIndex)
         if (nextIndex != -1) notifyItemChanged(nextIndex)

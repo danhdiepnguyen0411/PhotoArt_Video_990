@@ -11,8 +11,12 @@ import com.example.phortart_video_990.databinding.ItemTemplateCardBinding
 
 class TemplateAdapter(
     private var items: List<TemplateModel>,
-    private val onItemClick: (TemplateModel) -> Unit
+    private val onItemClick: (TemplateModel) -> Unit,
+    private val onPlayClick: ((TemplateModel, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<TemplateAdapter.TemplateViewHolder>() {
+
+    private var playingPosition: Int = -1
+    private var loadingPosition: Int = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TemplateViewHolder {
         val binding = ItemTemplateCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -20,7 +24,7 @@ class TemplateAdapter(
     }
 
     override fun onBindViewHolder(holder: TemplateViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position)
     }
 
     override fun getItemCount(): Int = items.size
@@ -30,22 +34,61 @@ class TemplateAdapter(
         notifyDataSetChanged()
     }
 
+    fun setPlayingState(position: Int, isPlaying: Boolean) {
+        val old = playingPosition
+        playingPosition = if (isPlaying) position else -1
+        loadingPosition = -1
+        if (old != -1 && old < items.size) notifyItemChanged(old)
+        if (position != -1 && position < items.size) notifyItemChanged(position)
+    }
+
+    fun setLoadingState(position: Int) {
+        val old = loadingPosition
+        loadingPosition = position
+        if (old != -1 && old < items.size) notifyItemChanged(old)
+        if (position != -1 && position < items.size) notifyItemChanged(position)
+    }
+
     inner class TemplateViewHolder(private val binding: ItemTemplateCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: TemplateModel) {
+        fun bind(item: TemplateModel, position: Int) {
             binding.tvTemplateTitle.text = item.title
-            binding.tvDuration.text = item.duration
+            binding.tvDuration.text = item.displayDuration
+            binding.tvPhotoCount.text = item.displayPhotoCount
+            binding.tvViews.text = item.displayViews
 
-            val templateKey = item.id.ifBlank { item.title }
-            binding.tvViews.text = TemplateViewsHelper.getOrIncrementViews(binding.root.context, templateKey)
+            val isPlaying = position == playingPosition
+            val isLoading = position == loadingPosition
 
-            // Load thumbnail image using Coil
-            val imageSource = item.safeImageUrl ?: item.localImageRes ?: R.drawable.template_trendy
+            binding.ivPlayIcon.setImageResource(
+                if (isPlaying) R.drawable.ic_pause_small else R.drawable.ic_play_small
+            )
+
+            val progressDrawable = androidx.swiperefreshlayout.widget.CircularProgressDrawable(binding.root.context).apply {
+                strokeWidth = 5f
+                centerRadius = 24f
+                setColorSchemeColors(
+                    android.graphics.Color.parseColor("#4A7BFE"),
+                    android.graphics.Color.parseColor("#9153EE")
+                )
+                start()
+            }
+
+            // Load thumbnail image using Coil with animated loading spinner
+            val imageSource = item.localImageRes ?: item.safeImageUrl?.takeIf { it.isNotBlank() } ?: R.drawable.bg_image_placeholder
             binding.ivTemplateThumb.load(imageSource) {
                 crossfade(true)
-                placeholder(R.drawable.template_trendy)
-                error(item.localImageRes ?: R.drawable.template_trendy)
+                placeholder(progressDrawable)
+                error(R.drawable.bg_image_placeholder)
+            }
+
+            binding.llDurationBadge.setOnClickListener {
+                if (onPlayClick != null) {
+                    onPlayClick.invoke(item, position)
+                } else {
+                    onItemClick(item)
+                }
             }
 
             binding.root.setOnClickListener {

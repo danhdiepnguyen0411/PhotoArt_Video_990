@@ -83,8 +83,15 @@ object VideoGenerator {
         durationSec: Float = 15f,
         audioUrl: String? = null,
         transitions: List<TransitionType>? = null,
+        aspectRatio: String = "9:16",
         onProgress: (progress: Int, status: String) -> Unit = { _, _ -> }
     ): File = withContext(Dispatchers.IO) {
+        val (videoWidth, videoHeight) = when (aspectRatio) {
+            "1:1" -> Pair(720, 720)
+            "16:9" -> Pair(1280, 720)
+            else -> Pair(720, 1280)
+        }
+
         val outputDir = File(context.cacheDir, "videos").apply { mkdirs() }
         val rawVideoFile = File(outputDir, "raw_${System.currentTimeMillis()}.mp4")
 
@@ -95,7 +102,7 @@ object VideoGenerator {
         // 1. Tải và giải mã hình ảnh
         val loadedBitmaps = mutableListOf<Bitmap>()
         for (uriStr in photoUris) {
-            val bmp = decodeSampledBitmap(context, Uri.parse(uriStr), VIDEO_WIDTH, VIDEO_HEIGHT)
+            val bmp = decodeSampledBitmap(context, Uri.parse(uriStr), videoWidth, videoHeight)
             if (bmp != null) {
                 loadedBitmaps.add(bmp)
             }
@@ -115,7 +122,7 @@ object VideoGenerator {
         val totalFrames = (durationSec * FRAME_RATE).toInt().coerceAtLeast(FRAME_RATE)
         val framesPerPhoto = totalFrames.toFloat() / loadedBitmaps.size
 
-        val format = MediaFormat.createVideoFormat(MIME_TYPE, VIDEO_WIDTH, VIDEO_HEIGHT).apply {
+        val format = MediaFormat.createVideoFormat(MIME_TYPE, videoWidth, videoHeight).apply {
             setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
             setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE)
             setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE)

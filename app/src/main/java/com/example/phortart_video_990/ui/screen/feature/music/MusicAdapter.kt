@@ -112,7 +112,7 @@ class MusicAdapter(
             }
             binding.tvTrackCategory.text = cleanCategory
 
-            binding.tvTrackDuration.text = track.duration.ifBlank { "0:30" }
+            binding.tvTrackDuration.text = track.displayDuration
 
             // Load Cover Artwork
             if (!track.safeImageUrl.isNullOrBlank()) {
