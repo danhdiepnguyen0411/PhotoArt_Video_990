@@ -239,6 +239,7 @@ tốt hơn.</string>
     <string name="toast_no_image_to_save">Không có ảnh để lưu</string>
     <string name="toast_cannot_open_share">Không thể mở ứng dụng chia sẻ</string>
     <string name="toast_select_at_least_1_photo">Vui lòng chọn ít nhất 1 ảnh để tạo video</string>
+    <string name="toast_max_photos_limit">Chỉ có thể chọn tối đa %1$d ảnh cho video này</string>
     <string name="toast_cannot_create_video_file">Không thể tạo file video. Vui lòng thử lại!</string>
     <string name="toast_video_file_not_found">Không tìm thấy file video!</string>
     <string name="toast_cannot_save_video">Không thể lưu video!</string>

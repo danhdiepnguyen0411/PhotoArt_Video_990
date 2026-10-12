@@ -58,20 +58,19 @@ object VideoGenerator {
     }
 
     /**
-     * Tính toán tổng thời lượng video sao cho mỗi ảnh hiển thị chia đều trong khoảng:
-     * - Tối thiểu (min): 1.0 giây / ảnh
-     * - Tối đa (max): 2.5 giây / ảnh
-     * - Mục tiêu chuẩn: ~2.0 giây / ảnh trong phạm vi 10s - 30s
+     * Tính toán tổng thời lượng video sao cho mỗi ảnh hiển thị ít nhất 3.0 giây:
+     * - Tối thiểu (min): 3.0 giây / ảnh
+     * - Chia đều toàn bộ thời lượng video cho số ảnh, không thừa không thiếu
      */
     fun calculateVideoDuration(photoCount: Int): Float {
         if (photoCount <= 0) return 15f
-        val calculated = (photoCount * 2.0f).coerceIn(photoCount * 1.0f, photoCount * 2.5f)
-        return calculated.coerceIn(5f, 60f)
+        val calculated = photoCount * 3.0f
+        return calculated.coerceIn(9f, 60f)
     }
 
     fun calculateSecondsPerPhoto(durationSec: Float, photoCount: Int): Float {
-        if (photoCount <= 0) return 2.0f
-        return (durationSec / photoCount).coerceIn(1.0f, 2.5f)
+        if (photoCount <= 0) return 3.0f
+        return (durationSec / photoCount).coerceAtLeast(3.0f)
     }
 
     /**

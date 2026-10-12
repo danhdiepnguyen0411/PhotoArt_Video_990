@@ -39,6 +39,25 @@ data class TemplateModel(
                 videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true ||
                 imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true
 
+    val durationSeconds: Int
+        get() {
+            val d = displayDuration
+            val parts = d.split(":")
+            if (parts.size == 2) {
+                val min = parts[0].trim().toIntOrNull() ?: 0
+                val sec = parts[1].trim().toIntOrNull() ?: 0
+                val total = min * 60 + sec
+                if (total > 0) return total
+            }
+            return 15
+        }
+
+    val targetPhotoCount: Int
+        get() = (durationSeconds / 3).coerceAtLeast(1)
+
+    val secondsPerPhoto: Float
+        get() = durationSeconds.toFloat() / targetPhotoCount
+
     val displayDuration: String
         get() {
             if (!duration.isNullOrBlank() && duration != "00:16") {
@@ -64,12 +83,6 @@ data class TemplateModel(
 
     val displayPhotoCount: String
         get() {
-            if (!photoCount.isNullOrBlank()) {
-                return photoCount
-            }
-            val key = id.ifBlank { title }
-            val hash = kotlin.math.abs(key.hashCode())
-            val count = 2 + (hash % 5)
-            return count.toString()
+            return targetPhotoCount.toString()
         }
 }

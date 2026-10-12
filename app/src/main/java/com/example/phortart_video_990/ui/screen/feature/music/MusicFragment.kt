@@ -267,6 +267,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 putString("selected_music_audio_url", track.safeAudioUrl)
                 putString("selected_music_file_path", cachedFilePath)
                 putString("selected_music_image_url", track.safeImageUrl)
+                putFloat("selected_template_duration_sec", track.durationSeconds.toFloat())
+                putInt("selected_template_photo_count", track.targetPhotoCount)
             }
             val navController = parentFragment?.parentFragment?.findNavController()
                 ?: parentFragment?.findNavController()
@@ -278,6 +280,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 putString("selected_music_audio_url", track.safeAudioUrl)
                 putString("selected_music_file_path", cachedFilePath)
                 putString("selected_music_image_url", track.safeImageUrl)
+                putFloat("selected_template_duration_sec", track.durationSeconds.toFloat())
+                putInt("selected_template_photo_count", track.targetPhotoCount)
             }
             findNavController().navigateSafe(R.id.action_musicFragment_to_memoriesFragment, bundle)
         } else {
@@ -297,6 +301,14 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "selected_music_image_url",
                 track.safeImageUrl
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_template_duration_sec",
+                track.durationSeconds.toFloat()
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_template_photo_count",
+                track.targetPhotoCount
             )
 
             findNavController().popBackStack()
