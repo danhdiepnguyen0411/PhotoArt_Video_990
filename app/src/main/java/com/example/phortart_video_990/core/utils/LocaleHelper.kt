@@ -12,13 +12,37 @@ object LocaleHelper {
         "vi", "en", "ja", "ko", "zh", "fr", "es", "de", "it", "ar", "pt", "ru", "hi", "id"
     )
 
+    fun getDeviceLanguage(): String {
+        val sysLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            android.content.res.Resources.getSystem().configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION")
+            android.content.res.Resources.getSystem().configuration.locale
+        }
+        val lang = sysLocale.language.lowercase()
+        val mappedLang = if (lang == "in") "id" else lang
+        return if (SUPPORTED_LANGUAGES.contains(mappedLang)) mappedLang else "en"
+    }
+
     fun onAttach(context: Context): Context {
+        val prefs = PreferencesManager.getInstance(context)
+        if (!prefs.hasCompletedIntro) {
+            prefs.isFirstLanguageSelected = false
+            val deviceLang = getDeviceLanguage()
+            prefs.languageCode = deviceLang
+            return setLocale(context, deviceLang)
+        }
         val lang = getSavedLanguage(context)
         return setLocale(context, lang)
     }
 
     fun getSavedLanguage(context: Context): String {
-        return PreferencesManager.getInstance(context).languageCode ?: "vi"
+        val prefs = PreferencesManager.getInstance(context)
+        if (!prefs.hasCompletedIntro) {
+            return getDeviceLanguage()
+        }
+        val code = prefs.languageCode
+        return if (code.isNotEmpty() && SUPPORTED_LANGUAGES.contains(code.lowercase())) code else getDeviceLanguage()
     }
 
     fun setLocale(context: Context, language: String): Context {

@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Удалить</string>
     <string name="shortcut_uninstall_desc">Удалить PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Оживите ваши воспоминания</string>
     <string name="splash_loading">Загрузка %1$d%%...</string>
     <string name="language_title">Выберите язык</string>
@@ -13,17 +13,14 @@
     <string name="btn_next">Далее</string>
     <string name="btn_skip">Пропустить</string>
     <string name="btn_get_started">Начать</string>
-    <string name="intro_1_title">Объединяйте фото,
-создавайте видео</string>
+    <string name="intro_1_title">Объединяйте фото,\nсоздавайте видео</string>
     <string name="intro_1_desc">Превратите любимые моменты
 в живые видео всего за пару
 секунд.</string>
-    <string name="intro_2_title">Генерация картинок
-по AI-промптам</string>
+    <string name="intro_2_title">Генерация картинок\nпо AI-промптам</string>
     <string name="intro_2_desc">Опишите свою идею,
 и искусственный интеллект воплотит её в кадре.</string>
-    <string name="intro_3_title">Восстановление старых
-и размытых фото</string>
+    <string name="intro_3_title">Восстановление старых\nи размытых фото</string>
     <string name="intro_3_desc">Очистите размытые снимки от шумов
 и сохраните важные моменты навсегда.</string>
     <string name="nav_home">Главная</string>
