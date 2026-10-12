@@ -26,3 +26,13 @@ fun NavController.navigateSafe(@IdRes actionId: Int, args: Bundle? = null) {
         Log.e("NavigationExt", "navigateSafe error: ${e.message}", e)
     }
 }
+
+fun NavController.safePopBackStack(): Boolean {
+    return try {
+        popBackStack()
+    } catch (e: Exception) {
+        Log.e("NavigationExt", "safePopBackStack error: ${e.message}", e)
+        false
+    }
+}
+

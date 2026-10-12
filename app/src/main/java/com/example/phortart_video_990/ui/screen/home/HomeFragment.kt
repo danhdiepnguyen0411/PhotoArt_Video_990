@@ -91,9 +91,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
+    private var lastNavTime = 0L
+    private fun canNavigate(): Boolean {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastNavTime < 600L) return false
+        lastNavTime = now
+        return true
+    }
+
     private fun setupHeader() {
         binding.tvBrandAi.post {
-            val width = binding.tvBrandAi.paint.measureText(binding.tvBrandAi.text.toString()).coerceAtLeast(1f)
+            if (!isAdded || bindingOrNull == null) return@post
+            val tv = bindingOrNull?.tvBrandAi ?: return@post
+            val width = tv.paint.measureText(tv.text.toString()).coerceAtLeast(1f)
             val shader = LinearGradient(
                 0f, 0f, width, 0f,
                 intArrayOf(
@@ -103,23 +113,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 null,
                 Shader.TileMode.CLAMP
             )
-            binding.tvBrandAi.paint.shader = shader
-            binding.tvBrandAi.invalidate()
+            tv.paint.shader = shader
+            tv.invalidate()
         }
     }
 
     override fun initListener() {
         // 3 Core Features
         binding.cardFeatureVideo.setOnClickListener {
-            navigateToFeature("video")
+            if (canNavigate()) navigateToFeature("video")
         }
 
         binding.cardFeaturePrompt.setOnClickListener {
-            navigateToFeature("prompt")
+            if (canNavigate()) navigateToFeature("prompt")
         }
 
         binding.cardFeatureRestore.setOnClickListener {
-            navigateToFeature("restore")
+            if (canNavigate()) navigateToFeature("restore")
         }
 
         // See all actions
@@ -153,7 +163,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun setupBanners() {
         val banners = getBannerList()
         val bannerAdapter = BannerAdapter(banners) { banner ->
-            navigateToFeature(banner.targetFeature)
+            if (canNavigate()) navigateToFeature(banner.targetFeature)
         }
         binding.vpBanners.adapter = bannerAdapter
 
@@ -340,15 +350,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             } catch (e: Exception) {
                 // Keep the Figma fallback items
             } finally {
-                binding.swipeRefreshLayout.postDelayed({
-                    if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
+                bindingOrNull?.swipeRefreshLayout?.postDelayed({
+                    if (isAdded && bindingOrNull != null) {
+                        bindingOrNull?.swipeRefreshLayout?.isRefreshing = false
+                    }
                 }, 500L)
             }
         }
     }
 
     private fun navigateToFeature(featureId: String) {
-        val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+        if (!isAdded) return
+        val navController = parentFragment?.parentFragment?.findNavController()
+            ?: parentFragment?.findNavController()
+            ?: findNavController()
         when (featureId) {
             "video" -> navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
             "prompt" -> navController.navigateSafe(R.id.action_mainFragment_to_enhanceFragment)

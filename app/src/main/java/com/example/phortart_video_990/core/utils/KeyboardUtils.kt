@@ -38,10 +38,6 @@ object KeyboardUtils {
                     return false
                 }
 
-                if (isTouchOnInteractiveView(activity.window.decorView, x, y)) {
-                    return false
-                }
-
                 val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                 imm?.hideSoftInputFromWindow(focusedView.windowToken, 0)
                 imm?.hideSoftInputFromWindow(activity.window.decorView.windowToken, 0)
@@ -82,33 +78,5 @@ object KeyboardUtils {
             }
         }
         return false
-    }
-
-    private fun isTouchOnInteractiveView(view: View, x: Float, y: Float): Boolean {
-        if (!view.isShown) return false
-        if (!isTouchInsideView(view, x, y)) return false
-
-        if (view is ViewGroup) {
-            for (i in view.childCount - 1 downTo 0) {
-                val child = view.getChildAt(i)
-                if (isTouchOnInteractiveView(child, x, y)) {
-                    return true
-                }
-            }
-        }
-
-        val id = view.id
-        val className = view.javaClass.name
-        if (id == android.R.id.content ||
-            id == com.google.android.material.R.id.touch_outside ||
-            id == com.google.android.material.R.id.design_bottom_sheet ||
-            id == com.google.android.material.R.id.coordinator ||
-            id == com.google.android.material.R.id.container ||
-            className.contains("DecorView") ||
-            className.contains("CoordinatorLayout")) {
-            return false
-        }
-
-        return view.isClickable || view.isLongClickable || view.hasOnClickListeners()
     }
 }

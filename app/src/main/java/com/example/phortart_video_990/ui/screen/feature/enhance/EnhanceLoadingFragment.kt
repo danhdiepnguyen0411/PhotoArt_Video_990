@@ -22,11 +22,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
+
 class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(FragmentEnhanceLoadingBinding::inflate) {
 
     private val promptRepository by lazy { AIPromptRepository(requireContext()) }
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
     private var progressAnimator: ValueAnimator? = null
+    private var finalAnimator: ValueAnimator? = null
 
     private var userPrompt: String = ""
     private var fullPrompt: String = ""
@@ -58,18 +62,24 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
     override fun initListener() {
         binding.btnBack.setOnClickListener {
             progressAnimator?.cancel()
-            findNavController().popBackStack()
+            finalAnimator?.cancel()
+            if (isAdded) {
+                findNavController().safePopBackStack()
+            }
         }
     }
 
     private fun startProgressSimulation() {
+        progressAnimator?.cancel()
         progressAnimator = ValueAnimator.ofFloat(0f, 92f).apply {
             duration = 4500
             interpolator = DecelerateInterpolator()
             addUpdateListener { animator ->
-                val value = animator.animatedValue as Float
-                binding.progressCircle.setProgress(value)
-                binding.tvProgressPercent.text = "${value.toInt()}%"
+                if (isAdded && bindingOrNull != null) {
+                    val value = animator.animatedValue as Float
+                    bindingOrNull?.progressCircle?.setProgress(value)
+                    bindingOrNull?.tvProgressPercent?.text = "${value.toInt()}%"
+                }
             }
             start()
         }
@@ -78,16 +88,24 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
     private fun startSdkGeneration() {
         viewLifecycleOwner.lifecycleScope.launch {
             val result = promptRepository.generateImageWithPrompt(fullPrompt)
+            if (!isAdded || view == null) return@launch
+
             if (result.isFailure) {
                 progressAnimator?.cancel()
+                finalAnimator?.cancel()
+                val act = activity ?: return@launch
                 com.example.phortart_video_990.core.dialog.AppDialogHelper.showAiErrorDialog(
-                    activity = requireActivity(),
+                    activity = act,
                     onRetry = {
-                        startProgressSimulation()
-                        startSdkGeneration()
+                        if (isAdded) {
+                            startProgressSimulation()
+                            startSdkGeneration()
+                        }
                     },
                     onCancel = {
-                        findNavController().popBackStack()
+                        if (isAdded) {
+                            findNavController().safePopBackStack()
+                        }
                     }
                 )
                 return@launch
@@ -96,50 +114,58 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
 
             // Preload the AI generated image into Coil cache so it renders immediately upon opening result screen
             if (outputUrl.isNotBlank()) {
-                try {
-                    val imageLoader = coil.Coil.imageLoader(requireContext())
-                    val request = coil.request.ImageRequest.Builder(requireContext())
-                        .data(outputUrl)
-                        .build()
-                    imageLoader.execute(request)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                val ctx = context
+                if (ctx != null) {
+                    try {
+                        val imageLoader = coil.Coil.imageLoader(ctx)
+                        val request = coil.request.ImageRequest.Builder(ctx)
+                            .data(outputUrl)
+                            .build()
+                        imageLoader.execute(request)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
-                // Tự động lưu vào lịch sử ngay khi gen ra thành công
-                try {
-                    val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-                    val currentDate = dateFormat.format(Date())
-                    val historyItem = HistoryItemModel(
-                        type = "Prompt AI",
-                        title = userPrompt.ifBlank { getString(R.string.func_03_enhance) },
-                        date = currentDate,
-                        imageUri = outputUrl,
-                        imageUrl = outputUrl
-                    )
-                    historyRepository.addHistoryItem(historyItem)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                    // Tự động lưu vào lịch sử ngay khi gen ra thành công
+                    try {
+                        val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
+                        val currentDate = dateFormat.format(Date())
+                        val historyItem = HistoryItemModel(
+                            type = "Prompt AI",
+                            title = userPrompt.ifBlank { getString(R.string.func_03_enhance) },
+                            date = currentDate,
+                            imageUri = outputUrl,
+                            imageUrl = outputUrl
+                        )
+                        historyRepository.addHistoryItem(historyItem)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
+
+            if (!isAdded || bindingOrNull == null) return@launch
 
             // Animate to 100%
             progressAnimator?.cancel()
-            val finalAnimator = ValueAnimator.ofFloat(binding.progressCircle.getProgress(), 100f).apply {
+            val currentProgress = bindingOrNull?.progressCircle?.getProgress() ?: 90f
+            finalAnimator = ValueAnimator.ofFloat(currentProgress, 100f).apply {
                 duration = 350
                 addUpdateListener { anim ->
-                    val v = anim.animatedValue as Float
-                    binding.progressCircle.setProgress(v)
-                    binding.tvProgressPercent.text = "${v.toInt()}%"
+                    if (isAdded && bindingOrNull != null) {
+                        val v = anim.animatedValue as Float
+                        bindingOrNull?.progressCircle?.setProgress(v)
+                        bindingOrNull?.tvProgressPercent?.text = "${v.toInt()}%"
+                    }
                 }
             }
-            finalAnimator.start()
+            finalAnimator?.start()
 
             delay(400)
 
             if (!isAdded) return@launch
 
-            findNavController().navigate(
+            findNavController().navigateSafe(
                 R.id.action_enhanceLoadingFragment_to_enhanceResultFragment,
                 bundleOf(
                     EnhanceResultFragment.KEY_USER_PROMPT to userPrompt,
@@ -151,6 +177,7 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
 
     override fun onDestroyView() {
         progressAnimator?.cancel()
+        finalAnimator?.cancel()
         super.onDestroyView()
     }
 

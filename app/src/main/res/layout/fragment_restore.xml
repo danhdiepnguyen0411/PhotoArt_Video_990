@@ -298,7 +298,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Action Button: Bắt đầu ngay -> -->
+    <!-- Bottom Action Button: Bắt đầu ngay -->
     <LinearLayout
         android:id="@+id/btnStartRestore"
         android:layout_width="match_parent"
@@ -319,13 +319,6 @@
             android:textColor="@color/white"
             android:textSize="17sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Next"
-            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

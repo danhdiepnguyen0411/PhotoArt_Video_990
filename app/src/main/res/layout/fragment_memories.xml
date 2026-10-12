@@ -426,7 +426,6 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="28dp"
         android:background="@drawable/bg_btn_primary"
-        android:drawableEnd="@drawable/ic_arrow_right"
         android:paddingHorizontal="24dp"
         android:text="@string/btn_create_video_now"
         android:textAllCaps="false"

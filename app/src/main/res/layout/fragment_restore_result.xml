@@ -130,7 +130,7 @@
 
     </LinearLayout>
 
-    <!-- Bottom Action Button: Lưu ảnh -> -->
+    <!-- Bottom Action Button: Lưu ảnh -->
     <LinearLayout
         android:id="@+id/btnSaveImage"
         android:layout_width="match_parent"
@@ -151,13 +151,6 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Save"
-            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
