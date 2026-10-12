@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo AI</string>
+    <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Gỡ cài đặt</string>
-    <string name="shortcut_uninstall_desc">Gỡ cài đặt Photo AI</string>
-    <string name="splash_title">Photo AI</string>
+    <string name="shortcut_uninstall_desc">Gỡ cài đặt PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
     <string name="splash_subtitle">Hồi sinh những kỷ niệm</string>
     <string name="splash_loading">Đang tải %1$d%%...</string>
     <string name="language_title">Chọn ngôn ngữ</string>
@@ -30,7 +30,7 @@ và giữ lại những kỷ niệm đáng nhớ.</string>
     <string name="nav_template">Template</string>
     <string name="nav_history">Lịch sử</string>
     <string name="nav_setting">Cài đặt</string>
-    <string name="home_brand_title">Photo AI</string>
+    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">Xem tất cả</string>
     <string name="home_recent_history">Lịch sử gần đây</string>
     <string name="home_suggestions">Dành riêng cho bạn</string>
@@ -197,10 +197,10 @@ tốt hơn.</string>
     <string name="exit_desc">Bạn có chắc chắn muốn thoát khỏi ứng dụng không?</string>
     <string name="btn_exit">Thoát</string>
     <string name="rate_title">Đánh giá ứng dụng</string>
-    <string name="rate_subtitle">Bạn cảm thấy trải nghiệm tạo ảnh với Photo AI như thế nào?</string>
+    <string name="rate_subtitle">Bạn cảm thấy trải nghiệm tạo ảnh với PHOTO ART &amp; VIDEO như thế nào?</string>
     <string name="btn_rate_submit">Gửi đánh giá</string>
     <string name="btn_rate_not_now">Để sau</string>
-    <string name="uninstall_step1_title">Bạn gặp vấn đề gì khi sử dụng Photo AI?</string>
+    <string name="uninstall_step1_title">Bạn gặp vấn đề gì khi sử dụng PHOTO ART &amp; VIDEO?</string>
     <string name="uninstall_card1_title">Không thể lưu hoặc chất lượng ảnh chưa tốt</string>
     <string name="uninstall_card1_desc">Thử lại với các chế độ AI khác hoặc xem mẹo tạo ảnh đẹp</string>
     <string name="uninstall_card2_title">Khám phá các phong cách AI mới</string>
