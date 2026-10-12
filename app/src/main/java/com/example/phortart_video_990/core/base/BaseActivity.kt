@@ -21,6 +21,7 @@ abstract class BaseActivity<VB : ViewBinding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.example.phortart_video_990.core.utils.SystemBarInsetsHelper.hideSystemBars(window)
         window.decorView.layoutDirection = if (LocaleHelper.isRtl(this)) {
             android.view.View.LAYOUT_DIRECTION_RTL
         } else {
@@ -31,6 +32,18 @@ abstract class BaseActivity<VB : ViewBinding>(
         initView()
         initData()
         initListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        com.example.phortart_video_990.core.utils.SystemBarInsetsHelper.hideSystemBars(window)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            com.example.phortart_video_990.core.utils.SystemBarInsetsHelper.hideSystemBars(window)
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

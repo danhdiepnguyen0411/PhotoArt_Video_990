@@ -27,11 +27,24 @@ data class CategoryModel(
 
     val displayName: String
         get() {
-            val raw = name.ifBlank { code }
-            return if (isMusicCategory && raw.startsWith("MUSIC_", ignoreCase = true)) {
+            val raw = name.ifBlank { code }.trim()
+            if (raw.equals("ALL", ignoreCase = true) || raw.equals("Tất cả", ignoreCase = true)) {
+                return "Tất cả"
+            }
+            val cleaned = if (isMusicCategory && raw.startsWith("MUSIC_", ignoreCase = true)) {
                 raw.substring(6)
             } else {
                 raw
+            }
+            return if (cleaned.contains("_")) {
+                cleaned.split("_").joinToString(" ") { word ->
+                    if (word.equals("ai", ignoreCase = true)) "AI"
+                    else word.lowercase().replaceFirstChar { it.uppercase() }
+                }
+            } else if (cleaned.length > 3 && cleaned.all { it.isUpperCase() || !it.isLetter() }) {
+                cleaned.lowercase().replaceFirstChar { it.uppercase() }
+            } else {
+                cleaned
             }
         }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo AI</string>
+    <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">卸载</string>
-    <string name="shortcut_uninstall_desc">卸载 Photo AI</string>
-    <string name="splash_title">Photo AI</string>
+    <string name="shortcut_uninstall_desc">卸载 PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
     <string name="splash_subtitle">让回忆重获新生</string>
     <string name="splash_loading">正在加载 %1$d%%...</string>
     <string name="language_title">选择语言</string>
@@ -29,7 +29,7 @@ AI 将为你绘出绚丽画面。</string>
     <string name="nav_template">模板</string>
     <string name="nav_history">历史</string>
     <string name="nav_setting">设置</string>
-    <string name="home_brand_title">Photo AI</string>
+    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">查看全部</string>
     <string name="home_recent_history">最近历史</string>
     <string name="home_suggestions">为你推荐</string>
@@ -196,10 +196,10 @@ AI 即可描摹</string>
     <string name="exit_desc">您确定要退出应用程序吗？</string>
     <string name="btn_exit">退出</string>
     <string name="rate_title">给应用评分</string>
-    <string name="rate_subtitle">您对 Photo AI 的照片创作体验满意吗？</string>
+    <string name="rate_subtitle">您对 PHOTO ART &amp; VIDEO 的照片创作体验满意吗？</string>
     <string name="btn_rate_submit">提交评价</string>
     <string name="btn_rate_not_now">稍后再说</string>
-    <string name="uninstall_step1_title">您在使用 Photo AI 时遇到了什么问题？</string>
+    <string name="uninstall_step1_title">您在使用 PHOTO ART &amp; VIDEO 时遇到了什么问题？</string>
     <string name="uninstall_card1_title">无法保存或图片画质未达预期</string>
     <string name="uninstall_card1_desc">尝试其他 AI 模式或查看高质量成像技巧</string>
     <string name="uninstall_card2_title">探索全新 AI 艺术风格与模板</string>

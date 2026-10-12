@@ -2,6 +2,7 @@ package com.example.phortart_video_990.ui.screen.template
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.phortart_video_990.R
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.TemplateRepository
@@ -26,8 +27,8 @@ class TemplateViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // Cache of all visual templates loaded from API
-    private var allVisualTemplates: List<TemplateModel> = emptyList()
+    // All music tracks from API
+    private var allMusicList: List<TemplateModel> = emptyList()
 
     init {
         loadData()
@@ -37,47 +38,52 @@ class TemplateViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Fetch all visual templates first to know which categories actually have templates
-                val allTemplates = repository.getTemplates(categoryCode = "ALL")
-                allVisualTemplates = allTemplates
+                // 1. Fetch real music tracks from API
+                var realMusicTracks = repository.getMusicTracks(categoryCode = "ALL")
+                if (realMusicTracks.isEmpty()) {
+                    realMusicTracks = repository.getDefaultMusicTracks()
+                }
+                allMusicList = realMusicTracks
 
-                // 2. Fetch categories from API
-                val apiCategories = repository.getTemplateCategories()
+                // 2. Fetch music categories from API
+                val apiMusicCategories = repository.getMusicCategories()
+                val categoriesList = mutableListOf(CategoryModel.ALL)
 
-                // Set of non-empty category identifiers found in actual templates
-                val templateCategoriesPresent = allTemplates.map { it.category.trim().lowercase() }
-                    .filter { it.isNotBlank() }
-                    .toSet()
+                val validMusicCategories = apiMusicCategories.filter {
+                    it.active && it.name.isNotBlank() &&
+                            !it.code.equals("ALL", ignoreCase = true) &&
+                            !it.name.equals("ALL", ignoreCase = true) &&
+                            !it.name.equals("Tất cả", ignoreCase = true)
+                }
+                categoriesList.addAll(validMusicCategories)
 
-                // Only keep categories that have templates (and ALL), excluding AI TOOL
-                val validCategories = apiCategories.filter { cat ->
-                    if (cat.isAiTool) return@filter false
-                    if (cat.code.equals("ALL", ignoreCase = true)) return@filter true
-                    val codeMatch = cat.code.trim().lowercase() in templateCategoriesPresent
-                    val nameMatch = cat.name.trim().lowercase() in templateCategoriesPresent
-                    codeMatch || nameMatch
-                }.toMutableList()
+                // 3. Dynamically discover any music categories from music tracks
+                val existingCodes = categoriesList.map { it.code.lowercase() }.toMutableSet()
+                existingCodes.addAll(categoriesList.map { it.name.lowercase() })
 
-                // Also discover any extra categories present in templates that weren't in API categories
-                val existingCodes = validCategories.map { it.code.trim().lowercase() }.toSet()
-                allTemplates.forEach { tpl ->
-                    val catCode = tpl.category.trim()
-                    val isMusic = catCode.startsWith("MUSIC_", ignoreCase = true) || tpl.isMusic
-                    val isAi = catCode.replace("_", " ").equals("AI TOOL", ignoreCase = true) ||
-                            catCode.equals("AI_TOOL", ignoreCase = true)
-                    if (catCode.isNotBlank() && !isMusic && !isAi && !existingCodes.contains(catCode.lowercase())) {
-                        validCategories.add(CategoryModel(code = catCode, name = catCode, active = true))
+                realMusicTracks.forEach { item ->
+                    val cat = item.category.trim()
+                    if (cat.isNotBlank()) {
+                        val cleanCat = cat.removePrefix("MUSIC_")
+                        if (!existingCodes.contains(cat.lowercase()) && !existingCodes.contains(cleanCat.lowercase())) {
+                            existingCodes.add(cat.lowercase())
+                            existingCodes.add(cleanCat.lowercase())
+                            categoriesList.add(CategoryModel(code = cat, name = cleanCat, active = true))
+                        }
                     }
                 }
 
-                _categories.value = validCategories
+                _categories.value = categoriesList
 
-                // Filter templates for current selected category
+                // Filter for current selected category
                 val currentCode = _selectedCategoryCode.value
-                val selectedCat = validCategories.find { it.code.equals(currentCode, ignoreCase = true) }
-                _templates.value = filterTemplatesByCategory(allTemplates, currentCode, selectedCat?.name)
+                val selectedCat = categoriesList.find { it.code.equals(currentCode, ignoreCase = true) }
+                _templates.value = filterMusic(realMusicTracks, currentCode, selectedCat?.name)
             } catch (e: Exception) {
-                _templates.value = emptyList()
+                val fallback = repository.getDefaultMusicTracks()
+                allMusicList = fallback
+                _templates.value = fallback
+                _categories.value = repository.getDefaultMusicCategories()
             } finally {
                 _isLoading.value = false
             }
@@ -87,41 +93,29 @@ class TemplateViewModel(
     fun selectCategory(category: CategoryModel) {
         if (_selectedCategoryCode.value != category.code) {
             _selectedCategoryCode.value = category.code
-            loadTemplates(category.code, category.name)
+            _templates.value = filterMusic(allMusicList, category.code, category.name)
         }
     }
 
-    fun loadTemplates(categoryCode: String = _selectedCategoryCode.value, categoryName: String? = null) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                if (allVisualTemplates.isNotEmpty()) {
-                    _templates.value = filterTemplatesByCategory(allVisualTemplates, categoryCode, categoryName)
-                } else {
-                    val list = repository.getTemplates(categoryCode = categoryCode, categoryName = categoryName)
-                    _templates.value = list
-                }
-            } catch (e: Exception) {
-                _templates.value = emptyList()
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    private fun filterTemplatesByCategory(
-        templates: List<TemplateModel>,
+    private fun filterMusic(
+        list: List<TemplateModel>,
         categoryCode: String,
         categoryName: String?
     ): List<TemplateModel> {
         val isAll = categoryCode.isBlank() ||
                 categoryCode.equals("ALL", ignoreCase = true) ||
                 categoryCode.equals("Tất cả", ignoreCase = true)
-        if (isAll) return templates
+        if (isAll) return list
 
-        return templates.filter {
-            it.category.equals(categoryCode, ignoreCase = true) ||
-                    (!categoryName.isNullOrBlank() && it.category.equals(categoryName, ignoreCase = true))
+        val target = categoryCode.trim()
+        val cleanTarget = target.removePrefix("MUSIC_").replace("_", " ").lowercase()
+
+        return list.filter { item ->
+            val itemCat = item.category.trim()
+            val cleanItemCat = itemCat.removePrefix("MUSIC_").replace("_", " ").lowercase()
+            cleanItemCat == cleanTarget ||
+                    itemCat.equals(target, ignoreCase = true) ||
+                    (!categoryName.isNullOrBlank() && itemCat.equals(categoryName, ignoreCase = true))
         }
     }
 }

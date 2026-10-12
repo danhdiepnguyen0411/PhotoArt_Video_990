@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo AI</string>
+    <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">إلغاء التثبيت</string>
-    <string name="shortcut_uninstall_desc">إلغاء تثبيت Photo AI</string>
-    <string name="splash_title">Photo AI</string>
+    <string name="shortcut_uninstall_desc">إلغاء تثبيت PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
     <string name="splash_subtitle">أعد ذكرياتك إلى الحياة</string>
     <string name="splash_loading">جارٍ التحميل %1$d%%...</string>
     <string name="language_title">اختر اللغة</string>
@@ -30,7 +30,7 @@
     <string name="nav_template">القوالب</string>
     <string name="nav_history">السجل</string>
     <string name="nav_setting">الإعدادات</string>
-    <string name="home_brand_title">Photo AI</string>
+    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">عرض الكل</string>
     <string name="home_recent_history">السجل الأخير</string>
     <string name="home_suggestions">مخصص لك</string>
@@ -197,7 +197,7 @@
     <string name="exit_desc">هل أنت متأكد من رغبتك في الخروج من التطبيق؟</string>
     <string name="btn_exit">خروج</string>
     <string name="rate_title">قيم التطبيق</string>
-    <string name="rate_subtitle">كيف كانت تجربتك في إنشاء الصور باستخدام Photo AI؟</string>
+    <string name="rate_subtitle">كيف كانت تجربتك في إنشاء الصور باستخدام PHOTO ART &amp; VIDEO؟</string>
     <string name="btn_rate_submit">إرسال التقييم</string>
     <string name="btn_rate_not_now">ليس الآن</string>
     <string name="uninstall_step1_title">ما المشاكل التي واجهتها أثناء الاستخدام؟</string>

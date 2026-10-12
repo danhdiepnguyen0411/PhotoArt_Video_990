@@ -175,7 +175,11 @@
         android:id="@+id/musicFragment"
         android:name="com.example.phortart_video_990.ui.screen.feature.music.MusicFragment"
         android:label="MusicFragment"
-        tools:layout="@layout/fragment_music" />
+        tools:layout="@layout/fragment_music">
+        <action
+            android:id="@+id/action_musicFragment_to_memoriesFragment"
+            app:destination="@id/memoriesFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/upscaleFragment"

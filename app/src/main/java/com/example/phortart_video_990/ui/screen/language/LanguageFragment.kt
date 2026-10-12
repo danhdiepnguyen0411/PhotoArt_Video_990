@@ -125,8 +125,8 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         }
 
         val hasSelection = baseList.any { it.isSelected }
-        binding.btnConfirm.isEnabled = hasSelection || isTutorialActive
-        binding.btnConfirm.alpha = if (hasSelection || isTutorialActive) 1f else 0.45f
+        binding.btnConfirm.isEnabled = hasSelection
+        binding.btnConfirm.alpha = if (hasSelection) 1f else 0.5f
 
         binding.rvLanguages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -351,10 +351,11 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         }
 
         binding.btnConfirm.setOnClickListener {
+            if (!binding.btnConfirm.isEnabled) return@setOnClickListener
+            val selected = adapter.getSelectedItem() ?: return@setOnClickListener
             hideHandTutorial()
-            val selected = adapter.getSelectedItem() ?: adapter.getLanguageAt(targetSuggestedPosition)
-            val langCode = selected?.code ?: previewLangCode
-            val langName = selected?.name ?: "Tiếng Việt"
+            val langCode = selected.code
+            val langName = selected.name
 
             val prefs = PreferencesManager.getInstance(requireContext())
             // Save ONLY when user explicitly presses the confirm / save button!
