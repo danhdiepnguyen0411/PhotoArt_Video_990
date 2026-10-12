@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Copot pemasangan</string>
     <string name="shortcut_uninstall_desc">Copot pemasangan PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Hidupkan kembali kenangan Anda</string>
     <string name="splash_loading">Memuat %1$d%%...</string>
     <string name="language_title">Pilih Bahasa</string>
@@ -13,17 +13,14 @@
     <string name="btn_next">Berikutnya</string>
     <string name="btn_skip">Lewati</string>
     <string name="btn_get_started">Mulai Sekarang</string>
-    <string name="intro_1_title">Gabungkan Foto,
-Buat Video</string>
+    <string name="intro_1_title">Gabungkan Foto,\nBuat Video</string>
     <string name="intro_1_desc">Ubah momen favorit Anda
 menjadi video hidup hanya dalam
 beberapa detik.</string>
-    <string name="intro_2_title">Buat Gambar dengan
-Prompt AI</string>
+    <string name="intro_2_title">Buat Gambar dengan\nPrompt AI</string>
     <string name="intro_2_desc">Jelaskan imajinasi Anda,
 dan AI akan mengubahnya menjadi visual yang menakjubkan.</string>
-    <string name="intro_3_title">Pulihkan Foto
-Lama &amp; Buram</string>
+    <string name="intro_3_title">Pulihkan Foto\nLama &amp; Buram</string>
     <string name="intro_3_desc">Perbaiki foto buram dan pudar,
 serta jaga kenangan berharga selamanya.</string>
     <string name="nav_home">Beranda</string>

@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">卸载</string>
     <string name="shortcut_uninstall_desc">卸载 PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">让回忆重获新生</string>
     <string name="splash_loading">正在加载 %1$d%%...</string>
     <string name="language_title">选择语言</string>
@@ -13,16 +13,13 @@
     <string name="btn_next">下一步</string>
     <string name="btn_skip">跳过</string>
     <string name="btn_get_started">立即开始</string>
-    <string name="intro_1_title">拼接照片，
-制作视频</string>
+    <string name="intro_1_title">拼接照片，\n制作视频</string>
     <string name="intro_1_desc">只需数秒，
 将美好瞬间化为生动视频。</string>
-    <string name="intro_2_title">通过 AI 提示词
-生成精美图片</string>
+    <string name="intro_2_title">通过 AI 提示词\n生成精美图片</string>
     <string name="intro_2_desc">输入你的奇思妙想，
 AI 将为你绘出绚丽画面。</string>
-    <string name="intro_3_title">唤醒老旧与
-模糊照片</string>
+    <string name="intro_3_title">唤醒老旧与\n模糊照片</string>
     <string name="intro_3_desc">修复模糊斑驳的旧照，
 悉心珍藏每一份珍贵记忆。</string>
     <string name="nav_home">首页</string>

@@ -3,7 +3,10 @@ package com.example.phortart_video_990.ui.screen.language
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Build
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -38,8 +41,8 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
 
         val prefs = PreferencesManager.getInstance(requireContext())
         val isFromSettings = prefs.hasCompletedIntro
-        val savedCode = prefs.languageCode
-        initialLangCode = savedCode ?: "vi"
+        val savedCode = if (isFromSettings) prefs.languageCode else LocaleHelper.getDeviceLanguage()
+        initialLangCode = savedCode
         previewLangCode = initialLangCode
 
         isTutorialActive = !isFromSettings
@@ -47,59 +50,43 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
 
         if (isFromSettings) {
             binding.btnBack.visibility = View.VISIBLE
-            binding.btnConfirm.text = getString(R.string.btn_save_changes)
+            binding.tvConfirmText.text = getString(R.string.btn_save_changes)
             binding.ivHandGif.visibility = View.GONE
         } else {
             binding.btnBack.visibility = View.GONE
-            binding.btnConfirm.text = getString(R.string.btn_confirm)
+            // Khi onboarding lần đầu: hiển thị title/subtitle/button theo ngôn ngữ máy
+            applyDeviceLocaleToHeader()
         }
 
-        // Base language list
+        // Tạo English context để subtitle luôn hiển thị tiếng Anh
+        val enConfig = android.content.res.Configuration(requireContext().resources.configuration)
+        enConfig.setLocale(java.util.Locale.ENGLISH)
+        val enCtx = requireContext().createConfigurationContext(enConfig)
+
+        // Base language list — subName luôn lấy từ enCtx (tiếng Anh cố định)
         val baseList = mutableListOf(
-            LanguageModel("vi", "Tiếng Việt", getString(R.string.lang_sub_vi), "flags/vn.svg", subResId = R.string.lang_sub_vi),
-            LanguageModel("en", "English", getString(R.string.lang_sub_en), "flags/en.svg", subResId = R.string.lang_sub_en),
-            LanguageModel("ja", "日本語", getString(R.string.lang_sub_ja), "flags/jp.svg", subResId = R.string.lang_sub_ja),
-            LanguageModel("ko", "한국어", getString(R.string.lang_sub_ko), "flags/kr.svg", subResId = R.string.lang_sub_ko),
-            LanguageModel("zh", "中文", getString(R.string.lang_sub_zh), "flags/cn.svg", subResId = R.string.lang_sub_zh),
-            LanguageModel("fr", "Français", getString(R.string.lang_sub_fr), "flags/fr.svg", subResId = R.string.lang_sub_fr),
-            LanguageModel("es", "Español", getString(R.string.lang_sub_es), "flags/es.svg", subResId = R.string.lang_sub_es),
-            LanguageModel("de", "Deutsch", getString(R.string.lang_sub_de), "flags/de.svg", subResId = R.string.lang_sub_de),
-            LanguageModel("it", "Italiano", getString(R.string.lang_sub_it), "flags/it.svg", subResId = R.string.lang_sub_it),
-            LanguageModel("ar", "العربية", getString(R.string.lang_sub_ar), "flags/sa.svg", subResId = R.string.lang_sub_ar),
-            LanguageModel("pt", "Português", getString(R.string.lang_sub_pt), "flags/pt.svg", subResId = R.string.lang_sub_pt),
-            LanguageModel("ru", "Русский", getString(R.string.lang_sub_ru), "flags/ru.svg", subResId = R.string.lang_sub_ru),
-            LanguageModel("hi", "हिन्दी", getString(R.string.lang_sub_hi), "flags/ind.svg", subResId = R.string.lang_sub_hi),
-            LanguageModel("id", "Bahasa Indonesia", getString(R.string.lang_sub_id), "flags/id.svg", subResId = R.string.lang_sub_id)
+            LanguageModel("vi", "Tiếng Việt", enCtx.getString(R.string.lang_sub_vi), "flags/vn.svg", subResId = R.string.lang_sub_vi),
+            LanguageModel("en", "English", enCtx.getString(R.string.lang_sub_en), "flags/en.svg", subResId = R.string.lang_sub_en),
+            LanguageModel("ja", "日本語", enCtx.getString(R.string.lang_sub_ja), "flags/jp.svg", subResId = R.string.lang_sub_ja),
+            LanguageModel("ko", "한국어", enCtx.getString(R.string.lang_sub_ko), "flags/kr.svg", subResId = R.string.lang_sub_ko),
+            LanguageModel("zh", "中文", enCtx.getString(R.string.lang_sub_zh), "flags/cn.svg", subResId = R.string.lang_sub_zh),
+            LanguageModel("fr", "Français", enCtx.getString(R.string.lang_sub_fr), "flags/fr.svg", subResId = R.string.lang_sub_fr),
+            LanguageModel("es", "Español", enCtx.getString(R.string.lang_sub_es), "flags/es.svg", subResId = R.string.lang_sub_es),
+            LanguageModel("de", "Deutsch", enCtx.getString(R.string.lang_sub_de), "flags/de.svg", subResId = R.string.lang_sub_de),
+            LanguageModel("it", "Italiano", enCtx.getString(R.string.lang_sub_it), "flags/it.svg", subResId = R.string.lang_sub_it),
+            LanguageModel("ar", "العربية", enCtx.getString(R.string.lang_sub_ar), "flags/sa.svg", subResId = R.string.lang_sub_ar),
+            LanguageModel("pt", "Português", enCtx.getString(R.string.lang_sub_pt), "flags/pt.svg", subResId = R.string.lang_sub_pt),
+            LanguageModel("ru", "Русский", enCtx.getString(R.string.lang_sub_ru), "flags/ru.svg", subResId = R.string.lang_sub_ru),
+            LanguageModel("hi", "हिन्दी", enCtx.getString(R.string.lang_sub_hi), "flags/ind.svg", subResId = R.string.lang_sub_hi),
+            LanguageModel("id", "Bahasa Indonesia", enCtx.getString(R.string.lang_sub_id), "flags/id.svg", subResId = R.string.lang_sub_id)
         )
 
-        // Fetch real device system language from Resources.getSystem() (unaffected by app locale overrides)
-        val sysLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Resources.getSystem().configuration.locales.get(0)
-        } else {
-            @Suppress("DEPRECATION")
-            Resources.getSystem().configuration.locale
-        }
-
-        val sysLang = sysLocale.language.lowercase()
-        val sysTag = sysLocale.toLanguageTag().lowercase()
-
         // Place device system language at position 4 (index 3)
-        var sysIndex = baseList.indexOfFirst { it.code.lowercase() == sysTag || it.code.lowercase() == sysLang }
-        if (sysIndex == -1) {
-            sysIndex = baseList.indexOfFirst { it.code.lowercase().startsWith(sysLang) || sysLang.startsWith(it.code.lowercase()) }
-        }
-
-        if (sysIndex != -1) {
-            if (sysIndex != targetSuggestedPosition) {
-                val sysItem = baseList.removeAt(sysIndex)
-                baseList.add(targetSuggestedPosition, sysItem)
-            }
-        } else {
-            val enIndex = baseList.indexOfFirst { it.code.lowercase().startsWith("en") }
-            if (enIndex != -1 && enIndex != targetSuggestedPosition) {
-                val enItem = baseList.removeAt(enIndex)
-                baseList.add(targetSuggestedPosition, enItem)
-            }
+        val deviceLang = LocaleHelper.getDeviceLanguage()
+        val sysIndex = baseList.indexOfFirst { it.code.lowercase() == deviceLang }
+        if (sysIndex != -1 && sysIndex != targetSuggestedPosition) {
+            val sysItem = baseList.removeAt(sysIndex)
+            baseList.add(targetSuggestedPosition, sysItem)
         }
 
         if (isFromSettings && !savedCode.isNullOrEmpty()) {
@@ -144,6 +131,53 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         } else {
             binding.ivHandGif.visibility = View.GONE
         }
+
+        applyTitleGradient()
+    }
+
+    /**
+     * Áp dụng gradient text cho title theo design reference:
+     * gradient: #2D7DF6 → #6A55F0 → #9A56EE
+     */
+    private fun applyTitleGradient() {
+        val tv = binding.tvLanguageTitle
+        tv.post {
+            if (tv.width <= 0) return@post
+            val paint = tv.paint
+            val width = tv.width.toFloat()
+            paint.shader = LinearGradient(
+                0f, 0f, width, 0f,
+                intArrayOf(
+                    android.graphics.Color.parseColor("#2D7DF6"),
+                    android.graphics.Color.parseColor("#6A55F0"),
+                    android.graphics.Color.parseColor("#9A56EE")
+                ),
+                floatArrayOf(0f, 0.55f, 1f),
+                Shader.TileMode.CLAMP
+            )
+            tv.invalidate()
+        }
+    }
+
+    /**
+     * Khi onboarding lần đầu (chưa chọn ngôn ngữ), hiển thị title/subtitle/button
+     * theo ngôn ngữ hệ thống máy. Header sẽ KHÔNG thay đổi khi user preview ngôn ngữ khác
+     * → tránh layout shift/giật.
+     */
+    private fun applyDeviceLocaleToHeader() {
+        val ctx = context ?: return
+        val supportedLang = LocaleHelper.getDeviceLanguage()
+        val locale = LocaleHelper.getLocale(supportedLang)
+        val config = Configuration(ctx.resources.configuration)
+        config.setLocale(locale)
+        val localizedCtx = ctx.createConfigurationContext(config)
+
+        binding.tvLanguageTitle.text = localizedCtx.getString(R.string.language_title)
+        binding.tvLanguageDesc.text = localizedCtx.getString(R.string.language_choose_desc)
+        binding.tvConfirmText.text = localizedCtx.getString(R.string.btn_confirm)
+
+        // Re-apply gradient sau khi text thay đổi
+        applyTitleGradient()
     }
 
     private fun setupHandAtSuggestedLanguage() {
@@ -236,15 +270,18 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
 
     private fun updateHandPositionAtConfirmButton(animate: Boolean = false) {
         if (!isTutorialActive || !isHandAtCheckmark || view == null) return
-        val btnLoc = IntArray(2)
-        binding.btnConfirm.getLocationOnScreen(btnLoc)
+
+        // Đặt hand tại vị trí icon arrow (ivConfirmArrow) để không che chữ
+        val arrowView = binding.ivConfirmArrow
+        val arrowLoc = IntArray(2)
+        arrowView.getLocationOnScreen(arrowLoc)
 
         val rootLoc = IntArray(2)
         binding.rootView.getLocationOnScreen(rootLoc)
 
         val density = resources.displayMetrics.density
-        val endX = (btnLoc[0] - rootLoc[0] + binding.btnConfirm.width / 2f - binding.ivHandGif.width / 2f + 12 * density)
-        val endY = (btnLoc[1] - rootLoc[1] + binding.btnConfirm.height / 2f - binding.ivHandGif.height / 2f + 4 * density)
+        val endX = (arrowLoc[0] - rootLoc[0] + arrowView.width / 2f - binding.ivHandGif.width / 2f)
+        val endY = (arrowLoc[1] - rootLoc[1] + arrowView.height / 2f - binding.ivHandGif.height / 2f + 2 * density)
 
         if (animate) {
             binding.ivHandGif.animate()
@@ -303,16 +340,24 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         act.window.decorView.layoutDirection = dir
 
         binding.btnBack.scaleX = if (isRtl) -1f else 1f
-        binding.tvLanguageTitle.text = getString(R.string.language_title)
-        binding.tvLanguageDesc.text = getString(R.string.language_choose_desc)
 
         val prefs = PreferencesManager.getInstance(act)
         val isFromSettings = prefs.hasCompletedIntro
-        binding.btnConfirm.text = if (isFromSettings) {
-            getString(R.string.btn_save_changes)
+
+        // Cập nhật title, subtitle và button theo ngôn ngữ được chọn
+        val targetLocale = LocaleHelper.getLocale(code)
+        val config = Configuration(act.resources.configuration)
+        config.setLocale(targetLocale)
+        val localizedCtx = act.createConfigurationContext(config)
+
+        binding.tvLanguageTitle.text = localizedCtx.getString(R.string.language_title)
+        binding.tvLanguageDesc.text = localizedCtx.getString(R.string.language_choose_desc)
+        binding.tvConfirmText.text = if (isFromSettings) {
+            localizedCtx.getString(R.string.btn_save_changes)
         } else {
-            getString(R.string.btn_confirm)
+            localizedCtx.getString(R.string.btn_confirm)
         }
+        applyTitleGradient()
 
         adapter.updateSubNames(act, isRtl)
 

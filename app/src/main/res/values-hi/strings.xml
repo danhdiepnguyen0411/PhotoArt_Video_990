@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">अनइंस्टॉल करें</string>
     <string name="shortcut_uninstall_desc">PHOTO ART &amp; VIDEO अनइंस्टॉल करें</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">यादों को फिर से जीवंत बनाएं</string>
     <string name="splash_loading">लोड हो रहा है %1$d%%...</string>
     <string name="language_title">भाषा चुनें</string>
@@ -13,16 +13,13 @@
     <string name="btn_next">आगे</string>
     <string name="btn_skip">छोड़ें</string>
     <string name="btn_get_started">शुरू करें</string>
-    <string name="intro_1_title">फ़ोटो जोड़ें,
-वीडियो बनाएं</string>
+    <string name="intro_1_title">फ़ोटो जोड़ें,\nवीडियो बनाएं</string>
     <string name="intro_1_desc">अपने पसंदीदा पलों को कुछ ही सेकंड में
 जीवंत वीडियो में बदलें।</string>
-    <string name="intro_2_title">AI प्रॉम्प्ट से
-चित्र बनाएं</string>
+    <string name="intro_2_title">AI प्रॉम्प्ट से\nचित्र बनाएं</string>
     <string name="intro_2_desc">अपनी कल्पना का वर्णन करें,
 और AI इसे सुंदर चित्र में बदल देगा।</string>
-    <string name="intro_3_title">पुरानी और धुंधली
-तस्वीरें सुधारें</string>
+    <string name="intro_3_title">पुरानी और धुंधली\nतस्वीरें सुधारें</string>
     <string name="intro_3_desc">धुंधली और पुरानी तस्वीरों को साफ करें
 और यादगार लम्हों को सहेजें।</string>
     <string name="nav_home">होम</string>

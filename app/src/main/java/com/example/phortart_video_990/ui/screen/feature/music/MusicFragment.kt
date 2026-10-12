@@ -1,18 +1,25 @@
 package com.example.phortart_video_990.ui.screen.feature.music
 
+import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentMusicBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::inflate) {
@@ -21,11 +28,14 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private lateinit var categoryAdapter: MusicCategoryAdapter
     private lateinit var musicAdapter: MusicAdapter
 
+    private var allMusicTracks: List<TemplateModel> = emptyList()
     private var musicCategories: List<CategoryModel> = listOf(CategoryModel.ALL)
     private var selectedCategoryCode: String = "ALL"
+    private var currentSearchQuery: String = ""
+
     private var mediaPlayer: MediaPlayer? = null
     private var currentPlayingPosition: Int = -1
-    private var audioActionJob: kotlinx.coroutines.Job? = null
+    private var audioActionJob: Job? = null
     private var isStartMergeFlow: Boolean = false
 
     private val isTabMode: Boolean
@@ -37,11 +47,9 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
         if (isTabMode) {
             binding.btnBack.visibility = View.GONE
-            binding.btnSkip.visibility = View.GONE
-            binding.tvTopTitle.text = getString(R.string.music_title)
+            binding.tvTopTitle.text = getString(R.string.func_04_music)
         } else {
             binding.btnBack.visibility = View.VISIBLE
-            binding.btnSkip.visibility = if (isStartMergeFlow) View.VISIBLE else View.GONE
             binding.tvTopTitle.text = getString(R.string.func_04_music)
         }
 
@@ -51,7 +59,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             selectedCategoryCode = selectedCategoryCode
         ) { selectedCategory ->
             selectedCategoryCode = selectedCategory.code
-            loadMusicTracks(selectedCategory.code)
+            applyFilter()
         }
         binding.rvMusicCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -60,11 +68,11 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         // Setup vertical music tracks list
         musicAdapter = MusicAdapter(
             tracks = emptyList(),
+            onTrackSelected = { _, _ ->
+                // Selected state is updated inside MusicAdapter
+            },
             onPreviewClick = { track, position ->
                 toggleAudioPreview(track, position)
-            },
-            onSelectClick = { track, position ->
-                selectTrack(track, position)
             }
         )
         binding.rvMusicTracks.layoutManager = LinearLayoutManager(requireContext())
@@ -90,9 +98,30 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             findNavController().popBackStack()
         }
 
-        binding.btnSkip.setOnClickListener {
-            stopAudio()
-            findNavController().navigateSafe(R.id.action_musicFragment_to_memoriesFragment)
+        // Search text watcher
+        binding.etSearchMusic.addTextChangedListener { text ->
+            currentSearchQuery = text?.toString()?.trim() ?: ""
+            binding.ivClearSearch.visibility = if (currentSearchQuery.isNotEmpty()) View.VISIBLE else View.GONE
+            applyFilter()
+        }
+
+        binding.ivClearSearch.setOnClickListener {
+            binding.etSearchMusic.setText("")
+        }
+
+        binding.etSearchMusic.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(binding.etSearchMusic.windowToken, 0)
+                true
+            } else {
+                false
+            }
+        }
+
+        // Bottom Continue button
+        binding.btnConfirmMusic.setOnClickListener {
+            onContinueClicked()
         }
     }
 
@@ -109,12 +138,14 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 categoryAdapter.submitList(musicCategories)
 
                 // Load all music tracks initially
-                val tracks = repository.getMusicTracks(categoryCode = selectedCategoryCode)
-                musicAdapter.submitList(tracks)
-                binding.llEmptyState.visibility = if (tracks.isEmpty()) View.VISIBLE else View.GONE
+                val tracks = repository.getMusicTracks(categoryCode = "ALL")
+                allMusicTracks = tracks
 
                 // Dynamically discover extra categories from tracks
                 discoverExtraMusicCategories(tracks)
+
+                // Apply initial category & search filter
+                applyFilter()
             } catch (e: Exception) {
                 binding.llEmptyState.visibility = View.VISIBLE
             } finally {
@@ -124,25 +155,36 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         }
     }
 
-    private fun loadMusicTracks(categoryCode: String) {
+    private fun applyFilter() {
         stopAudio()
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!binding.swipeRefreshLayout.isRefreshing) {
-                binding.pbLoading.visibility = View.VISIBLE
-            }
-            binding.llEmptyState.visibility = View.GONE
-            try {
-                val tracks = repository.getMusicTracks(categoryCode = categoryCode)
-                musicAdapter.submitList(tracks)
-                binding.llEmptyState.visibility = if (tracks.isEmpty()) View.VISIBLE else View.GONE
-                discoverExtraMusicCategories(tracks)
-            } catch (e: Exception) {
-                binding.llEmptyState.visibility = View.VISIBLE
-            } finally {
-                binding.pbLoading.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
+        var filtered = allMusicTracks
+
+        // Category filter
+        val isAll = selectedCategoryCode.isBlank() ||
+                selectedCategoryCode.equals("ALL", ignoreCase = true) ||
+                selectedCategoryCode.equals("Tất cả", ignoreCase = true)
+
+        if (!isAll) {
+            val target = selectedCategoryCode.trim()
+            val cleanTarget = target.removePrefix("MUSIC_").lowercase()
+            filtered = filtered.filter {
+                it.category.equals(target, ignoreCase = true) ||
+                        it.category.removePrefix("MUSIC_").lowercase() == cleanTarget
             }
         }
+
+        // Search query filter
+        if (currentSearchQuery.isNotBlank()) {
+            val q = currentSearchQuery.lowercase()
+            filtered = filtered.filter { track ->
+                track.title.lowercase().contains(q) ||
+                        track.category.lowercase().contains(q) ||
+                        track.category.removePrefix("MUSIC_").lowercase().contains(q)
+            }
+        }
+
+        musicAdapter.submitList(filtered)
+        binding.llEmptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun discoverExtraMusicCategories(tracks: List<TemplateModel>) {
@@ -171,7 +213,6 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             return
         }
 
-        // Hủy bất kỳ tác vụ tải hoặc chọn trước đó đang diễn ra
         audioActionJob?.cancel()
         audioActionJob = null
 
@@ -183,11 +224,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
         stopAudio()
 
-        // Hiển thị loading indicator tại icon nghe thử của item (đồng thời adapter tự clear các loading khác)
         musicAdapter.setPreviewLoading(position)
 
         audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
-            val cachedFile = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+            val cachedFile = AudioCacheManager.getOrDownloadAudio(
                 requireContext(),
                 audioUrl
             )
@@ -203,9 +243,9 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             try {
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(
-                        android.media.AudioAttributes.Builder()
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
                             .build()
                     )
                     setDataSource(cachedFile.absolutePath)
@@ -231,39 +271,55 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         }
     }
 
-    private fun selectTrack(track: TemplateModel, position: Int) {
-        // Hủy bất kỳ tác vụ tải nghe thử hoặc chọn trước đó
-        audioActionJob?.cancel()
-        audioActionJob = null
-
-        stopAudio()
-
-        val audioUrl = track.safeAudioUrl
-        if (audioUrl.isNullOrBlank()) {
-            returnTrackResult(track, null)
+    private fun onContinueClicked() {
+        val selectedTrack = musicAdapter.getSelectedTrack()
+        if (selectedTrack == null) {
+            Toast.makeText(requireContext(), getString(R.string.toast_please_select_music), Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Hiển thị loading tại nút Chọn (tự động xóa loading ở tất cả nút khác)
-        musicAdapter.setSelectLoading(position)
+        stopAudio()
 
+        val audioUrl = selectedTrack.safeAudioUrl
+        if (audioUrl.isNullOrBlank()) {
+            returnTrackResult(selectedTrack, null)
+            return
+        }
+
+        // Show loading state on bottom Continue button
+        binding.btnConfirmMusic.isEnabled = false
+        binding.ivConfirmArrow.visibility = View.GONE
+        binding.pbConfirmLoading.visibility = View.VISIBLE
+
+        audioActionJob?.cancel()
         audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
-            val cachedFile = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+            val cachedFile = AudioCacheManager.getOrDownloadAudio(
                 requireContext(),
                 audioUrl
             )
 
             if (!isAdded || view == null) return@launch
 
-            musicAdapter.clearAllLoading()
-            returnTrackResult(track, cachedFile?.absolutePath)
+            binding.btnConfirmMusic.isEnabled = true
+            binding.pbConfirmLoading.visibility = View.GONE
+            binding.ivConfirmArrow.visibility = View.VISIBLE
+
+            returnTrackResult(selectedTrack, cachedFile?.absolutePath)
         }
     }
 
     private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
+        val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
+            track.category.substring(6)
+        } else {
+            track.category
+        }).ifBlank { "Photo AI" }
+        val musicSubtitle = "$artistText • ${track.displayDuration}"
+
         if (isTabMode) {
             val bundle = android.os.Bundle().apply {
                 putString("selected_music_title", track.title)
+                putString("selected_music_subtitle", musicSubtitle)
                 putString("selected_music_audio_url", track.safeAudioUrl)
                 putString("selected_music_file_path", cachedFilePath)
                 putString("selected_music_image_url", track.safeImageUrl)
@@ -277,6 +333,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         } else if (isStartMergeFlow) {
             val bundle = android.os.Bundle().apply {
                 putString("selected_music_title", track.title)
+                putString("selected_music_subtitle", musicSubtitle)
                 putString("selected_music_audio_url", track.safeAudioUrl)
                 putString("selected_music_file_path", cachedFilePath)
                 putString("selected_music_image_url", track.safeImageUrl)
@@ -289,6 +346,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "selected_music_title",
                 track.title
+            )
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_music_subtitle",
+                musicSubtitle
             )
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "selected_music_audio_url",

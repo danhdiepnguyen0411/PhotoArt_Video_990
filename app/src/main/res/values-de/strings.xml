@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Deinstallieren</string>
     <string name="shortcut_uninstall_desc">PHOTO ART &amp; VIDEO deinstallieren</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Erinnerungen wiederbeleben</string>
     <string name="splash_loading">Laden %1$d%%...</string>
     <string name="language_title">Sprache auswählen</string>
@@ -13,17 +13,14 @@
     <string name="btn_next">Weiter</string>
     <string name="btn_skip">Überspringen</string>
     <string name="btn_get_started">Loslegen</string>
-    <string name="intro_1_title">Fotos zusammenfügen,
-Videos erstellen</string>
+    <string name="intro_1_title">Fotos zusammenfügen,\nVideos erstellen</string>
     <string name="intro_1_desc">Verwandeln Sie Lieblingsmomente
 in wenigen Sekunden in lebendige
 Videos.</string>
-    <string name="intro_2_title">Bilder mit KI-Prompts
-erstellen</string>
+    <string name="intro_2_title">Bilder mit KI-Prompts\nerstellen</string>
     <string name="intro_2_desc">Beschreiben Sie Ihre Vorstellung,
 und die KI zaubert beeindruckende Bilder daraus.</string>
-    <string name="intro_3_title">Alte und unscharfe
-Fotos restaurieren</string>
+    <string name="intro_3_title">Alte und unscharfe\nFotos restaurieren</string>
     <string name="intro_3_desc">Schärfen Sie verblasste Aufnahmen
 und bewahren Sie unvergessliche Momente.</string>
     <string name="nav_home">Startseite</string>

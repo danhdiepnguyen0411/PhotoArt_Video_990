@@ -2,70 +2,49 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardTrack"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardBackgroundColor="@color/card_bg"
-    app:cardCornerRadius="16dp"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/card_stroke"
+    app:strokeColor="#E8EEF8"
     app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp">
 
-        <!-- Track Cover / Music Art -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            app:cardBackgroundColor="@color/banner_bg_fallback"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="0dp">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/ivTrackCover"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Track Cover"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_func_music" />
-
-                <!-- Semi-transparent overlay with music note badge -->
-                <ImageView
-                    android:id="@+id/ivCoverMusicBadge"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="bottom|end"
-                    android:layout_margin="3dp"
-                    android:background="@drawable/bg_media_badge"
-                    android:padding="3dp"
-                    android:src="@drawable/ic_filter_music"
-                    app:tint="@color/primary"
-                    android:contentDescription="Audio indicator" />
-
-            </FrameLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        <!-- Track Cover Artwork (42x42dp rounded 10dp matching design) -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivTrackCover"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:contentDescription="Track Cover"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_func_music"
+            app:shapeAppearanceOverlay="@style/Rounded10ImageView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Track Title & Metadata -->
         <LinearLayout
+            android:id="@+id/llTrackInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/flActionContainer"
+            app:layout_constraintStart_toEndOf="@+id/ivTrackCover"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Title with Marquee support -->
             <TextView
                 android:id="@+id/tvTrackTitle"
                 android:layout_width="match_parent"
@@ -73,109 +52,83 @@
                 android:ellipsize="marquee"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:fontFamily="@font/inter_bold"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/navy"
-                android:textSize="15sp"
+                android:textColor="#1B2A78"
+                android:textSize="14.5sp"
                 android:textStyle="bold"
-                tools:text="Future Bass Cyberpunk EDM Remix" />
+                tools:text="Sunshine" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvTrackArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/inter_regular"
+                android:singleLine="true"
+                android:textColor="#8296BC"
+                android:textSize="12sp"
+                tools:text="Tobu" />
+
+            <TextView
+                android:id="@+id/tvTrackDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvTrackCategory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_category_chip_unselected"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:textColor="@color/primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    tools:text="EDM" />
-
-                <TextView
-                    android:id="@+id/tvTrackDuration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:textColor="@color/muted"
-                    android:textSize="12sp"
-                    tools:text="0:30" />
-
-            </LinearLayout>
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="#8296BC"
+                android:textSize="11.5sp"
+                tools:text="03:24" />
 
         </LinearLayout>
 
-        <!-- Play/Pause Preview Button -->
+        <!-- Right Action Button: Checkmark (when selected) OR Play/Pause circle (when unselected) -->
         <FrameLayout
-            android:id="@+id/btnPlayPreview"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_category_chip_unselected"
-            android:clickable="true"
-            android:focusable="true">
+            android:id="@+id/flActionContainer"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_track_play_circle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Play / Pause Icon -->
             <ImageView
                 android:id="@+id/ivPlayIcon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
+                android:contentDescription="Play/Pause"
                 android:src="@drawable/ic_play_small"
-                app:tint="@color/navy"
-                android:contentDescription="Play Preview" />
+                app:tint="#6A4FE0" />
 
-            <ProgressBar
-                android:id="@+id/pbPreviewLoading"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+            <!-- Checkmark Icon (visible when track is selected) -->
+            <ImageView
+                android:id="@+id/ivCheckIcon"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
                 android:layout_gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/primary"
-                android:visibility="gone" />
+                android:contentDescription="Selected"
+                android:src="@drawable/ic_check"
+                android:visibility="gone"
+                app:tint="@color/white" />
 
-        </FrameLayout>
-
-        <!-- Select / Apply Track Button -->
-        <FrameLayout
-            android:id="@+id/btnSelectContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_btn_music_select"
-            android:clickable="true"
-            android:focusable="true"
-            android:minWidth="64dp">
-
-            <TextView
-                android:id="@+id/btnSelectTrack"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:paddingHorizontal="14dp"
-                android:text="@string/music_btn_choose"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
+            <!-- Loading Spinner -->
             <ProgressBar
-                android:id="@+id/pbSelectLoading"
+                android:id="@+id/pbLoading"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/white"
+                android:indeterminateTint="#6A4FE0"
                 android:visibility="gone" />
 
         </FrameLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

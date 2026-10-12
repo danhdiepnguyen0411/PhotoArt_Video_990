@@ -20,6 +20,13 @@ class PhotoArtApp : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
+        // Reset nếu user chưa hoàn thành intro (hoặc kill app tại Intro) -> bắt đầu lại từ Splash/Language
+        val prefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this)
+        if (!prefs.hasCompletedIntro) {
+            prefs.isFirstLanguageSelected = false
+            prefs.languageCode = com.example.phortart_video_990.core.utils.LocaleHelper.getDeviceLanguage()
+        }
+
         // Initialize ArtMagicClient SDK
         ArtSdkManager.init(this)
 

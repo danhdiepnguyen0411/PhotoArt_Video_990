@@ -7,29 +7,22 @@
     android:background="@drawable/bg_restore_screen">
 
     <!-- Circular Back Button -->
-    <com.google.android.material.card.MaterialCardView
+    <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/bg_circle_back"
         android:clickable="true"
+        android:contentDescription="@string/btn_back"
+        android:elevation="1dp"
         android:focusable="true"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="999dp"
-        app:cardElevation="0dp"
-        app:cardPreventCornerOverlap="false"
-        app:strokeWidth="0dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_arrow_back"
+        app:tint="#2D7DF6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/btn_back"
-            android:src="@drawable/ic_chevron_left" />
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"

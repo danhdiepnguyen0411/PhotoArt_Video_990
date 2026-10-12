@@ -1,5 +1,6 @@
 package com.example.phortart_video_990.ui.screen.splash
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.LocaleHelper
 import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.SystemBarInsetsHelper
 import com.example.phortart_video_990.core.utils.navigateSafe
@@ -44,6 +46,53 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
     override fun initView() {
         activity?.window?.let { SystemBarInsetsHelper.hideSystemBars(it) }
         binding.progressBar.progress = 0
+
+        // Reset nếu user đã chọn ngôn ngữ nhưng chưa hoàn thành intro
+        // (kill app tại màn Intro → mở lại phải bắt đầu từ đầu)
+        resetIncompleteOnboardingIfNeeded()
+
+        setSubtitleForDeviceLocale()
+    }
+
+    /**
+     * Nếu user chưa xem xong intro (hasCompletedIntro = false) → họ đã kill app giữa chừng hoặc lần đầu mở app.
+     * Reset về trạng thái ban đầu: ngôn ngữ sẽ theo hệ thống máy, bắt đầu lại từ LanguageScreen.
+     */
+    private fun resetIncompleteOnboardingIfNeeded() {
+        val ctx = context ?: return
+        val prefs = PreferencesManager.getInstance(ctx)
+        if (!prefs.hasCompletedIntro) {
+            prefs.isFirstLanguageSelected = false
+            val deviceLang = LocaleHelper.getDeviceLanguage()
+            prefs.languageCode = deviceLang
+            activity?.let { act ->
+                LocaleHelper.setLocale(act, deviceLang)
+                val isRtl = deviceLang.lowercase() == "ar"
+                act.window.decorView.layoutDirection = if (isRtl) {
+                    android.view.View.LAYOUT_DIRECTION_RTL
+                } else {
+                    android.view.View.LAYOUT_DIRECTION_LTR
+                }
+            }
+        }
+    }
+
+    /**
+     * Khi lần đầu vào app (chưa chọn ngôn ngữ), hiển thị subtitle theo ngôn ngữ hệ thống máy.
+     * Nếu ngôn ngữ máy không nằm trong danh sách hỗ trợ, fallback về tiếng Anh.
+     * Sau khi người dùng đã chọn ngôn ngữ và hoàn thành intro, Android resource system tự xử lý đúng locale.
+     */
+    private fun setSubtitleForDeviceLocale() {
+        val ctx = context ?: return
+        val prefs = PreferencesManager.getInstance(ctx)
+        if (prefs.isFirstLanguageSelected && prefs.hasCompletedIntro) return
+
+        val supportedLang = LocaleHelper.getDeviceLanguage()
+        val locale = LocaleHelper.getLocale(supportedLang)
+        val config = Configuration(ctx.resources.configuration)
+        config.setLocale(locale)
+        val localizedCtx = ctx.createConfigurationContext(config)
+        binding.tvSubtitle.text = localizedCtx.getString(R.string.splash_subtitle)
     }
 
     override fun initData() {
