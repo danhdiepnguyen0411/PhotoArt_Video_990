@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo AI</string>
+    <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Desinstalar</string>
-    <string name="shortcut_uninstall_desc">Desinstalar o Photo AI</string>
-    <string name="splash_title">Photo AI</string>
+    <string name="shortcut_uninstall_desc">Desinstalar o PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
     <string name="splash_subtitle">Dê vida às suas memórias</string>
     <string name="splash_loading">Carregando %1$d%%...</string>
     <string name="language_title">Selecionar idioma</string>
@@ -30,7 +30,7 @@ e preserve memórias inesquecíveis.</string>
     <string name="nav_template">Modelos</string>
     <string name="nav_history">Histórico</string>
     <string name="nav_setting">Configurações</string>
-    <string name="home_brand_title">Photo AI</string>
+    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">Ver tudo</string>
     <string name="home_recent_history">Histórico recente</string>
     <string name="home_suggestions">Para você</string>
@@ -197,7 +197,7 @@ uma experiência premium.</string>
     <string name="exit_desc">Tem certeza de que deseja sair do aplicativo?</string>
     <string name="btn_exit">Sair</string>
     <string name="rate_title">Avalie o app</string>
-    <string name="rate_subtitle">O que você achou de criar fotos com o Photo AI?</string>
+    <string name="rate_subtitle">O que você achou de criar fotos com o PHOTO ART &amp; VIDEO?</string>
     <string name="btn_rate_submit">Enviar avaliação</string>
     <string name="btn_rate_not_now">Mais tarde</string>
     <string name="uninstall_step1_title">Quais problemas você encontrou durante o uso?</string>
