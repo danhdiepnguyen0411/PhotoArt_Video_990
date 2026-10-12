@@ -145,6 +145,9 @@ object AppDialogHelper {
         val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
             .setCancelable(true)
+            .setOnCancelListener {
+                onCancel?.invoke()
+            }
             .create()
 
         btnTryAgain.setOnClickListener {

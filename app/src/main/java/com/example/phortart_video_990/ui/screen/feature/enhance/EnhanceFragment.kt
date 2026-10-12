@@ -2,6 +2,7 @@ package com.example.phortart_video_990.ui.screen.feature.enhance
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.os.bundleOf
@@ -12,11 +13,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.databinding.FragmentEnhanceBinding
 
 class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBinding::inflate) {
 
     private var selectedStyleName: String = "Cyber Move"
+    private var lastClickTime = 0L
 
     override fun initView() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
@@ -42,11 +46,13 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
     override fun initListener() {
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            if (isAdded) findNavController().safePopBackStack()
         }
 
         binding.btnFavorite.setOnClickListener {
-            Toast.makeText(requireContext(), getString(R.string.toast_saved_to_favorites), Toast.LENGTH_SHORT).show()
+            if (isAdded && context != null) {
+                Toast.makeText(requireContext(), getString(R.string.toast_saved_to_favorites), Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Suggestion chips
@@ -87,16 +93,21 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
         // Start Generate
         binding.btnGeneratePrompt.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - lastClickTime < 600L) return@setOnClickListener
+            lastClickTime = SystemClock.elapsedRealtime()
+
             val userPrompt = binding.etPromptInput.text?.toString()?.trim().orEmpty()
             if (userPrompt.isBlank()) {
-                Toast.makeText(requireContext(), getString(R.string.toast_enter_prompt_description), Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    Toast.makeText(requireContext(), getString(R.string.toast_enter_prompt_description), Toast.LENGTH_SHORT).show()
+                }
                 return@setOnClickListener
             }
 
             // Combine user prompt with chosen style
             val fullPrompt = getString(R.string.prompt_style_suffix, userPrompt, selectedStyleName)
 
-            findNavController().navigate(
+            findNavController().navigateSafe(
                 R.id.action_enhanceFragment_to_enhanceLoadingFragment,
                 bundleOf(
                     EnhanceLoadingFragment.KEY_USER_PROMPT to userPrompt,
@@ -108,11 +119,17 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
     }
 
     private fun updateSelectedStyle(index: Int) {
+        val strokeWidth = (2.5f * resources.displayMetrics.density).toInt()
         val selectedColor = Color.parseColor("#4D70F7")
         val transparentColor = Color.TRANSPARENT
 
+        binding.cardStyle1.strokeWidth = if (index == 1) strokeWidth else 0
         binding.cardStyle1.strokeColor = if (index == 1) selectedColor else transparentColor
+
+        binding.cardStyle2.strokeWidth = if (index == 2) strokeWidth else 0
         binding.cardStyle2.strokeColor = if (index == 2) selectedColor else transparentColor
+
+        binding.cardStyle3.strokeWidth = if (index == 3) strokeWidth else 0
         binding.cardStyle3.strokeColor = if (index == 3) selectedColor else transparentColor
 
         selectedStyleName = when (index) {

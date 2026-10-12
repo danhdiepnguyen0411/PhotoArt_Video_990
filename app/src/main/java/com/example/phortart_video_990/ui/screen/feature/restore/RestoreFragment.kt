@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.databinding.FragmentRestoreBinding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -22,8 +24,8 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            findNavController().navigate(
+        if (uri != null && isAdded) {
+            findNavController().navigateSafe(
                 R.id.action_restoreFragment_to_restoreLoadingFragment,
                 androidx.core.os.bundleOf(RestoreLoadingFragment.KEY_IMAGE_URI to uri.toString())
             )
@@ -47,7 +49,7 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
 
     override fun initListener() {
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            if (isAdded) findNavController().safePopBackStack()
         }
 
         binding.btnStartRestore.setOnClickListener {

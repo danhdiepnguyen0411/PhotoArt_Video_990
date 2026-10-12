@@ -443,7 +443,7 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="0dp"
                         app:strokeColor="@color/transparent"
-                        app:strokeWidth="0dp">
+                        app:strokeWidth="2.5dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -484,7 +484,7 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="0dp"
                         app:strokeColor="@color/transparent"
-                        app:strokeWidth="0dp">
+                        app:strokeWidth="2.5dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -521,7 +521,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Action Button: Tạo ảnh -> -->
+    <!-- Bottom Action Button: Tạo ảnh -->
     <LinearLayout
         android:id="@+id/btnGeneratePrompt"
         android:layout_width="match_parent"
@@ -544,17 +544,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
+            android:layout_marginStart="8dp"
             android:text="@string/btn_generate_image"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:contentDescription="Next"
-            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
