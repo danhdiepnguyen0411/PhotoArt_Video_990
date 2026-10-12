@@ -19,53 +19,80 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_circle_back"
             android:contentDescription="@string/btn_back"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="@color/navy" />
+            app:tint="#2D7DF6" />
 
         <TextView
             android:id="@+id/tvTopTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:fontFamily="@font/inter_bold"
             android:text="@string/func_04_music"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
+            android:textColor="#18377F"
+            android:textSize="21sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/btnSkip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_skip"
-            android:textColor="@color/primary"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp" />
 
     </LinearLayout>
 
-    <!-- Subtitle / Hint -->
-    <TextView
-        android:id="@+id/tvMusicHint"
+    <!-- Search Bar (Above Categories / Tabs matching Photo AI design) -->
+    <LinearLayout
+        android:id="@+id/llSearchBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/music_screen_subtitle"
-        android:textColor="@color/muted"
-        android:textSize="13sp"
-        app:layout_constraintTop_toBottomOf="@+id/llTopBar" />
+        android:layout_height="42dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_search_bar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        app:layout_constraintTop_toBottomOf="@+id/llTopBar">
 
-    <!-- Music Categories RecyclerView (Horizontal Filter Chips) -->
+        <ImageView
+            android:id="@+id/ivSearchIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:contentDescription="Search Icon"
+            android:src="@drawable/ic_search" />
+
+        <EditText
+            android:id="@+id/etSearchMusic"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="@font/inter_regular"
+            android:hint="@string/search_music_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="#1B2A78"
+            android:textColorHint="#A3AACB"
+            android:textSize="13.5sp" />
+
+        <ImageView
+            android:id="@+id/ivClearSearch"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Clear"
+            android:padding="2dp"
+            android:src="@drawable/ic_close"
+            android:visibility="gone"
+            app:tint="#8F9BBD" />
+
+    </LinearLayout>
+
+    <!-- Music Categories RecyclerView (Horizontal Filter Chips without music note icon) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMusicCategories"
         android:layout_width="match_parent"
@@ -75,7 +102,7 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/tvMusicHint"
+        app:layout_constraintTop_toBottomOf="@+id/llSearchBar"
         tools:listitem="@layout/item_music_category_chip" />
 
     <!-- Swipe Refresh Layout containing Music Tracks & Empty State -->
@@ -83,8 +110,8 @@
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/flBottomBar"
         app:layout_constraintTop_toBottomOf="@+id/rvMusicCategories">
 
         <FrameLayout
@@ -96,7 +123,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="24dp"
+                android:paddingBottom="12dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_music_track" />
 
@@ -119,6 +146,7 @@
                     android:src="@drawable/ic_func_music" />
 
                 <TextView
+                    android:id="@+id/tvEmptyTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -128,6 +156,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvEmptyDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -140,6 +169,65 @@
         </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Bottom Continue Button Bar matching Photo AI design -->
+    <FrameLayout
+        android:id="@+id/flBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <FrameLayout
+            android:id="@+id/btnConfirmMusic"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_btn_primary"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvConfirmText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="@string/btn_next_step"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivConfirmArrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_arrow_forward_white" />
+
+                <ProgressBar
+                    android:id="@+id/pbConfirmLoading"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </FrameLayout>
 
     <!-- Loading Indicator -->
     <ProgressBar

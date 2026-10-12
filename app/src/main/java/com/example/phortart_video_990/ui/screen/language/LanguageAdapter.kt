@@ -56,10 +56,20 @@ class LanguageAdapter(
         }
     }
 
+    /**
+     * Cập nhật subtitle của các ngôn ngữ luôn bằng tiếng Anh,
+     * bất kể ngôn ngữ nào đang được preview.
+     */
     fun updateSubNames(context: Context, isRtl: Boolean) {
+        // Tạo context với locale tiếng Anh cố định
+        val enLocale = java.util.Locale.ENGLISH
+        val config = android.content.res.Configuration(context.resources.configuration)
+        config.setLocale(enLocale)
+        val enCtx = context.createConfigurationContext(config)
+
         items.forEach { item ->
             if (item.subResId != 0) {
-                item.subName = context.getString(item.subResId)
+                item.subName = enCtx.getString(item.subResId)
             }
         }
         notifyDataSetChanged()

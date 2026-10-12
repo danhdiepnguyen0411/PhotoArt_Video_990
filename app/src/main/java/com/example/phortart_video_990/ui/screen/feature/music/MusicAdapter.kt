@@ -1,6 +1,8 @@
 package com.example.phortart_video_990.ui.screen.feature.music
 
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -10,15 +12,14 @@ import com.example.phortart_video_990.databinding.ItemMusicTrackBinding
 
 class MusicAdapter(
     private var tracks: List<TemplateModel>,
-    private val onPreviewClick: (TemplateModel, Int) -> Unit,
-    private val onSelectClick: (TemplateModel, Int) -> Unit
+    private val onTrackSelected: (TemplateModel, Int) -> Unit,
+    private val onPreviewClick: (TemplateModel, Int) -> Unit
 ) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
+    private var selectedTrackId: String? = null
     private var currentlyPlayingIndex: Int = -1
     private var isPlaying: Boolean = false
-
     private var currentlyLoadingPreviewIndex: Int = -1
-    private var currentlyLoadingSelectIndex: Int = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val binding = ItemMusicTrackBinding.inflate(
@@ -28,10 +29,11 @@ class MusicAdapter(
     }
 
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
+        val track = tracks[position]
+        val isSelected = track.id == selectedTrackId || (selectedTrackId.isNullOrEmpty() && position == 0 && tracks.isNotEmpty())
         val isThisPlaying = (position == currentlyPlayingIndex && isPlaying)
         val isThisLoadingPreview = (position == currentlyLoadingPreviewIndex)
-        val isThisLoadingSelect = (position == currentlyLoadingSelectIndex)
-        holder.bind(tracks[position], isThisPlaying, isThisLoadingPreview, isThisLoadingSelect)
+        holder.bind(track, isSelected, isThisPlaying, isThisLoadingPreview)
     }
 
     override fun getItemCount(): Int = tracks.size
@@ -41,47 +43,45 @@ class MusicAdapter(
         currentlyPlayingIndex = -1
         isPlaying = false
         currentlyLoadingPreviewIndex = -1
-        currentlyLoadingSelectIndex = -1
+
+        // Default to first track if none selected yet
+        if (selectedTrackId == null && newList.isNotEmpty()) {
+            selectedTrackId = newList[0].id
+        }
         notifyDataSetChanged()
+    }
+
+    fun setSelectedTrackId(id: String?) {
+        val oldIndex = tracks.indexOfFirst { it.id == selectedTrackId }
+        selectedTrackId = id
+        val newIndex = tracks.indexOfFirst { it.id == selectedTrackId }
+
+        if (oldIndex != -1) notifyItemChanged(oldIndex)
+        if (newIndex != -1 && newIndex != oldIndex) notifyItemChanged(newIndex)
+    }
+
+    fun getSelectedTrack(): TemplateModel? {
+        return tracks.find { it.id == selectedTrackId } ?: tracks.firstOrNull()
     }
 
     fun setPreviewLoading(index: Int) {
         val prevPreview = currentlyLoadingPreviewIndex
-        val prevSelect = currentlyLoadingSelectIndex
         currentlyLoadingPreviewIndex = index
-        currentlyLoadingSelectIndex = -1 // Chỉ cho phép 1 loading duy nhất trên toàn màn hình
-
-        if (prevSelect != -1 && prevSelect != index) notifyItemChanged(prevSelect)
         if (prevPreview != -1 && prevPreview != index) notifyItemChanged(prevPreview)
-        if (index != -1) notifyItemChanged(index)
-    }
-
-    fun setSelectLoading(index: Int) {
-        val prevPreview = currentlyLoadingPreviewIndex
-        val prevSelect = currentlyLoadingSelectIndex
-        currentlyLoadingSelectIndex = index
-        currentlyLoadingPreviewIndex = -1 // Chỉ cho phép 1 loading duy nhất trên toàn màn hình
-
-        if (prevPreview != -1 && prevPreview != index) notifyItemChanged(prevPreview)
-        if (prevSelect != -1 && prevSelect != index) notifyItemChanged(prevSelect)
         if (index != -1) notifyItemChanged(index)
     }
 
     fun clearAllLoading() {
         val prevPreview = currentlyLoadingPreviewIndex
-        val prevSelect = currentlyLoadingSelectIndex
         currentlyLoadingPreviewIndex = -1
-        currentlyLoadingSelectIndex = -1
-
         if (prevPreview != -1) notifyItemChanged(prevPreview)
-        if (prevSelect != -1 && prevSelect != prevPreview) notifyItemChanged(prevSelect)
     }
 
     fun setPlayingState(index: Int, playing: Boolean) {
         val prevIndex = currentlyPlayingIndex
         currentlyPlayingIndex = index
         isPlaying = playing
-        currentlyLoadingPreviewIndex = -1 // Reset loading khi đã chuyển sang playing
+        currentlyLoadingPreviewIndex = -1
 
         if (prevIndex != -1 && prevIndex != index) {
             notifyItemChanged(prevIndex)
@@ -96,22 +96,25 @@ class MusicAdapter(
 
         fun bind(
             track: TemplateModel,
+            isSelected: Boolean,
             isCurrentPlaying: Boolean,
-            isLoadingPreview: Boolean,
-            isLoadingSelect: Boolean
+            isLoadingPreview: Boolean
         ) {
-            // Enable marquee text scrolling
+            val context = binding.root.context
+
+            // Title
             binding.tvTrackTitle.text = track.title
             binding.tvTrackTitle.isSelected = true
 
-            // Category tag (strip MUSIC_ prefix)
-            val cleanCategory = if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
+            // Artist / Category
+            val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
                 track.category.substring(6)
             } else {
-                track.category.ifBlank { binding.root.context.getString(R.string.music_original_sound) }
-            }
-            binding.tvTrackCategory.text = cleanCategory
+                track.category
+            }).ifBlank { "Photo AI" }
+            binding.tvTrackArtist.text = artistText
 
+            // Duration
             binding.tvTrackDuration.text = track.displayDuration
 
             // Load Cover Artwork
@@ -125,54 +128,63 @@ class MusicAdapter(
                 binding.ivTrackCover.setImageResource(R.drawable.ic_func_music)
             }
 
-            // Preview button UI (Play / Pause / Loading)
-            if (isLoadingPreview) {
-                binding.ivPlayIcon.visibility = android.view.View.GONE
-                binding.pbPreviewLoading.visibility = android.view.View.VISIBLE
-                binding.btnPlayPreview.setBackgroundResource(R.drawable.bg_category_chip_unselected)
+            // Card background & border matching selection
+            if (isSelected) {
+                binding.cardTrack.setBackgroundResource(R.drawable.bg_item_language_selected)
+                binding.cardTrack.strokeColor = Color.parseColor("#4D9678EB")
+                binding.cardTrack.setCardBackgroundColor(Color.TRANSPARENT)
             } else {
-                binding.pbPreviewLoading.visibility = android.view.View.GONE
-                binding.ivPlayIcon.visibility = android.view.View.VISIBLE
+                binding.cardTrack.setBackgroundResource(0)
+                binding.cardTrack.setCardBackgroundColor(Color.WHITE)
+                binding.cardTrack.strokeColor = Color.parseColor("#E8EEF8")
+            }
+
+            // Right Action Button (Checkmark vs Play/Pause)
+            if (isLoadingPreview) {
+                binding.pbLoading.visibility = View.VISIBLE
+                binding.ivPlayIcon.visibility = View.GONE
+                binding.ivCheckIcon.visibility = View.GONE
+                binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_play_circle)
+            } else if (isSelected) {
+                binding.pbLoading.visibility = View.GONE
+                if (isCurrentPlaying) {
+                    binding.ivPlayIcon.visibility = View.VISIBLE
+                    binding.ivPlayIcon.setImageResource(R.drawable.ic_pause_small)
+                    binding.ivPlayIcon.setColorFilter(Color.WHITE)
+                    binding.ivCheckIcon.visibility = View.GONE
+                } else {
+                    binding.ivPlayIcon.visibility = View.GONE
+                    binding.ivCheckIcon.visibility = View.VISIBLE
+                }
+                binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_check_circle)
+            } else {
+                binding.pbLoading.visibility = View.GONE
+                binding.ivCheckIcon.visibility = View.GONE
+                binding.ivPlayIcon.visibility = View.VISIBLE
+                binding.ivPlayIcon.setColorFilter(Color.parseColor("#6A4FE0"))
+                binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_play_circle)
+
                 if (isCurrentPlaying) {
                     binding.ivPlayIcon.setImageResource(R.drawable.ic_pause_small)
-                    binding.btnPlayPreview.setBackgroundResource(R.drawable.bg_category_chip_selected)
-                    binding.ivPlayIcon.setColorFilter(binding.root.context.getColor(R.color.white))
                 } else {
                     binding.ivPlayIcon.setImageResource(R.drawable.ic_play_small)
-                    binding.btnPlayPreview.setBackgroundResource(R.drawable.bg_category_chip_unselected)
-                    binding.ivPlayIcon.setColorFilter(binding.root.context.getColor(R.color.navy))
                 }
             }
 
-            // Select button UI (Chọn / Loading)
-            if (isLoadingSelect) {
-                binding.btnSelectTrack.visibility = android.view.View.INVISIBLE
-                binding.pbSelectLoading.visibility = android.view.View.VISIBLE
-                binding.btnSelectContainer.isClickable = false
-            } else {
-                binding.btnSelectTrack.visibility = android.view.View.VISIBLE
-                binding.pbSelectLoading.visibility = android.view.View.GONE
-                binding.btnSelectContainer.isClickable = true
-            }
-
-            // Preview Play button
-            binding.btnPlayPreview.setOnClickListener {
-                if (!isLoadingPreview) {
-                    onPreviewClick(track, bindingAdapterPosition)
+            // Clicking play action circle
+            binding.flActionContainer.setOnClickListener {
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    onPreviewClick(track, pos)
                 }
             }
 
-            // Select button
-            binding.btnSelectContainer.setOnClickListener {
-                if (!isLoadingSelect) {
-                    onSelectClick(track, bindingAdapterPosition)
-                }
-            }
-
-            // Whole item click to select
-            binding.root.setOnClickListener {
-                if (!isLoadingSelect) {
-                    onSelectClick(track, bindingAdapterPosition)
+            // Clicking whole card selects track
+            binding.cardTrack.setOnClickListener {
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    setSelectedTrackId(track.id)
+                    onTrackSelected(track, pos)
                 }
             }
         }

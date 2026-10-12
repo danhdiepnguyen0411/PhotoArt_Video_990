@@ -40,12 +40,13 @@
 
                 <ImageView
                     android:id="@+id/btnBackStep1"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:padding="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/bg_circle_back"
+                    android:elevation="1dp"
                     android:src="@drawable/ic_arrow_back"
-                    app:tint="#1F2937"
+                    app:tint="#2D7DF6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -392,12 +393,13 @@
 
                 <ImageView
                     android:id="@+id/btnBackStep2"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:padding="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/bg_circle_back"
+                    android:elevation="1dp"
                     android:src="@drawable/ic_arrow_back"
-                    app:tint="#1F2937"
+                    app:tint="#2D7DF6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" />
