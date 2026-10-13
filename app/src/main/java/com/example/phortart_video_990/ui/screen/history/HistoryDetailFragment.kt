@@ -27,9 +27,15 @@ import com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.google.gson.Gson
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.os.SystemClock
+import com.example.phortart_video_990.core.utils.MediaSaveUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(FragmentHistoryDetailBinding::inflate) {
 
@@ -269,9 +275,144 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
             shareCurrentItem()
         }
 
-        // Save to device gallery (custom 600Y save success dialog)
+        // Save to device gallery
         binding.btnSaveMedia.setOnClickListener {
+            saveCurrentMedia()
+        }
+    }
+
+    private fun saveCurrentMedia() {
+        val item = historyItem ?: run {
+            Toast.makeText(requireContext(), getString(R.string.toast_no_image_to_save), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.btnSaveMedia.isEnabled = false
+            try {
+                val type = item.type.lowercase()
+                val isVideo = item.isVideo ||
+                        type.contains("video") ||
+                        type.contains("gom") ||
+                        type.contains("music") ||
+                        (item.imageUri?.endsWith(".mp4", ignoreCase = true) == true) ||
+                        (item.imageUrl?.endsWith(".mp4", ignoreCase = true) == true)
+
+                if (isVideo) {
+                    saveVideoItem(item)
+                } else {
+                    saveImageItem(item)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                if (isAdded) {
+                    Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
+                }
+            } finally {
+                if (isAdded) {
+                    binding.btnSaveMedia.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private suspend fun saveVideoItem(item: HistoryItemModel) {
+        val rawPath = item.imageUri ?: item.imageUrl
+        if (rawPath.isNullOrBlank()) {
+            Toast.makeText(requireContext(), getString(R.string.toast_video_file_not_found), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val videoFileToSave: File? = withContext(Dispatchers.IO) {
+            when {
+                // 1. Remote URL (http/https) -> download or use cached
+                rawPath.startsWith("http://", ignoreCase = true) || rawPath.startsWith("https://", ignoreCase = true) -> {
+                    val fileName = "history_vid_" + Math.abs(rawPath.hashCode()) + ".mp4"
+                    val cachedFile = File(requireContext().cacheDir, fileName)
+                    if (cachedFile.exists() && cachedFile.length() > 0) {
+                        cachedFile
+                    } else {
+                        val ok = VideoGenerator.downloadVideoFile(rawPath, cachedFile)
+                        if (ok && cachedFile.exists() && cachedFile.length() > 0) cachedFile else null
+                    }
+                }
+                // 2. Content URI -> copy to cache temp file
+                rawPath.startsWith("content://", ignoreCase = true) -> {
+                    try {
+                        val tempFile = File(requireContext().cacheDir, "history_save_${System.currentTimeMillis()}.mp4")
+                        requireContext().contentResolver.openInputStream(Uri.parse(rawPath))?.use { input ->
+                            FileOutputStream(tempFile).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        if (tempFile.exists() && tempFile.length() > 0) tempFile else null
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                }
+                // 3. Local file path
+                else -> {
+                    val cleanPath = rawPath.removePrefix("file://")
+                    val f = File(cleanPath)
+                    if (f.exists() && f.length() > 0) f else null
+                }
+            }
+        }
+
+        if (videoFileToSave != null && videoFileToSave.exists()) {
+            val title = if (item.title.isNotBlank()) "PhotoArt_${item.title.replace(" ", "_")}" else "PhotoArt_Video_${System.currentTimeMillis()}"
+            val savedUri = VideoGenerator.copyVideoToGallery(
+                context = requireContext(),
+                videoFile = videoFileToSave,
+                title = title
+            )
+            if (savedUri != null) {
+                AppDialogHelper.showSaveSuccessDialog(requireActivity())
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_save_video), Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Nếu không tìm thấy file video MP4 cục bộ, fallback sang lưu ảnh preview nếu có
+            saveImageItem(item)
+        }
+    }
+
+    private suspend fun saveImageItem(item: HistoryItemModel) {
+        val type = item.type.lowercase()
+        val targetSource = item.imageUrl ?: item.imageUri ?: item.beforeUri
+
+        val fallbackDrawable: Drawable? = if (type.contains("restore") || type.contains("khôi phục")) {
+            binding.sliderView.getAfterDrawable() ?: binding.ivDetailMedia.drawable
+        } else {
+            binding.ivDetailMedia.drawable
+        }
+
+        val prefix = if (type.contains("restore") || type.contains("khôi phục")) {
+            "PhotoArt_Restore"
+        } else {
+            "PhotoArt_Prompt"
+        }
+
+        val savedUri: Uri? = if (!targetSource.isNullOrBlank()) {
+            MediaSaveUtils.saveImageToGallery(
+                context = requireContext(),
+                imageSource = targetSource,
+                fallbackDrawable = fallbackDrawable,
+                filenamePrefix = prefix
+            )
+        } else if (fallbackDrawable != null) {
+            val bmp = MediaSaveUtils.drawableToBitmap(fallbackDrawable)
+            MediaSaveUtils.saveBitmapToGallery(requireContext(), bmp, prefix)
+        } else if (item.imageRes != 0) {
+            val bmp = BitmapFactory.decodeResource(resources, item.imageRes)
+            if (bmp != null) MediaSaveUtils.saveBitmapToGallery(requireContext(), bmp, prefix) else null
+        } else null
+
+        if (savedUri != null) {
             AppDialogHelper.showSaveSuccessDialog(requireActivity())
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
         }
     }
 

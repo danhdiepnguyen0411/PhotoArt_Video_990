@@ -71,9 +71,13 @@ class RestoreResultFragment : BaseFragment<FragmentRestoreResultBinding>(Fragmen
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnSaveImage.isEnabled = false
-            restoreRepository.saveImageToGallery(targetSource)
+            val savedUri = restoreRepository.saveImageToGallery(targetSource)
             binding.btnSaveImage.isEnabled = true
-            com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
+            if (savedUri != null) {
+                com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

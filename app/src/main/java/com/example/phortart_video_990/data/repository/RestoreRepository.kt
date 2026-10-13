@@ -32,17 +32,31 @@ class RestoreRepository(private val context: Context) {
     private val TAG = "RestoreProcess"
 
     /**
-     * Copy input Uri to local temporary File for SDK processing.
+     * Copy input Uri to local temporary File for SDK processing,
+     * ensuring EXIF rotation is normalized so the photo is sent strictly upright.
      */
     fun createTempFileFromUri(uri: Uri): File? {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            val tempFile = File(context.cacheDir, "restore_input_${System.currentTimeMillis()}.jpg")
-            FileOutputStream(tempFile).use { output ->
+            val rawFile = File(context.cacheDir, "restore_raw_${System.currentTimeMillis()}.jpg")
+            FileOutputStream(rawFile).use { output ->
                 inputStream.copyTo(output)
             }
             inputStream.close()
-            tempFile
+
+            // Chuẩn hoá hướng xoay (EXIF rotation) và nén ảnh hợp lý để AI luôn nhận ảnh thẳng đứng
+            val normalizedFile = com.example.phortart_video_990.core.utils.ImageCompressor.compressIfNeeded(
+                context = context,
+                srcFile = rawFile,
+                maxSizeBytes = 3 * 1024 * 1024L,
+                maxDimension = 2560
+            )
+
+            if (rawFile.absolutePath != normalizedFile.absolutePath) {
+                try { rawFile.delete() } catch (_: Exception) {}
+            }
+
+            normalizedFile
         } catch (e: Exception) {
             Log.e(TAG, "Error copying uri to file: ${e.message}", e)
             null
@@ -157,50 +171,15 @@ class RestoreRepository(private val context: Context) {
     /**
      * Saves the restored image to device media storage.
      */
-    suspend fun saveImageToGallery(imageSource: String): Uri? = withContext(Dispatchers.IO) {
-        try {
-            val loader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(imageSource)
-                .allowHardware(false)
-                .build()
-
-            val result = (loader.execute(request) as? SuccessResult)?.drawable
-            val bitmap = (result as? BitmapDrawable)?.bitmap ?: return@withContext null
-
-            val filename = "PhotoArt_Restore_${System.currentTimeMillis()}.jpg"
-            var outputStream: OutputStream? = null
-            var imageUri: Uri? = null
-
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PhotoArt")
-                    put(MediaStore.MediaColumns.IS_PENDING, 1)
-                }
-            }
-
-            val resolver = context.contentResolver
-            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-            if (imageUri != null) {
-                outputStream = resolver.openOutputStream(imageUri)
-                outputStream?.let { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
-                outputStream?.flush()
-                outputStream?.close()
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    contentValues.clear()
-                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
-                    resolver.update(imageUri, contentValues, null, null)
-                }
-            }
-
-            imageUri
-        } catch (e: Exception) {
-            Log.e(TAG, "Lỗi lưu ảnh vào thư viện: ${e.message}", e)
-            null
-        }
+    suspend fun saveImageToGallery(
+        imageSource: String,
+        fallbackDrawable: android.graphics.drawable.Drawable? = null
+    ): Uri? {
+        return com.example.phortart_video_990.core.utils.MediaSaveUtils.saveImageToGallery(
+            context = context,
+            imageSource = imageSource,
+            fallbackDrawable = fallbackDrawable,
+            filenamePrefix = "PhotoArt_Restore"
+        )
     }
 }

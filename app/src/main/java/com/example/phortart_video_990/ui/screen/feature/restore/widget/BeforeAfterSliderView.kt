@@ -197,4 +197,8 @@ class BeforeAfterSliderView @JvmOverloads constructor(
             }
         }
     }
+
+    fun getAfterDrawable(): android.graphics.drawable.Drawable? = ivAfter.drawable
+
+    fun getBeforeDrawable(): android.graphics.drawable.Drawable? = ivBefore.drawable
 }

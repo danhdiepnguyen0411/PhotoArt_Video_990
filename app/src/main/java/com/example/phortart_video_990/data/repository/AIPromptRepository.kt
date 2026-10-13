@@ -116,50 +116,15 @@ class AIPromptRepository(private val context: Context) {
         return null
     }
 
-    suspend fun saveImageToGallery(imageSource: String): Uri? = withContext(Dispatchers.IO) {
-        try {
-            val loader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(imageSource)
-                .allowHardware(false)
-                .build()
-
-            val result = (loader.execute(request) as? SuccessResult)?.drawable
-            val bitmap = (result as? BitmapDrawable)?.bitmap ?: return@withContext null
-
-            val filename = "PhotoArt_Prompt_${System.currentTimeMillis()}.jpg"
-            var outputStream: OutputStream? = null
-            var imageUri: Uri? = null
-
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PhotoArt")
-                    put(MediaStore.MediaColumns.IS_PENDING, 1)
-                }
-            }
-
-            val resolver = context.contentResolver
-            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-            if (imageUri != null) {
-                outputStream = resolver.openOutputStream(imageUri)
-                outputStream?.let { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
-                outputStream?.flush()
-                outputStream?.close()
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    contentValues.clear()
-                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
-                    resolver.update(imageUri, contentValues, null, null)
-                }
-            }
-
-            imageUri
-        } catch (e: Exception) {
-            Log.e(TAG, "Lỗi lưu ảnh: ${e.message}", e)
-            null
-        }
+    suspend fun saveImageToGallery(
+        imageSource: String,
+        fallbackDrawable: android.graphics.drawable.Drawable? = null
+    ): Uri? {
+        return com.example.phortart_video_990.core.utils.MediaSaveUtils.saveImageToGallery(
+            context = context,
+            imageSource = imageSource,
+            fallbackDrawable = fallbackDrawable,
+            filenamePrefix = "PhotoArt_Prompt"
+        )
     }
 }

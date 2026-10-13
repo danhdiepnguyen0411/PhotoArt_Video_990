@@ -83,21 +83,31 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
     }
 
     private fun saveImageToDevice() {
-        if (imageUrl.isBlank()) {
+        val currentDrawable = binding.ivResultImage.drawable
+        if (imageUrl.isBlank() && currentDrawable == null) {
             Toast.makeText(requireContext(), getString(R.string.toast_no_image_to_save), Toast.LENGTH_SHORT).show()
             return
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnDownload.isEnabled = false
-            promptRepository.saveImageToGallery(imageUrl)
+            val savedUri = promptRepository.saveImageToGallery(
+                imageSource = imageUrl,
+                fallbackDrawable = currentDrawable
+            )
             binding.btnDownload.isEnabled = true
-            com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
+
+            if (savedUri != null) {
+                com.example.phortart_video_990.core.dialog.AppDialogHelper.showSaveSuccessDialog(requireActivity())
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun shareImage() {
-        if (imageUrl.isBlank()) {
+        val currentDrawable = binding.ivResultImage.drawable
+        if (imageUrl.isBlank() && currentDrawable == null) {
             Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
             return
         }
@@ -105,11 +115,19 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnShare.isEnabled = false
             try {
+                val effectiveSource: Any = if (imageUrl.isNotBlank()) {
+                    imageUrl
+                } else {
+                    currentDrawable?.let { com.example.phortart_video_990.core.utils.MediaSaveUtils.drawableToBitmap(it) } ?: return@launch
+                }
+
                 val success = ShareUtils.shareImage(
                     context = requireContext(),
-                    imageSource = imageUrl,
+                    imageSource = effectiveSource,
                     chooserTitle = getString(R.string.share_artwork_title),
-                    caption = "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl"
+                    caption = if (userPrompt.isNotBlank()) {
+                        "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl".trim()
+                    } else null
                 )
                 if (!success && isAdded) {
                     Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
