@@ -19,8 +19,21 @@ import com.example.phortart_video_990.databinding.FragmentEnhanceBinding
 
 class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBinding::inflate) {
 
+    private var selectedStyleIndex: Int = 1
     private var selectedStyleName: String = "Cyber Move"
     private var lastClickTime = 0L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            selectedStyleIndex = savedInstanceState.getInt("KEY_SELECTED_STYLE_INDEX", selectedStyleIndex)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("KEY_SELECTED_STYLE_INDEX", selectedStyleIndex)
+    }
 
     override fun initView() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
@@ -42,7 +55,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             binding.tvPromptCounter.text = "$count/500"
         }
 
-        updateSelectedStyle(1)
+        updateSelectedStyle(selectedStyleIndex)
     }
 
     override fun initListener() {
@@ -114,6 +127,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
     }
 
     private fun updateSelectedStyle(index: Int) {
+        selectedStyleIndex = index
         val strokeWidth = (2.5f * resources.displayMetrics.density).toInt()
         val selectedColor = Color.parseColor("#4D70F7")
         val transparentColor = Color.TRANSPARENT
