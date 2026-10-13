@@ -455,7 +455,7 @@
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="4dp"
-                tools:listitem="@layout/item_home_media_card" />
+                tools:listitem="@layout/item_home_recent_history_card" />
 
         </LinearLayout>
 
@@ -543,7 +543,7 @@
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="4dp"
-                tools:listitem="@layout/item_home_media_card" />
+                tools:listitem="@layout/item_home_for_you_card" />
 
         </LinearLayout>
 
@@ -631,7 +631,7 @@
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="4dp"
-                tools:listitem="@layout/item_home_media_card" />
+                tools:listitem="@layout/item_home_hot_card" />
 
         </LinearLayout>
 

@@ -52,6 +52,59 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean("is_notification_enabled", true)
         set(value) = prefs.edit().putBoolean("is_notification_enabled", value).apply()
 
+    fun recordSelectedCategory(category: String) {
+        val cat = category.trim()
+        if (cat.isBlank() || cat.equals("ALL", ignoreCase = true) || cat.equals("Tất cả", ignoreCase = true)) return
+        prefs.edit().putString("last_selected_category", cat).apply()
+        recordUsedTemplateCategory(cat)
+    }
+
+    fun getLastSelectedCategory(): String? {
+        return prefs.getString("last_selected_category", null)?.takeIf { it.isNotBlank() }
+    }
+
+    fun recordUsedTemplateCategory(category: String) {
+        val cat = category.trim()
+        if (cat.isBlank()) return
+        val currentJson = prefs.getString("used_template_categories", "{}") ?: "{}"
+        try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableMap<String, Int>>() {}.type
+            val map: MutableMap<String, Int> = com.google.gson.Gson().fromJson(currentJson, type) ?: mutableMapOf()
+            val currentCount = map[cat] ?: 0
+            map[cat] = currentCount + 1
+            prefs.edit().putString("used_template_categories", com.google.gson.Gson().toJson(map)).apply()
+        } catch (_: Exception) {}
+    }
+
+    fun getUsedCategoriesRanked(): List<String> {
+        val currentJson = prefs.getString("used_template_categories", "{}") ?: "{}"
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<Map<String, Int>>() {}.type
+            val map: Map<String, Int> = com.google.gson.Gson().fromJson(currentJson, type) ?: emptyMap()
+            map.entries.sortedByDescending { it.value }.map { it.key }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    fun getRecentlyShownTemplateIds(): List<String> {
+        val raw = prefs.getString("recently_shown_template_ids", "") ?: ""
+        if (raw.isBlank()) return emptyList()
+        return raw.split(",").filter { it.isNotBlank() }
+    }
+
+    fun recordShownTemplateIds(ids: List<String>) {
+        if (ids.isEmpty()) return
+        val current = getRecentlyShownTemplateIds().toMutableList()
+        for (id in ids) {
+            current.remove(id) // avoid duplicates in tracking list
+            current.add(id)
+        }
+        // Retain at most 15 items for session anti-collision
+        val trimmed = if (current.size > 15) current.takeLast(15) else current
+        prefs.edit().putString("recently_shown_template_ids", trimmed.joinToString(",")).apply()
+    }
+
     fun saveLanguage(code: String, name: String) {
         prefs.edit()
             .putString(KEY_LANGUAGE_CODE, code)

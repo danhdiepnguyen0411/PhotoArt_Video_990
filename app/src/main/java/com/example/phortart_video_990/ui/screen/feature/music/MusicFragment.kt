@@ -59,7 +59,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             selectedCategoryCode = selectedCategoryCode
         ) { selectedCategory ->
             selectedCategoryCode = selectedCategory.code
+            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+                .recordSelectedCategory(selectedCategory.code)
             applyFilter()
+
         }
         binding.rvMusicCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -309,6 +312,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     }
 
     private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
+
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+            .recordSelectedCategory(track.category)
+
         val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
             track.category.substring(6)
         } else {
