@@ -186,21 +186,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
 
         binding.btnSeeAllSuggestions.setOnClickListener {
-            if (canNavigate()) {
-                val navController = parentFragment?.parentFragment?.findNavController()
-                    ?: parentFragment?.findNavController()
-                    ?: findNavController()
-                navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)
-            }
+            stopAudio()
+            (parentFragment as? MainFragment)?.selectTab(1)
+                ?: (parentFragment?.parentFragment as? MainFragment)?.selectTab(1)
         }
 
         binding.btnSeeAllTemplates.setOnClickListener {
-            if (canNavigate()) {
-                val navController = parentFragment?.parentFragment?.findNavController()
-                    ?: parentFragment?.findNavController()
-                    ?: findNavController()
-                navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)
-            }
+            stopAudio()
+            (parentFragment as? MainFragment)?.selectTab(1)
+                ?: (parentFragment?.parentFragment as? MainFragment)?.selectTab(1)
         }
 
         binding.swipeRefreshLayout.setColorSchemeColors(
@@ -211,7 +205,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             savedScrollY = 0
             setupBanners()
             loadRecentHistory()
-            loadHomeData()
+            com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.clearSessionCache()
+            loadHomeData(forceRefresh = true)
         }
 
         binding.btnPro.setOnClickListener {
@@ -313,8 +308,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun setupForYouTemplates() {
         forYouAdapter = HomeForYouAdapter(
             items = emptyList(),
-            onItemClick = { template -> onTemplateSelected(template) },
-            onPlayClick = { template, pos -> toggleAudioPreview(template, pos, isForYou = true) }
+            onItemClick = { template -> onTemplateSelected(template) }
         )
         binding.rvSuggestions.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -324,8 +318,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun setupHotTemplates() {
         hotTemplateAdapter = HomeHotAdapter(
             items = emptyList(),
-            onItemClick = { template -> onTemplateSelected(template) },
-            onPlayClick = { template, pos -> toggleAudioPreview(template, pos, isForYou = false) }
+            onItemClick = { template -> onTemplateSelected(template) }
         )
         binding.rvHotTemplates.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -434,17 +427,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         val currentPool = cachedMusicTracks
         if (currentPool.isEmpty()) return
         val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-            .recommendForYouTemplates(requireContext(), currentPool)
+            .recommendForYouTemplates(requireContext(), currentPool, forceRefresh = false)
         forYouAdapter.submitList(recommended)
 
-        val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
-        val availableHot = currentPool
-            .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
-            .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
-        hotTemplateAdapter.submitList(availableHot.take(8))
+        val availableHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+            .computeAndCacheHotTemplates(currentPool, recommended, forceRefresh = false)
+        hotTemplateAdapter.submitList(availableHot)
     }
 
-    private fun loadHomeData() {
+    private fun loadHomeData(forceRefresh: Boolean = false) {
+        // Nếu trong phiên mở app này đã có danh sách "Dành riêng cho bạn" và không phải do user chủ động swipe-refresh
+        if (!forceRefresh && com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.hasSessionRecommendations()) {
+            val sessionForYou = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getSessionForYouTemplates() ?: emptyList()
+            val sessionHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getSessionHotTemplates() ?: emptyList()
+            forYouAdapter.submitList(sessionForYou)
+            hotTemplateAdapter.submitList(sessionHot)
+            bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
+            bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
+            bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.GONE
+            bindingOrNull?.rvHotTemplates?.visibility = View.VISIBLE
+            restoreScrollPosition()
+            return
+        }
+
         // Show skeleton shimmer loading for both sections while calling API
         bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.VISIBLE
         bindingOrNull?.rvSuggestions?.visibility = View.GONE
@@ -461,14 +466,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 if (apiTracks.isNotEmpty()) {
                     cachedMusicTracks = apiTracks
                     val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-                        .recommendForYouTemplates(requireContext(), apiTracks)
+                        .recommendForYouTemplates(requireContext(), apiTracks, forceRefresh = forceRefresh)
                     forYouAdapter.submitList(recommended)
 
-                    val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
-                    val availableHot = apiTracks
-                        .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
-                        .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
-                    hotTemplateAdapter.submitList(availableHot.take(8))
+                    val availableHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+                        .computeAndCacheHotTemplates(apiTracks, recommended, forceRefresh = forceRefresh)
+                    hotTemplateAdapter.submitList(availableHot)
 
                     bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
                     bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
