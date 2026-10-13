@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -22,9 +23,11 @@ import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentHistoryDetailBinding
+import com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.google.gson.Gson
+import android.os.SystemClock
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -36,6 +39,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
     private var historyItem: HistoryItemModel? = null
+    private var lastShareClickTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,8 +102,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                     binding.sliderView.setBeforeImage(mediaSource, isFallback = true)
                     binding.sliderView.setAfterImage(mediaSource)
                 } else {
-                    binding.sliderView.setBeforeImage(R.drawable.history_2, isFallback = false)
-                    binding.sliderView.setAfterImage(R.drawable.history_2)
+                    binding.sliderView.setBeforeImage(R.drawable.bg_card_white, isFallback = false)
+                    binding.sliderView.setAfterImage(R.drawable.bg_card_white)
                 }
 
                 // Show Restore section card
@@ -141,7 +145,10 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
                 binding.btnRecreate.text = getString(R.string.detail_btn_reuse_prompt)
                 binding.btnRecreate.setOnClickListener {
-                    findNavController().navigateSafe(R.id.action_historyDetailFragment_to_enhanceFragment)
+                    findNavController().navigateSafe(
+                        R.id.action_historyDetailFragment_to_enhanceFragment,
+                        bundleOf(EnhanceFragment.KEY_INITIAL_PROMPT to promptText)
+                    )
                 }
             }
 
@@ -168,7 +175,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 val trackName = if (item.title.contains("Nhạc:") || item.title.contains("Music:")) {
                     item.title.substringAfter(":").trim()
                 } else {
-                    "Lumen Phonk (Slowed)"
+                    item.title
                 }
                 binding.tvMusicTrackTitle.text = getString(R.string.detail_music_label, trackName)
 
@@ -257,6 +264,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
         // Share
         binding.btnShareTop.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - lastShareClickTime < 1000L) return@setOnClickListener
+            lastShareClickTime = SystemClock.elapsedRealtime()
             shareCurrentItem()
         }
 
@@ -270,14 +279,32 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         val item = historyItem ?: return
         val path = item.imageUri ?: item.imageUrl
 
-        if (!path.isNullOrBlank() && (path.endsWith(".mp4", ignoreCase = true) || item.type.contains("Gom", ignoreCase = true))) {
+        if (!path.isNullOrBlank() && (path.endsWith(".mp4", ignoreCase = true) || item.isVideo)) {
             ShareUtils.shareVideo(requireContext(), path, getString(R.string.share_artwork_title))
         } else {
-            val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_artwork_message, item.title))
+            val imageSource: Any? = when {
+                !path.isNullOrBlank() -> path
+                item.imageRes != 0 -> item.imageRes
+                !item.beforeUri.isNullOrBlank() -> item.beforeUri
+                else -> null
             }
-            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_artwork_title)))
+
+            if (imageSource != null) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    ShareUtils.shareImage(
+                        context = requireContext(),
+                        imageSource = imageSource,
+                        chooserTitle = getString(R.string.share_artwork_title),
+                        caption = getString(R.string.share_artwork_message, item.title)
+                    )
+                }
+            } else {
+                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, getString(R.string.share_artwork_message, item.title))
+                }
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.share_artwork_title)))
+            }
         }
     }
 

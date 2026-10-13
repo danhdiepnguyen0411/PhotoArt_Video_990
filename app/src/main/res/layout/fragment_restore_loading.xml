@@ -56,55 +56,67 @@
             android:layout_width="144dp"
             android:layout_height="144dp">
 
-            <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left, 0 deg) -->
+            <!-- 1. Deep Blue Gradient Card BEHIND (Shifted Top-Left, 0 deg) -->
             <View
-                android:id="@+id/layerBackBlue"
-                android:layout_width="104dp"
-                android:layout_height="104dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_restore_back_layer"
+                android:id="@+id/cardBaseBlue"
+                android:layout_width="96dp"
+                android:layout_height="84dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                android:elevation="3dp"
+                android:outlineAmbientShadowColor="#334F7CFE"
+                android:outlineSpotShadowColor="#334F7CFE"
+                android:background="@drawable/bg_restore_hero_back_blue"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- 2. Main Glassmorphic Photo Card Layer (Tilted ~7 deg Clockwise matching Figma) -->
+            <!-- 2. Translucent Grey Frosted Glass Card IN FRONT (Rotated 7 deg clockwise) -->
             <FrameLayout
                 android:id="@+id/cardFront"
-                android:layout_width="116dp"
-                android:layout_height="116dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
+                android:layout_width="96dp"
+                android:layout_height="84dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
                 android:rotation="7"
-                android:background="@drawable/bg_restore_illustration"
+                android:transformPivotX="48dp"
+                android:transformPivotY="42dp"
+                android:elevation="6dp"
+                android:outlineAmbientShadowColor="#266E78EC"
+                android:outlineSpotShadowColor="#266E78EC"
+                android:background="@drawable/bg_restore_hero_glass"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:layout_gravity="center"
                     android:contentDescription="Photo Frame"
-                    android:src="@drawable/ic_restore_illustration_photo" />
+                    android:src="@drawable/ic_restore_illustration_photo"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
-            <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right, Horizontal arrows) -->
+            <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right) -->
             <FrameLayout
                 android:id="@+id/badgeCompare"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginEnd="-8dp"
-                android:layout_marginBottom="-4dp"
-                android:rotation="0"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="-10dp"
+                android:layout_marginBottom="-10dp"
+                android:elevation="10dp"
+                android:outlineAmbientShadowColor="#666E64EB"
+                android:outlineSpotShadowColor="#666E64EB"
                 android:background="@drawable/bg_restore_compare_badge"
                 app:layout_constraintBottom_toBottomOf="@+id/cardFront"
                 app:layout_constraintEnd_toEndOf="@+id/cardFront">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center"
                     android:contentDescription="Compare"
-                    android:src="@drawable/ic_compare_arrows" />
+                    android:src="@drawable/ic_compare_arrows"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

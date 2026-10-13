@@ -41,6 +41,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private var activePlayingTrackId: String? = null
     private var previewJob: Job? = null
 
+    private var savedScrollY: Int = 0
+
+    override fun onViewCreated(view: View, savedInstanceState: android.os.Bundle?) {
+        savedInstanceState?.getInt("saved_home_scroll_y")?.let {
+            if (it > 0) savedScrollY = it
+        }
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     private fun getBannerList(): List<BannerItemModel> {
         return listOf(
             BannerItemModel(
@@ -84,15 +93,40 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onResume() {
         super.onResume()
-        setupBanners()
+        startAutoScroll()
         loadRecentHistory()
-        refreshRecommendations()
         checkCustomNotificationPermission()
+        restoreScrollPosition()
     }
 
     override fun onPause() {
+        pauseAutoScroll()
         stopAudio()
+        bindingOrNull?.let {
+            savedScrollY = it.nestedScrollView.scrollY
+        }
         super.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: android.os.Bundle) {
+        super.onSaveInstanceState(outState)
+        val scrollY = bindingOrNull?.nestedScrollView?.scrollY ?: savedScrollY
+        outState.putInt("saved_home_scroll_y", scrollY)
+    }
+
+    private fun restoreScrollPosition() {
+        if (savedScrollY > 0) {
+            bindingOrNull?.nestedScrollView?.post {
+                if (isAdded && bindingOrNull != null && savedScrollY > 0) {
+                    bindingOrNull?.nestedScrollView?.scrollTo(0, savedScrollY)
+                }
+            }
+            bindingOrNull?.nestedScrollView?.postDelayed({
+                if (isAdded && bindingOrNull != null && savedScrollY > 0) {
+                    bindingOrNull?.nestedScrollView?.scrollTo(0, savedScrollY)
+                }
+            }, 100L)
+        }
     }
 
     private fun checkCustomNotificationPermission() {
@@ -174,6 +208,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             Color.parseColor("#9153EE")
         )
         binding.swipeRefreshLayout.setOnRefreshListener {
+            savedScrollY = 0
             setupBanners()
             loadRecentHistory()
             loadHomeData()
@@ -249,20 +284,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun setupRecentHistory() {
         recentHistoryAdapter = HomeRecentHistoryAdapter(emptyList()) { item ->
-            val historyItems = historyRepository.getHistoryList()
-            val matched = historyItems.find { it.title == item.title || (item.imageUrl != null && it.imageUrl == item.imageUrl) }
-            if (matched != null) {
-                val bundle = android.os.Bundle().apply {
-                    putString(
-                        com.example.phortart_video_990.ui.screen.history.HistoryDetailFragment.KEY_HISTORY_ITEM_JSON,
-                        com.google.gson.Gson().toJson(matched)
-                    )
-                }
-                val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
-                navController.navigateSafe(R.id.action_mainFragment_to_historyDetailFragment, bundle)
-            } else {
-                (parentFragment as? MainFragment)?.selectTab(2)
+            val bundle = android.os.Bundle().apply {
+                putString(
+                    com.example.phortart_video_990.ui.screen.history.HistoryDetailFragment.KEY_HISTORY_ITEM_JSON,
+                    com.google.gson.Gson().toJson(item)
+                )
             }
+            val navController = parentFragment?.parentFragment?.findNavController() ?: findNavController()
+            navController.navigateSafe(R.id.action_mainFragment_to_historyDetailFragment, bundle)
         }
         binding.rvRecentHistory.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -272,13 +301,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun loadRecentHistory() {
         val historyItems = historyRepository.getHistoryList()
-        val displayList = if (historyItems.isNotEmpty()) {
-            historyItems
+        if (historyItems.isNotEmpty()) {
+            recentHistoryAdapter.submitList(historyItems)
+            binding.llRecentHistorySection.visibility = View.VISIBLE
         } else {
-            com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultRecentHistory()
+            recentHistoryAdapter.submitList(emptyList())
+            binding.llRecentHistorySection.visibility = View.GONE
         }
-        recentHistoryAdapter.submitList(displayList)
-        binding.llRecentHistorySection.visibility = View.VISIBLE
     }
 
     private fun setupForYouTemplates() {
@@ -305,6 +334,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun onTemplateSelected(template: TemplateModel) {
         stopAudio()
+        bindingOrNull?.let {
+            savedScrollY = it.nestedScrollView.scrollY
+        }
         // Record template category usage to boost category ranking for future sessions and priority
         com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
             .recordSelectedCategory(template.category)
@@ -400,49 +432,64 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun refreshRecommendations() {
         if (!isAdded) return
         val currentPool = cachedMusicTracks
+        if (currentPool.isEmpty()) return
         val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
             .recommendForYouTemplates(requireContext(), currentPool)
         forYouAdapter.submitList(recommended)
 
         val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
-        val defaultHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultHotTemplates()
-        val availableHot = (currentPool + defaultHot)
+        val availableHot = currentPool
             .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
             .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
         hotTemplateAdapter.submitList(availableHot.take(8))
     }
 
     private fun loadHomeData() {
-        // 1. Immediately recommend and display templates using the ranking, priority, and anti-collision engine
-        val initialForYou = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-            .recommendForYouTemplates(requireContext(), emptyList())
-        forYouAdapter.submitList(initialForYou)
+        // Show skeleton shimmer loading for both sections while calling API
+        bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.VISIBLE
+        bindingOrNull?.rvSuggestions?.visibility = View.GONE
+        bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.VISIBLE
+        bindingOrNull?.rvHotTemplates?.visibility = View.GONE
 
-        val forYouKeys = initialForYou.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
-        val initialHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-            .getDefaultHotTemplates()
-            .filterNot { forYouKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
-        hotTemplateAdapter.submitList(initialHot)
-
-        // 2. Fetch music tracks from API in background and apply ranking, priority, and anti-collision
+        // Fetch templates from API in background (NO hardcoded fake templates)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val apiMusicTracks = templateRepository.getMusicTracks()
-                if (apiMusicTracks.isNotEmpty()) {
-                    cachedMusicTracks = apiMusicTracks
+                var apiTracks = templateRepository.getMusicTracks()
+                if (apiTracks.isEmpty()) {
+                    apiTracks = templateRepository.getAllTemplateApps()
+                }
+                if (apiTracks.isNotEmpty()) {
+                    cachedMusicTracks = apiTracks
                     val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-                        .recommendForYouTemplates(requireContext(), apiMusicTracks)
+                        .recommendForYouTemplates(requireContext(), apiTracks)
                     forYouAdapter.submitList(recommended)
 
                     val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
-                    val defaultHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultHotTemplates()
-                    val availableHot = (apiMusicTracks + defaultHot)
+                    val availableHot = apiTracks
                         .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
                         .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
                     hotTemplateAdapter.submitList(availableHot.take(8))
+
+                    bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
+                    bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
+                    bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.GONE
+                    bindingOrNull?.rvHotTemplates?.visibility = View.VISIBLE
+                    restoreScrollPosition()
+                } else {
+                    forYouAdapter.submitList(emptyList())
+                    hotTemplateAdapter.submitList(emptyList())
+                    bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
+                    bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
+                    bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.GONE
+                    bindingOrNull?.rvHotTemplates?.visibility = View.VISIBLE
                 }
             } catch (_: Exception) {
-                // Keep default recommendation and hot music lists
+                forYouAdapter.submitList(emptyList())
+                hotTemplateAdapter.submitList(emptyList())
+                bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
+                bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
+                bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.GONE
+                bindingOrNull?.rvHotTemplates?.visibility = View.VISIBLE
             } finally {
                 bindingOrNull?.swipeRefreshLayout?.postDelayed({
                     if (isAdded && bindingOrNull != null) {
@@ -455,6 +502,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun navigateToFeature(featureId: String) {
         if (!isAdded) return
+        bindingOrNull?.let {
+            savedScrollY = it.nestedScrollView.scrollY
+        }
         val navController = parentFragment?.parentFragment?.findNavController()
             ?: parentFragment?.findNavController()
             ?: findNavController()

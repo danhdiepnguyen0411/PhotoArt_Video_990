@@ -141,7 +141,6 @@
                 <ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:alpha="0.6"
                     android:contentDescription="Empty"
                     android:src="@drawable/ic_func_music" />
 
@@ -170,15 +169,134 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Bottom Continue Button Bar matching Photo AI design -->
-    <FrameLayout
+    <!-- Bottom Continue Button Bar & Mini Player matching Photo AI design -->
+    <LinearLayout
         android:id="@+id/flBottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="10dp"
+        android:paddingTop="8dp"
         android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Fixed Bottom Mini Player (Shown when track is selected) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardMiniPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E8EEF8"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivMiniCover"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="Mini Player Cover"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_func_music"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/Rounded10ImageView" />
+
+                <LinearLayout
+                    android:id="@+id/llMiniTrackInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/waveView"
+                    app:layout_constraintStart_toEndOf="@+id/ivMiniCover"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvMiniTrackTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="marquee"
+                        android:fontFamily="@font/inter_bold"
+                        android:singleLine="true"
+                        android:textColor="#18377F"
+                        android:textSize="13.5sp"
+                        android:textStyle="bold"
+                        tools:text="Lovely" />
+
+                    <TextView
+                        android:id="@+id/tvMiniTrackDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter_regular"
+                        android:singleLine="true"
+                        android:textColor="#8296BC"
+                        android:textSize="11.5sp"
+                        tools:text="03:20" />
+
+                </LinearLayout>
+
+                <com.example.phortart_video_990.ui.screen.feature.music.AudioWaveformView
+                    android:id="@+id/waveView"
+                    android:layout_width="66dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btnMiniPlayPause"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <FrameLayout
+                    android:id="@+id/btnMiniPlayPause"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_track_check_circle"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/ivMiniPlayPauseIcon"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Play/Pause"
+                        android:src="@drawable/ic_pause_small"
+                        app:tint="@color/white" />
+
+                    <ProgressBar
+                        android:id="@+id/pbMiniLoading"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_gravity="center"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/white"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <FrameLayout
             android:id="@+id/btnConfirmMusic"
@@ -227,7 +345,7 @@
 
         </FrameLayout>
 
-    </FrameLayout>
+    </LinearLayout>
 
     <!-- Loading Indicator -->
     <ProgressBar

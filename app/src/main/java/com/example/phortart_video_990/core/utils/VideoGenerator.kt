@@ -150,7 +150,11 @@ object VideoGenerator {
                 val nextPhotoIndex = (photoIndex + 1).coerceAtMost(loadedBitmaps.lastIndex)
                 val isTransitioning = remainingFramesInPhoto <= TRANSITION_FRAMES && photoIndex < loadedBitmaps.lastIndex
 
-                val canvas: Canvas = inputSurface.lockHardwareCanvas()
+                val canvas: Canvas = try {
+                    inputSurface.lockHardwareCanvas()
+                } catch (e: Exception) {
+                    inputSurface.lockCanvas(null)
+                }
                 try {
                     canvas.drawColor(Color.BLACK)
 
@@ -164,7 +168,9 @@ object VideoGenerator {
                         drawBitmapCenterCrop(canvas, currentBitmap, paint)
                     }
                 } finally {
-                    inputSurface.unlockCanvasAndPost(canvas)
+                    try {
+                        inputSurface.unlockCanvasAndPost(canvas)
+                    } catch (_: Exception) {}
                 }
 
                 drainEncoder(encoder, muxer, bufferInfo, false) {

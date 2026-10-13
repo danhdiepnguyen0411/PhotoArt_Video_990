@@ -5,22 +5,51 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.FileProvider
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.example.phortart_video_990.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
 object ShareUtils {
 
+    private const val TAG = "ShareUtils"
+    private var lastIntentLaunchTime = 0L
+    private const val SHARE_DEBOUNCE_MS = 1200L
+
+    /**
+     * Chống spam click share liên tục để tránh mở trùng đè nhiều Bottom Sheet chia sẻ
+     */
+    @Synchronized
+    fun checkAndMarkLaunch(): Boolean {
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastIntentLaunchTime < SHARE_DEBOUNCE_MS) {
+            return false
+        }
+        lastIntentLaunchTime = now
+        return true
+    }
+
+    /**
+     * Chia sẻ Video kèm ảnh thumbnail preview hiển thị trên Bottom Sheet
+     */
     fun shareVideo(
         context: Context,
         filePath: String?,
         chooserTitle: String? = null,
         thumbnailPath: String? = null
     ): Boolean {
+        if (!checkAndMarkLaunch()) return false
+
         val effectiveTitle = chooserTitle ?: context.getString(R.string.share_video_ai_title)
         val cleanVideoPath = filePath?.removePrefix("file://")?.takeIf { it.isNotBlank() } ?: return false
         val videoFile = File(cleanVideoPath)
@@ -47,28 +76,137 @@ object ShareUtils {
                 }
             } else null
 
+            val previewUri = thumbUri ?: contentUri
+            val previewMime = if (thumbUri != null) "image/jpeg" else "video/mp4"
+
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "video/mp4"
                 putExtra(Intent.EXTRA_STREAM, contentUri)
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                val item = ClipData.Item(contentUri)
-                clipData = ClipData(effectiveTitle, arrayOf("video/mp4"), item)
+                val clipData = ClipData(effectiveTitle, arrayOf(previewMime), ClipData.Item(previewUri))
+                this.clipData = clipData
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
+                clipData = sendIntent.clipData
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 if (context !is Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             }
 
+            try {
+                context.grantUriPermission("android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                if (thumbUri != null) {
+                    context.grantUriPermission("android", thumbUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            } catch (_: Exception) {}
+
             context.startActivity(chooserIntent)
             true
         } catch (e: Exception) {
-            Log.e("ShareUtils", "Failed to share video", e)
+            Log.e(TAG, "Failed to share video", e)
             false
+        }
+    }
+
+    /**
+     * Chia sẻ Ảnh (ảnh kết quả tạo prompt, phục hồi ảnh...) hiển thị ảnh preview trực tiếp trên Bottom Sheet
+     */
+    suspend fun shareImage(
+        context: Context,
+        imageSource: Any?,
+        chooserTitle: String? = null,
+        caption: String? = null
+    ): Boolean = withContext(Dispatchers.IO) {
+        if (!checkAndMarkLaunch()) return@withContext false
+        if (imageSource == null) return@withContext false
+
+        try {
+            val authority = "${context.packageName}.fileprovider"
+            val localFile = prepareLocalImageFile(context, imageSource) ?: return@withContext false
+            val contentUri = FileProvider.getUriForFile(context, authority, localFile)
+
+            val effectiveTitle = chooserTitle ?: context.getString(R.string.share_artwork_title)
+
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "image/jpeg"
+                putExtra(Intent.EXTRA_STREAM, contentUri)
+                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
+                if (!caption.isNullOrBlank()) {
+                    putExtra(Intent.EXTRA_TEXT, caption)
+                }
+                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
+                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
+                clipData = sendIntent.clipData
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                if (context !is Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+
+            try {
+                context.grantUriPermission("android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: Exception) {}
+
+            withContext(Dispatchers.Main) {
+                context.startActivity(chooserIntent)
+            }
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to share image", e)
+            false
+        }
+    }
+
+    private suspend fun prepareLocalImageFile(context: Context, imageSource: Any): File? = withContext(Dispatchers.IO) {
+        try {
+            val sharedDir = File(context.cacheDir, "shared_images").apply { mkdirs() }
+
+            if (imageSource is File && imageSource.exists() && imageSource.length() > 0) {
+                val targetFile = File(sharedDir, "share_${imageSource.nameWithoutExtension}.jpg")
+                if (!targetFile.exists() || targetFile.length() != imageSource.length()) {
+                    imageSource.copyTo(targetFile, overwrite = true)
+                }
+                return@withContext targetFile
+            }
+
+            if (imageSource is String) {
+                val cleanPath = imageSource.removePrefix("file://")
+                val existing = File(cleanPath)
+                if (existing.exists() && existing.length() > 0) {
+                    val targetFile = File(sharedDir, "share_${existing.nameWithoutExtension}.jpg")
+                    if (!targetFile.exists() || targetFile.length() != existing.length()) {
+                        existing.copyTo(targetFile, overwrite = true)
+                    }
+                    return@withContext targetFile
+                }
+            }
+
+            val loader = ImageLoader(context)
+            val request = ImageRequest.Builder(context)
+                .data(imageSource)
+                .allowHardware(false)
+                .build()
+
+            val result = (loader.execute(request) as? SuccessResult)?.drawable
+            val bitmap = (result as? BitmapDrawable)?.bitmap ?: return@withContext null
+
+            val targetFile = File(sharedDir, "share_img_${System.currentTimeMillis()}.jpg")
+            FileOutputStream(targetFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+            }
+
+            if (targetFile.exists() && targetFile.length() > 0) targetFile else null
+        } catch (e: Exception) {
+            Log.e(TAG, "prepareLocalImageFile error: ${e.message}", e)
+            null
         }
     }
 

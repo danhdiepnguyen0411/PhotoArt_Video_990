@@ -19,6 +19,10 @@ import com.example.phortart_video_990.databinding.FragmentEnhanceBinding
 
 class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBinding::inflate) {
 
+    companion object {
+        const val KEY_INITIAL_PROMPT = "KEY_INITIAL_PROMPT"
+    }
+
     private var selectedStyleIndex: Int = 1
     private var selectedStyleName: String = "Cyber Move"
     private var lastClickTime = 0L
@@ -49,12 +53,22 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             insets
         }
 
+        val initialPrompt = arguments?.getString(KEY_INITIAL_PROMPT)
+        if (!initialPrompt.isNullOrBlank() && binding.etPromptInput.text.isNullOrBlank()) {
+            binding.etPromptInput.setText(initialPrompt)
+            binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
+        }
+
+        binding.etPromptInput.filters = arrayOf(android.text.InputFilter.LengthFilter(500))
         binding.etPromptInput.doAfterTextChanged { text ->
             val count = text?.length ?: 0
             binding.tvPromptCounter.text = "$count/500"
+            updateGenerateButtonState()
         }
 
+        setupTopTitleGradient()
         updateSelectedStyle(selectedStyleIndex)
+        updateGenerateButtonState()
     }
 
     override fun initListener() {
@@ -106,16 +120,14 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
         // Start Generate
         binding.btnGeneratePrompt.setOnClickListener {
-            if (SystemClock.elapsedRealtime() - lastClickTime < 600L) return@setOnClickListener
-            lastClickTime = SystemClock.elapsedRealtime()
-
             val userPrompt = binding.etPromptInput.text?.toString()?.trim().orEmpty()
             if (userPrompt.isBlank()) {
-                if (isAdded && context != null) {
-                    Toast.makeText(requireContext(), getString(R.string.toast_enter_prompt_description), Toast.LENGTH_SHORT).show()
-                }
+                updateGenerateButtonState()
                 return@setOnClickListener
             }
+
+            if (SystemClock.elapsedRealtime() - lastClickTime < 600L) return@setOnClickListener
+            lastClickTime = SystemClock.elapsedRealtime()
 
             // Combine user prompt with chosen style
             val fullPrompt = getString(R.string.prompt_style_suffix, userPrompt, selectedStyleName)
@@ -131,10 +143,38 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         }
     }
 
+    private fun updateGenerateButtonState() {
+        val hasPrompt = !binding.etPromptInput.text?.toString()?.trim().isNullOrEmpty()
+        binding.btnGeneratePrompt.isEnabled = hasPrompt
+        binding.btnGeneratePrompt.isClickable = hasPrompt
+        binding.btnGeneratePrompt.alpha = if (hasPrompt) 1.0f else 0.4f
+    }
+
+    private fun setupTopTitleGradient() {
+        val textView = binding.tvTopTitle
+        textView.post {
+            val width = textView.paint.measureText(textView.text.toString())
+            if (width > 0f) {
+                val shader = android.graphics.LinearGradient(
+                    0f, 0f, width, 0f,
+                    intArrayOf(
+                        Color.parseColor("#3A8BF5"),
+                        Color.parseColor("#7A63EE"),
+                        Color.parseColor("#D45BD8")
+                    ),
+                    floatArrayOf(0f, 0.55f, 1f),
+                    android.graphics.Shader.TileMode.CLAMP
+                )
+                textView.paint.shader = shader
+                textView.invalidate()
+            }
+        }
+    }
+
     private fun updateSelectedStyle(index: Int) {
         selectedStyleIndex = index
         val strokeWidth = (2.5f * resources.displayMetrics.density).toInt()
-        val selectedColor = Color.parseColor("#4D70F7")
+        val selectedColor = Color.parseColor("#7F8CF6")
         val transparentColor = Color.TRANSPARENT
 
         binding.cardStyle1.strokeWidth = if (index == 1) strokeWidth else 0

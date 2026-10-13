@@ -1,14 +1,36 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
-  <!-- Rounded music tile -->
-  <path
-      android:fillColor="#FB923C"
-      android:pathData="M10,8h28c3.3,0 6,2.7 6,6v20c0,3.3 -2.7,6 -6,6H10c-3.3,0 -6,-2.7 -6,-6V14c0,-3.3 2.7,-6 6,-6z"/>
-  <!-- Music note -->
-  <path
-      android:fillColor="#FFFFFF"
-      android:pathData="M20,32c-2.2,0 -4,-1.8 -4,-4s1.8,-4 4,-4c1.1,0 2.1,0.5 2.8,1.2V16l10,-2v11c-0.8,-0.6 -1.8,-1 -2.8,-1 -2.2,0 -4,1.8 -4,4s1.8,4 4,4c2.2,0 3.8,-1.7 4,-3.8V13.2L22.8,16.2V28.2c-0.8,-0.7 -1.8,-1.2 -2.8,-1.2z"/>
+
+    <!-- Rounded orange tile background with gradient -->
+    <path android:pathData="M15,4 h18 c6.08,0 11,4.92 11,11 v18 c0,6.08 -4.92,11 -11,11 H15 c-6.08,0 -11,-4.92 -11,-11 V15 c0,-6.08 4.92,-11 11,-11 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="4"
+                android:startY="4"
+                android:endX="44"
+                android:endY="44"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFA040" />
+                <item android:offset="1.0" android:color="#FF6B2B" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Perfectly formed solid music note (left head, right head, and stems + beam) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22.49,29.39 C23.15,31.03 21.9,33.08 19.7,33.97 C17.5,34.86 15.18,34.25 14.51,32.61 C13.85,30.97 15.1,28.92 17.3,28.03 C19.5,27.14 21.82,27.75 22.49,29.39 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33.49,25.89 C34.15,27.53 32.9,29.58 30.7,30.47 C28.5,31.36 26.18,30.75 25.51,29.11 C24.85,27.47 26.1,25.42 28.3,24.53 C30.5,23.64 32.82,24.25 33.49,25.89 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20.0,30.5 L20.0,16.0 L33.4,12.0 L33.4,27.0 L31.0,27.0 L31.0,15.6 L22.4,18.2 L22.4,30.5 Z" />
+
 </vector>

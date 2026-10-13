@@ -100,7 +100,8 @@ as new</string>
     <string name="memories_upload_title">Upload photos from gallery</string>
     <string name="memories_photos_count">%1$d photos</string>
     <string name="tap_to_select_photos">Tap to select photos from gallery</string>
-    <string name="select_multiple_photos">Select 1 or more photos (JPG, PNG)</string>
+    <string name="select_multiple_photos">Select up to 10 photos (JPG, PNG)</string>
+    <string name="select_max_photos_format">Select up to %d photos (JPG, PNG)</string>
     <string name="tap_to_manage_photos">Tap to view and manage photos</string>
     <string name="btn_add_photos">Add photos</string>
     <string name="btn_view_photos">View photos</string>
@@ -324,4 +325,11 @@ a premium experience.</string>
     <string name="lang_sub_ru">Russian</string>
     <string name="lang_sub_hi">Hindi</string>
     <string name="lang_sub_id">Indonesian</string>
+    <string name="selected_photos_title">Selected Photos</string>
+    <string name="selected_photos_count_format">Selected %1$d/%2$d photos</string>
+    <string name="btn_done_short">Done</string>
+    <string name="picker_title">Select Photos</string>
+    <string name="btn_picker_confirm">Confirm (%1$d/%2$d)</string>
+    <string name="toast_permission_needed_for_photos">Permission required to access device photos</string>
+    <string name="picker_empty_photos">No photos found in device gallery</string>
 </resources>

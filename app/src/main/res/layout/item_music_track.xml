@@ -71,16 +71,17 @@
                 android:singleLine="true"
                 android:textColor="#8296BC"
                 android:textSize="12sp"
+                android:visibility="gone"
                 tools:text="Tobu" />
 
             <TextView
                 android:id="@+id/tvTrackDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="3dp"
                 android:fontFamily="@font/inter_regular"
                 android:textColor="#8296BC"
-                android:textSize="11.5sp"
+                android:textSize="12sp"
                 tools:text="03:24" />
 
         </LinearLayout>
