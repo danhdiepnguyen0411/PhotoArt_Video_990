@@ -141,20 +141,12 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     }
 
     private fun updateMusicInfoUi() {
-        val title = musicTitle?.takeIf { it.isNotBlank() } ?: getString(R.string.music_none_selected)
-        binding.tvVideoTitle.text = title
-        binding.tvVideoSubtitle.text = formatTime(videoDurationSec)
-
-        val imageUrl = musicImageUrl
-        if (!imageUrl.isNullOrBlank()) {
-            binding.ivMusicCover.visibility = View.VISIBLE
-            binding.ivDefaultThumbIcon.visibility = View.GONE
-            binding.ivMusicCover.load(imageUrl) {
-                crossfade(true)
-            }
+        val title = musicTitle?.takeIf { it.isNotBlank() } ?: getString(R.string.no_music_selected)
+        binding.tvVideoTitle.text = getString(R.string.memories_of_us)
+        binding.tvVideoSubtitle.text = if (!musicTitle.isNullOrBlank()) {
+            getString(R.string.video_subtitle_format, formatTime(videoDurationSec), title)
         } else {
-            binding.ivMusicCover.visibility = View.GONE
-            binding.ivDefaultThumbIcon.visibility = View.VISIBLE
+            getString(R.string.video_subtitle_no_music_format, formatTime(videoDurationSec))
         }
     }
 
@@ -195,7 +187,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
 
             val dur = mp.duration / 1000f
             if (dur > 0) videoDurationSec = dur
-            binding.tvVideoSubtitle.text = formatTime(videoDurationSec)
+            updateMusicInfoUi()
 
             binding.videoView.start()
             isPlaying = true
@@ -389,7 +381,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         val totalSecs = seconds.toInt()
         val m = totalSecs / 60
         val s = totalSecs % 60
-        return String.format(Locale.getDefault(), "%02d:%02d", m, s)
+        return String.format(Locale.getDefault(), "%d:%02d", m, s)
     }
 
     private fun showExportLoading(show: Boolean, status: String? = null, percent: Int = 0) {

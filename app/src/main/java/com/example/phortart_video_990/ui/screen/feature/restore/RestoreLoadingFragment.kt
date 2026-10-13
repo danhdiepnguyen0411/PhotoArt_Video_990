@@ -131,18 +131,43 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
             }
             val restoreData = result.getOrNull()
 
-            val finalInputUrl = restoreData?.inputUrl ?: uriStr
-            val finalOutputUrl = restoreData?.outputUrl ?: uriStr
+            val finalInputUrl = restoreData?.inputUrl?.takeIf { it.isNotBlank() } ?: file.absolutePath
+            var finalOutputUrl = restoreData?.outputUrl?.takeIf { it.isNotBlank() } ?: file.absolutePath
 
-            // Preload the restored image into Coil cache so it renders immediately upon opening result screen
+            // Preload the restored image and verify that output orientation matches input orientation
             val ctx = context
             if (ctx != null) {
                 try {
                     val imageLoader = coil.Coil.imageLoader(ctx)
                     val outRequest = coil.request.ImageRequest.Builder(ctx)
                         .data(finalOutputUrl)
+                        .allowHardware(false)
                         .build()
-                    imageLoader.execute(outRequest)
+                    val outResult = imageLoader.execute(outRequest)
+
+                    // Kiểm tra tỷ lệ khung hình / hướng ảnh để đảm bảo ảnh kết quả không bao giờ bị lệch xoay 90 độ
+                    if (outResult is coil.request.SuccessResult) {
+                        val outBitmap = com.example.phortart_video_990.core.utils.MediaSaveUtils.drawableToBitmap(outResult.drawable)
+
+                        val inputBounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        android.graphics.BitmapFactory.decodeFile(file.absolutePath, inputBounds)
+                        val isInputPortrait = inputBounds.outHeight > inputBounds.outWidth
+                        val isOutputPortrait = outBitmap.height > outBitmap.width
+
+                        if (isInputPortrait != isOutputPortrait && inputBounds.outWidth > 0 && inputBounds.outHeight > 0) {
+                            android.util.Log.w("RestoreProcess", "Phát hiện ảnh kết quả lệch hướng xoay so với ảnh gốc! Tự động xoay chuẩn lại.")
+                            val matrix = android.graphics.Matrix().apply { postRotate(90f) }
+                            val rotatedBmp = android.graphics.Bitmap.createBitmap(outBitmap, 0, 0, outBitmap.width, outBitmap.height, matrix, true)
+                            val fixedFile = java.io.File(ctx.cacheDir, "restore_aligned_${System.currentTimeMillis()}.jpg")
+                            java.io.FileOutputStream(fixedFile).use { fos ->
+                                rotatedBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, fos)
+                            }
+                            finalOutputUrl = fixedFile.absolutePath
+                            if (rotatedBmp != outBitmap) {
+                                rotatedBmp.recycle()
+                            }
+                        }
+                    }
 
                     if (finalInputUrl.startsWith("http://") || finalInputUrl.startsWith("https://")) {
                         val inRequest = coil.request.ImageRequest.Builder(ctx)

@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.FileProvider
@@ -168,6 +169,19 @@ object ShareUtils {
     private suspend fun prepareLocalImageFile(context: Context, imageSource: Any): File? = withContext(Dispatchers.IO) {
         try {
             val sharedDir = File(context.cacheDir, "shared_images").apply { mkdirs() }
+
+            if (imageSource is Bitmap) {
+                val targetFile = File(sharedDir, "share_img_${System.currentTimeMillis()}.jpg")
+                FileOutputStream(targetFile).use { out ->
+                    val safeBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && imageSource.config == Bitmap.Config.HARDWARE) {
+                        imageSource.copy(Bitmap.Config.ARGB_8888, false)
+                    } else {
+                        imageSource
+                    }
+                    safeBitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                }
+                return@withContext if (targetFile.exists() && targetFile.length() > 0) targetFile else null
+            }
 
             if (imageSource is File && imageSource.exists() && imageSource.length() > 0) {
                 val targetFile = File(sharedDir, "share_${imageSource.nameWithoutExtension}.jpg")

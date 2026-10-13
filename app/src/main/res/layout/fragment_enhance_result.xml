@@ -30,34 +30,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvHeaderTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
+            android:layout_marginStart="14dp"
+            android:fontFamily="@font/inter_bold"
+            android:letterSpacing="-0.02"
+            android:text="@string/ai_create_title"
+            android:textColor="#2A34C9"
+            android:textSize="22sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/btnBack"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btnBack">
-
-            <TextView
-                android:id="@+id/tvHeaderTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ai_create_title"
-                android:textColor="#102148"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="@+id/btnBack" />
 
         <TextView
             android:id="@+id/tvHeaderSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
+            android:fontFamily="@font/inter_medium"
+            android:lineSpacingExtra="2dp"
             android:text="@string/enhance_result_subtitle"
-            android:textColor="#6F7E94"
+            android:textColor="#7B8EB5"
             android:textSize="13sp"
             app:layout_constraintTop_toBottomOf="@+id/btnBack" />
 
@@ -82,8 +79,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="10dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -92,18 +89,20 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:contentDescription="Prompt"
-                    android:src="@drawable/ic_sparkle_chip"
-                    app:tint="#3556D4" />
+                    android:src="@drawable/ic_magic_sparkle_white"
+                    app:tint="#3B5EE8" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
+                    android:fontFamily="@font/inter_bold"
+                    android:letterSpacing="0.03"
                     android:text="@string/enhance_your_prompt"
-                    android:textColor="#3556D4"
+                    android:textColor="#3B5EE8"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -113,8 +112,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="#102148"
-                android:textSize="14sp"
+                android:fontFamily="@font/inter_medium"
+                android:lineHeight="20sp"
+                android:lineSpacingExtra="3dp"
+                android:textColor="#243572"
+                android:textSize="13.5sp"
                 tools:text="Cô gái anime dưới ánh hoàng hôn" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -185,16 +187,17 @@
         app:layout_constraintBottom_toTopOf="@+id/btnShare">
 
         <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:contentDescription="Sparkle"
-            android:src="@drawable/ic_sparkle_chip"
+            android:src="@drawable/ic_magic_sparkle_white"
             app:tint="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/inter_bold"
             android:text="@string/btn_generate_again"
             android:textColor="@color/white"
             android:textSize="15.5sp"
@@ -220,14 +223,15 @@
             android:layout_height="18dp"
             android:contentDescription="Share"
             android:src="@drawable/ic_share_line"
-            app:tint="#3250C9" />
+            app:tint="#3850B0" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:fontFamily="@font/inter_bold"
             android:text="@string/btn_share"
-            android:textColor="#3250C9"
+            android:textColor="#3850B0"
             android:textSize="15.5sp"
             android:textStyle="bold" />
     </LinearLayout>
