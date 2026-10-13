@@ -145,6 +145,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvEmptyPhotoDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"

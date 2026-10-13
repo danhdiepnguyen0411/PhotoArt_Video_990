@@ -100,7 +100,8 @@ tinh khôi</string>
     <string name="memories_upload_title">Tải ảnh lên từ thư viện</string>
     <string name="memories_photos_count">%1$d ảnh</string>
     <string name="tap_to_select_photos">Nhấn để chọn ảnh từ thư viện</string>
-    <string name="select_multiple_photos">Chọn 1 hoặc nhiều ảnh (JPG, PNG)</string>
+    <string name="select_multiple_photos">Chọn tối đa 10 ảnh (JPG, PNG)</string>
+    <string name="select_max_photos_format">Chọn tối đa %d ảnh (JPG, PNG)</string>
     <string name="tap_to_manage_photos">Chạm vào để xem và quản lý ảnh</string>
     <string name="btn_add_photos">Thêm ảnh</string>
     <string name="btn_view_photos">Xem ảnh</string>
@@ -254,7 +255,7 @@ tốt hơn.</string>
     <string name="prompt_chip_cyberpunk">Cyberpunk</string>
     <string name="prompt_chip_nature">Nature</string>
     <string name="prompt_chip_portrait">Portrait</string>
-    <string name="prompt_style">Phong cách</string>
+    <string name="prompt_style">Style</string>
     <string name="prompt_badge_hot">🔥 Hot</string>
     <string name="prompt_anime_full">Anime girl xinh đẹp, phong cách truyện tranh Nhật Bản</string>
     <string name="prompt_fantasy_full">Lâu đài kỳ ảo bay giữa bầu trời thần tiên rực rỡ</string>
@@ -324,4 +325,11 @@ tốt hơn.</string>
     <string name="lang_sub_ru">Tiếng Nga</string>
     <string name="lang_sub_hi">Tiếng Hindi</string>
     <string name="lang_sub_id">Tiếng Indonesia</string>
+    <string name="selected_photos_title">Ảnh đã chọn</string>
+    <string name="selected_photos_count_format">Đã chọn %1$d/%2$d ảnh</string>
+    <string name="btn_done_short">Xong</string>
+    <string name="picker_title">Chọn ảnh</string>
+    <string name="btn_picker_confirm">Xác nhận (%1$d/%2$d)</string>
+    <string name="toast_permission_needed_for_photos">Cần cấp quyền truy cập để chọn ảnh từ thư viện</string>
+    <string name="picker_empty_photos">Không tìm thấy ảnh nào trong thư viện thiết bị</string>
 </resources>

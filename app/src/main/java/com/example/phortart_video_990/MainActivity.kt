@@ -15,6 +15,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Fix: Avoid duplicate activity instances when opened from launcher icon
+        if (!isTaskRoot && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN == intent.action) {
+            finish()
+            return
+        }
+
         SystemBarInsetsHelper.setupNormalSystemBars(window)
 
         // Initialize launcher shortcut for Uninstall

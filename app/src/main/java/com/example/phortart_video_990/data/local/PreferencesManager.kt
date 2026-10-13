@@ -52,6 +52,18 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean("is_notification_enabled", true)
         set(value) = prefs.edit().putBoolean("is_notification_enabled", value).apply()
 
+    var lastSelectedMusicTrackId: String?
+        get() = prefs.getString("last_selected_music_track_id", null)
+        set(value) = prefs.edit().putString("last_selected_music_track_id", value).apply()
+
+    var lastMusicScrollPosition: Int
+        get() = prefs.getInt("last_music_scroll_position", -1)
+        set(value) = prefs.edit().putInt("last_music_scroll_position", value).apply()
+
+    var lastMusicScrollOffset: Int
+        get() = prefs.getInt("last_music_scroll_offset", 0)
+        set(value) = prefs.edit().putInt("last_music_scroll_offset", value).apply()
+
     fun recordSelectedCategory(category: String) {
         val cat = category.trim()
         if (cat.isBlank() || cat.equals("ALL", ignoreCase = true) || cat.equals("Tất cả", ignoreCase = true)) return

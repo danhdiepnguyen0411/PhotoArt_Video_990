@@ -43,7 +43,7 @@ class HomeRecentHistoryAdapter(
             val source: Any? = when {
                 rawSource is String && rawSource.startsWith("/") -> java.io.File(rawSource)
                 rawSource is String && rawSource.startsWith("content://") -> android.net.Uri.parse(rawSource)
-                else -> rawSource ?: R.drawable.history_1
+                else -> rawSource ?: R.drawable.bg_card_white
             }
 
             binding.ivHistoryThumb.load(source) {

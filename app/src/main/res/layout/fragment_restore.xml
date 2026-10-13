@@ -16,7 +16,9 @@
         android:background="@drawable/bg_circle_back"
         android:clickable="true"
         android:contentDescription="@string/btn_back"
-        android:elevation="1dp"
+        android:elevation="4dp"
+        android:outlineAmbientShadowColor="#5A6EC8"
+        android:outlineSpotShadowColor="#5A6EC8"
         android:focusable="true"
         android:padding="8dp"
         android:src="@drawable/ic_arrow_back"
@@ -39,54 +41,76 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="10dp"
+            android:paddingTop="8dp"
             android:paddingBottom="20dp">
 
-            <!-- 3D Layered Illustration Block (Matching the Right Screen Mockup) -->
+            <!-- 3D Layered Hero Illustration Block (Matching Design Spec) -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutIllustration"
-                android:layout_width="144dp"
-                android:layout_height="144dp">
+                android:layout_width="180dp"
+                android:layout_height="150dp">
 
-                <!-- 1. Deep Blue 3D Back Layer (Shifted Top-Left, 0 deg) -->
+                <!-- 0. Radial Glow Halo Behind -->
                 <View
-                    android:id="@+id/layerBackBlue"
-                    android:layout_width="104dp"
-                    android:layout_height="104dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/bg_restore_back_layer"
+                    android:id="@+id/glowHalo"
+                    android:layout_width="168dp"
+                    android:layout_height="146dp"
+                    android:background="@drawable/bg_restore_hero_glow"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- 2. Main Glassmorphic Photo Card Layer (Tilted ~7 deg Clockwise matching Figma) -->
+                <!-- 1. Deep Blue Gradient Card BEHIND (Shifted Top-Left, 0 deg) -->
+                <View
+                    android:id="@+id/cardBaseBlue"
+                    android:layout_width="112dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:elevation="3dp"
+                    android:outlineAmbientShadowColor="#334F7CFE"
+                    android:outlineSpotShadowColor="#334F7CFE"
+                    android:background="@drawable/bg_restore_hero_back_blue"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- 2. Translucent Grey Frosted Glass Card IN FRONT (Rotated 7 deg clockwise) -->
                 <FrameLayout
                     android:id="@+id/cardFront"
-                    android:layout_width="116dp"
-                    android:layout_height="116dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_width="112dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="36dp"
+                    android:layout_marginTop="22dp"
                     android:rotation="7"
-                    android:background="@drawable/bg_restore_illustration"
+                    android:transformPivotX="56dp"
+                    android:transformPivotY="50dp"
+                    android:elevation="6dp"
+                    android:outlineAmbientShadowColor="#266E78EC"
+                    android:outlineSpotShadowColor="#266E78EC"
+                    android:background="@drawable/bg_restore_hero_glass"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:layout_gravity="center"
                         android:contentDescription="Photo Frame"
-                        android:src="@drawable/ic_restore_illustration_photo" />
+                        android:src="@drawable/ic_restore_illustration_photo"
+                        app:tint="#FFFFFF" />
                 </FrameLayout>
 
-                <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right, Horizontal arrows) -->
+                <!-- 3. Comparison Badge with White Border & Double Arrows (Bottom-Right) -->
                 <FrameLayout
                     android:id="@+id/badgeCompare"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:layout_marginEnd="-8dp"
-                    android:layout_marginBottom="-4dp"
-                    android:rotation="0"
+                    android:layout_marginEnd="-14dp"
+                    android:layout_marginBottom="-14dp"
+                    android:elevation="10dp"
+                    android:outlineAmbientShadowColor="#666E64EB"
+                    android:outlineSpotShadowColor="#666E64EB"
                     android:background="@drawable/bg_restore_compare_badge"
                     app:layout_constraintBottom_toBottomOf="@+id/cardFront"
                     app:layout_constraintEnd_toEndOf="@+id/cardFront">
@@ -96,9 +120,9 @@
                         android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:contentDescription="Compare"
-                        android:src="@drawable/ic_compare_arrows" />
+                        android:src="@drawable/ic_compare_arrows"
+                        app:tint="#FFFFFF" />
                 </FrameLayout>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Main Title: Khôi phục ảnh -->
@@ -106,7 +130,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:gravity="center"
                 android:text="@string/restore_title"
                 android:textColor="#17327C"
@@ -121,7 +145,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginHorizontal="20dp"
                 android:gravity="center"
-                android:lineSpacingExtra="4dp"
+                android:lineSpacingExtra="3.5dp"
                 android:text="@string/restore_main_desc"
                 android:textColor="#7A8FB8"
                 android:textSize="14sp" />
@@ -136,19 +160,20 @@
 
                 <!-- Feature 1: Sửa ảnh mờ, nhòe -->
                 <LinearLayout
+                    android:id="@+id/itemFeature1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.card.MaterialCardView
+                    <FrameLayout
+                        android:id="@+id/layoutFeatureIcon1"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="999dp"
-                        app:cardElevation="0dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:strokeWidth="0dp">
+                        android:elevation="4dp"
+                        android:outlineAmbientShadowColor="#40646EC8"
+                        android:outlineSpotShadowColor="#40646EC8"
+                        android:background="@drawable/bg_feature_icon">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -156,7 +181,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="Sun Rays"
                             android:src="@drawable/ic_feature_sun_rays" />
-                    </com.google.android.material.card.MaterialCardView>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -186,20 +211,21 @@
 
                 <!-- Feature 2: Khôi phục ảnh cũ -->
                 <LinearLayout
+                    android:id="@+id/itemFeature2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.card.MaterialCardView
+                    <FrameLayout
+                        android:id="@+id/layoutFeatureIcon2"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="999dp"
-                        app:cardElevation="0dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:strokeWidth="0dp">
+                        android:elevation="4dp"
+                        android:outlineAmbientShadowColor="#40646EC8"
+                        android:outlineSpotShadowColor="#40646EC8"
+                        android:background="@drawable/bg_feature_icon">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -207,7 +233,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="Old Photo"
                             android:src="@drawable/ic_feature_photo" />
-                    </com.google.android.material.card.MaterialCardView>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -237,20 +263,21 @@
 
                 <!-- Feature 3: Tăng độ chân thực -->
                 <LinearLayout
+                    android:id="@+id/itemFeature3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.card.MaterialCardView
+                    <FrameLayout
+                        android:id="@+id/layoutFeatureIcon3"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="999dp"
-                        app:cardElevation="0dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:strokeWidth="0dp">
+                        android:elevation="4dp"
+                        android:outlineAmbientShadowColor="#40646EC8"
+                        android:outlineSpotShadowColor="#40646EC8"
+                        android:background="@drawable/bg_feature_icon">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -258,7 +285,7 @@
                             android:layout_gravity="center"
                             android:contentDescription="True Details"
                             android:src="@drawable/ic_feature_focus_lens" />
-                    </com.google.android.material.card.MaterialCardView>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -300,6 +327,9 @@
         android:layout_marginBottom="28dp"
         android:background="@drawable/bg_btn_start_restore"
         android:clickable="true"
+        android:elevation="8dp"
+        android:outlineAmbientShadowColor="#7878F0"
+        android:outlineSpotShadowColor="#7878F0"
         android:focusable="true"
         android:gravity="center"
         android:orientation="horizontal"
@@ -312,6 +342,13 @@
             android:textColor="@color/white"
             android:textSize="17sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Arrow"
+            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

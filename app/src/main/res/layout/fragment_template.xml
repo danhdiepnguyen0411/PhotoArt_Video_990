@@ -113,6 +113,14 @@
                 app:spanCount="2"
                 tools:listitem="@layout/item_template_card" />
 
+            <!-- Skeleton Shimmer Loading Grid (White cards with light beam sweep) -->
+            <include
+                android:id="@+id/layoutSkeletonLoading"
+                layout="@layout/layout_template_skeleton_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
             <!-- Empty State -->
             <LinearLayout
                 android:id="@+id/llEmptyState"
@@ -127,8 +135,7 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:contentDescription="Empty"
-                    android:src="@drawable/ic_func_music"
-                    app:tint="#8E9BB0" />
+                    android:src="@drawable/ic_func_music" />
 
                 <TextView
                     android:layout_width="wrap_content"

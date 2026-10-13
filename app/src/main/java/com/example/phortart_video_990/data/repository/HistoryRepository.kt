@@ -16,7 +16,8 @@ class HistoryRepository(context: Context) {
         if (json.isNullOrBlank()) return emptyList()
         return try {
             val type = object : TypeToken<List<HistoryItemModel>>() {}.type
-            gson.fromJson<List<HistoryItemModel>>(json, type) ?: emptyList()
+            val list = gson.fromJson<List<HistoryItemModel>>(json, type) ?: emptyList()
+            list.filter { !it.id.startsWith("hist_figma_") }
         } catch (e: Exception) {
             emptyList()
         }

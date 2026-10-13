@@ -72,22 +72,15 @@ class TemplateAdapter(
             binding.ivPlayIcon.setColorFilter(playColor)
             binding.tvDuration.setTextColor(playColor)
 
-            val progressDrawable = androidx.swiperefreshlayout.widget.CircularProgressDrawable(binding.root.context).apply {
-                strokeWidth = 5f
-                centerRadius = 24f
-                setColorSchemeColors(
-                    android.graphics.Color.parseColor("#4A7BFE"),
-                    android.graphics.Color.parseColor("#9153EE")
-                )
-                start()
-            }
+            // Load thumbnail image using Coil with animated Shimmer light beam placeholder (NO static images as background)
+            val shimmerPlaceholder = com.example.phortart_video_990.core.utils.ShimmerDrawable()
+            val imageSource: Any = item.safeImageUrl?.takeIf { it.isNotBlank() }
+                ?: (if (item.localImageRes != 0) item.localImageRes else "") ?: ""
 
-            // Load thumbnail image using Coil with animated loading spinner
-            val imageSource = item.localImageRes ?: item.safeImageUrl?.takeIf { it.isNotBlank() } ?: R.drawable.bg_image_placeholder
             binding.ivTemplateThumb.load(imageSource) {
                 crossfade(true)
-                placeholder(progressDrawable)
-                error(R.drawable.bg_image_placeholder)
+                placeholder(shimmerPlaceholder)
+                error(shimmerPlaceholder)
             }
 
             binding.llDurationBadge.setOnClickListener {

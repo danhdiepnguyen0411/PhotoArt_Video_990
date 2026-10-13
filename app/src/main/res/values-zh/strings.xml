@@ -94,7 +94,8 @@ AI 即可描摹</string>
     <string name="memories_upload_title">从相册上传照片</string>
     <string name="memories_photos_count">%1$d 张照片</string>
     <string name="tap_to_select_photos">点击从相册中选择照片</string>
-    <string name="select_multiple_photos">选择 1 张或多张照片 (JPG, PNG)</string>
+    <string name="select_multiple_photos">最多选择 10 张照片 (JPG, PNG)</string>
+    <string name="select_max_photos_format">最多选择 %d 张照片 (JPG, PNG)</string>
     <string name="tap_to_manage_photos">点击查看和管理照片</string>
     <string name="btn_add_photos">添加照片</string>
     <string name="btn_view_photos">查看照片</string>

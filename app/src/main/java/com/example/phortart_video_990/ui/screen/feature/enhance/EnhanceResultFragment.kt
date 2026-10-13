@@ -18,6 +18,8 @@ import com.example.phortart_video_990.data.repository.AIPromptRepository
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentEnhanceResultBinding
 import kotlinx.coroutines.launch
+import android.os.SystemClock
+import com.example.phortart_video_990.core.utils.ShareUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,6 +31,7 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
 
     private var userPrompt: String = ""
     private var imageUrl: String = ""
+    private var lastShareClickTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +76,8 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
         }
 
         binding.btnShare.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - lastShareClickTime < 1000L) return@setOnClickListener
+            lastShareClickTime = SystemClock.elapsedRealtime()
             shareImage()
         }
     }
@@ -92,14 +97,26 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
     }
 
     private fun shareImage() {
-        try {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl")
-            }
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_artwork_title)))
-        } catch (e: Exception) {
+        if (imageUrl.isBlank()) {
             Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.btnShare.isEnabled = false
+            try {
+                val success = ShareUtils.shareImage(
+                    context = requireContext(),
+                    imageSource = imageUrl,
+                    chooserTitle = getString(R.string.share_artwork_title),
+                    caption = "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl"
+                )
+                if (!success && isAdded) {
+                    Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
+                }
+            } finally {
+                binding.btnShare.isEnabled = true
+            }
         }
     }
 

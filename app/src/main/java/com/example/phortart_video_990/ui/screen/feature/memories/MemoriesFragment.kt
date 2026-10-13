@@ -1,15 +1,23 @@
 package com.example.phortart_video_990.ui.screen.feature.memories
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
+import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
@@ -18,6 +26,10 @@ import java.io.File
 
 class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesBinding::inflate) {
 
+    companion object {
+        private const val SAVED_PHOTOS_KEY = "saved_selected_photos"
+    }
+
     private val selectedPhotos = mutableListOf<Uri>()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
@@ -25,7 +37,110 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private var maxPhotoLimit: Int = 10
     private var templateDurationSec: Float? = null
 
-    private val pickMultipleImagesLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
+    // Permission launcher for accessing device gallery
+    private val requestGalleryPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions[Manifest.permission.READ_MEDIA_IMAGES] == true ||
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                    permissions[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true)
+        } else {
+            permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+        }
+
+        if (granted) {
+            showImagePickerBottomSheet()
+        } else {
+            // Fallback to system photo picker if permission is denied
+            try {
+                pickVisualMediaLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            } catch (e: Exception) {
+                fallbackGetMultipleContentsLauncher.launch("image/*")
+            }
+        }
+    }
+
+    // Native Photo Picker bottom sheet launcher (fallback)
+    private val pickVisualMediaLauncher = registerForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia()
+    ) { uris: List<Uri> ->
+        handleSelectedPhotos(uris)
+    }
+
+    // Fallback launcher for devices without Photo Picker support
+    private val fallbackGetMultipleContentsLauncher = registerForActivityResult(
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        handleSelectedPhotos(uris)
+    }
+
+    private var selectedMusicTrackId: String? = null
+    private var selectedMusicTitle: String? = null
+    private var selectedMusicAudioUrl: String? = null
+    private var selectedMusicAudioFilePath: String? = null
+    private var selectedMusicImageUrl: String? = null
+
+    private var isGeneratingVideo = false
+    private var pendingVideoResultBundle: Bundle? = null
+    private var pendingVideoErrorMsg: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val savedUris = savedInstanceState?.getStringArrayList(SAVED_PHOTOS_KEY)
+        if (selectedPhotos.isEmpty() && !savedUris.isNullOrEmpty()) {
+            selectedPhotos.addAll(savedUris.map { Uri.parse(it) })
+        }
+        savedInstanceState?.getString("selected_aspect_ratio")?.let {
+            selectedAspectRatio = it
+        }
+        val savedLimit = savedInstanceState?.getInt("max_photo_limit", 0) ?: 0
+        if (savedLimit > 0) {
+            maxPhotoLimit = savedLimit
+        }
+        savedInstanceState?.getString("selected_music_track_id")?.let {
+            selectedMusicTrackId = it
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putStringArrayList(SAVED_PHOTOS_KEY, ArrayList(selectedPhotos.map { it.toString() }))
+        outState.putString("selected_aspect_ratio", selectedAspectRatio)
+        outState.putInt("max_photo_limit", maxPhotoLimit)
+        outState.putString("selected_music_track_id", selectedMusicTrackId)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // If video finished generating while the app was in the background, navigate now safely!
+        pendingVideoResultBundle?.let { bundle ->
+            pendingVideoResultBundle = null
+            hideLoading()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            findNavController().navigateSafe(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
+            return
+        }
+
+        // If an error occurred while the app was in the background, show error toast now!
+        pendingVideoErrorMsg?.let { errorMsg ->
+            pendingVideoErrorMsg = null
+            hideLoading()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            context?.let { ctx ->
+                Toast.makeText(ctx, getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun savePhotosState() {
+        val uriStrings = ArrayList(selectedPhotos.map { it.toString() })
+        findNavController().currentBackStackEntry?.savedStateHandle?.set(SAVED_PHOTOS_KEY, uriStrings)
+    }
+
+    private fun handleSelectedPhotos(uris: List<Uri>) {
         if (uris.isNotEmpty()) {
             val newUris = uris.filter { it !in selectedPhotos }
             val remainingSlots = maxPhotoLimit - selectedPhotos.size
@@ -35,37 +150,46 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     getString(R.string.toast_max_photos_limit, maxPhotoLimit),
                     Toast.LENGTH_SHORT
                 ).show()
-                return@registerForActivityResult
+                return
             }
             val toAdd = newUris.take(remainingSlots)
             if (toAdd.isNotEmpty()) {
                 selectedPhotos.addAll(toAdd)
-                if (newUris.size > remainingSlots) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.toast_max_photos_limit, maxPhotoLimit),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                savePhotosState()
                 updatePhotosUi()
+            }
+            if (newUris.size > remainingSlots) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    private var selectedMusicTitle: String? = null
-    private var selectedMusicAudioUrl: String? = null
-    private var selectedMusicAudioFilePath: String? = null
-    private var selectedMusicImageUrl: String? = null
-
     override fun initView() {
         binding.tvTopTitle.text = getString(R.string.memories_title)
+
+        // Restore uploaded photos if previously saved
+        val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val restoredUris = stateHandle?.get<ArrayList<String>>(SAVED_PHOTOS_KEY)
+            ?: arguments?.getStringArrayList(SAVED_PHOTOS_KEY)
+        if (selectedPhotos.isEmpty() && !restoredUris.isNullOrEmpty()) {
+            selectedPhotos.addAll(restoredUris.map { Uri.parse(it) })
+        }
 
         updatePhotosUi()
         updateRatioUi()
 
         // Read music selection from arguments or savedStateHandle
         val args = arguments
-        val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+
+        val initialTrackId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+            ?: stateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
+        if (!initialTrackId.isNullOrBlank()) {
+            selectedMusicTrackId = initialTrackId
+        }
 
         val initialTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
             ?: stateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
@@ -74,7 +198,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         if (!initialTitle.isNullOrBlank()) {
             selectedMusicTitle = initialTitle
             binding.tvSelectedMusicTitle.text = initialTitle
-            binding.tvSelectedMusicSubtitle.text = initialSubtitle ?: "Billie Eilish • 03:20"
+            binding.tvSelectedMusicSubtitle.text = initialSubtitle ?: "04:17"
         }
 
         val initialAudioUrl = args?.getString("selected_music_audio_url")
@@ -104,8 +228,16 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         if (initialPhotoLimit != null) {
             maxPhotoLimit = initialPhotoLimit
         }
+        updateEmptyPhotoDescription()
 
         // Observe returned music selection from MusicFragment
+        stateHandle?.getLiveData<String>("selected_track_id")
+            ?.observe(viewLifecycleOwner) { trackId ->
+                if (!trackId.isNullOrBlank()) {
+                    selectedMusicTrackId = trackId
+                }
+            }
+
         stateHandle?.getLiveData<String>("selected_music_title")
             ?.observe(viewLifecycleOwner) { musicTitle ->
                 if (!musicTitle.isNullOrBlank()) {
@@ -150,24 +282,32 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     if (selectedPhotos.size > limit) {
                         val toRemove = selectedPhotos.drop(limit)
                         selectedPhotos.removeAll(toRemove)
+                        savePhotosState()
                         updatePhotosUi()
                     }
+                    updateEmptyPhotoDescription()
                 }
             }
     }
 
+    private fun updateEmptyPhotoDescription() {
+        val b = bindingOrNull ?: return
+        b.tvEmptyPhotoDescription.text = getString(R.string.select_max_photos_format, maxPhotoLimit)
+    }
+
     private fun updateMusicCoverUi(imageUrl: String?) {
         selectedMusicImageUrl = imageUrl
+        val b = bindingOrNull ?: return
         if (!imageUrl.isNullOrBlank()) {
-            binding.ivMusicCover.visibility = View.VISIBLE
-            binding.ivMusicIcon.visibility = View.GONE
-            binding.ivMusicCover.load(imageUrl) {
+            b.ivMusicCover.visibility = View.VISIBLE
+            b.ivMusicIcon.visibility = View.GONE
+            b.ivMusicCover.load(imageUrl) {
                 crossfade(true)
                 error(R.drawable.ic_music_note)
             }
         } else {
-            binding.ivMusicCover.visibility = View.GONE
-            binding.ivMusicIcon.visibility = View.VISIBLE
+            b.ivMusicCover.visibility = View.GONE
+            b.ivMusicIcon.visibility = View.VISIBLE
         }
     }
 
@@ -183,6 +323,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
             binding.llEmptyPhotosPrompt.visibility = View.VISIBLE
             binding.flPolaroidStack.visibility = View.GONE
+            updateEmptyPhotoDescription()
         } else {
             binding.tvPhotosSectionTitle.text = getString(R.string.your_photos)
             binding.tvSelectedCount.visibility = View.VISIBLE
@@ -304,35 +445,80 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
     }
 
-    private fun openPhotoViewer(initialPosition: Int = 0) {
+    private fun onUploadAreaClicked() {
         if (selectedPhotos.isEmpty()) {
-            pickMultipleImagesLauncher.launch("image/*")
-            return
+            launchImagePicker()
+        } else {
+            showSelectedPhotosBottomSheet()
         }
-        PhotoViewerDialog(
+    }
+
+    private fun showSelectedPhotosBottomSheet() {
+        SelectedPhotosBottomSheetDialog(
             context = requireContext(),
             photos = selectedPhotos,
-            initialPosition = initialPosition,
+            maxLimit = maxPhotoLimit,
             onPhotosChanged = {
+                savePhotosState()
                 updatePhotosUi()
             },
             onAddMoreRequested = {
-                if (selectedPhotos.size >= maxPhotoLimit) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.toast_max_photos_limit, maxPhotoLimit),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    pickMultipleImagesLauncher.launch("image/*")
-                }
+                launchImagePicker()
+            }
+        ).show()
+    }
+
+    private fun launchImagePicker() {
+        val remainingSlots = maxPhotoLimit - selectedPhotos.size
+        if (remainingSlots <= 0) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.toast_max_photos_limit, maxPhotoLimit),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val context = requireContext()
+        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED)
+        } else {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+
+        if (hasPermission) {
+            showImagePickerBottomSheet()
+        } else {
+            val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+            } else {
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            requestGalleryPermissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun showImagePickerBottomSheet() {
+        ImagePickerBottomSheetDialog(
+            context = requireContext(),
+            initialSelectedPhotos = selectedPhotos,
+            maxLimit = maxPhotoLimit,
+            onPhotosSelected = { newlySelected ->
+                selectedPhotos.clear()
+                selectedPhotos.addAll(newlySelected)
+                savePhotosState()
+                updatePhotosUi()
             }
         ).show()
     }
 
     override fun initListener() {
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().safePopBackStack()
         }
 
         binding.btnAddPhotos.setOnClickListener {
@@ -343,34 +529,24 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                pickMultipleImagesLauncher.launch("image/*")
+                launchImagePicker()
             }
         }
 
         binding.cardPhotoStackContainer.setOnClickListener {
-            openPhotoViewer(0)
+            onUploadAreaClicked()
         }
 
         binding.cardPolaroidLeft.setOnClickListener {
-            if (selectedPhotos.size == 2) {
-                openPhotoViewer(0)
-            } else if (selectedPhotos.size >= 3) {
-                openPhotoViewer(1)
-            }
+            onUploadAreaClicked()
         }
 
         binding.cardPolaroidCenter.setOnClickListener {
-            if (selectedPhotos.size == 2) {
-                openPhotoViewer(1)
-            } else {
-                openPhotoViewer(0)
-            }
+            onUploadAreaClicked()
         }
 
         binding.cardPolaroidRight.setOnClickListener {
-            if (selectedPhotos.size >= 3) {
-                openPhotoViewer(2)
-            }
+            onUploadAreaClicked()
         }
 
         binding.btnRatio916.setOnClickListener {
@@ -389,11 +565,19 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
 
         binding.cardSelectMusic.setOnClickListener {
-            findNavController().navigate(R.id.action_memoriesFragment_to_musicFragment)
+            val bundle = android.os.Bundle().apply {
+                putString("selected_track_id", selectedMusicTrackId)
+                putString("selected_music_title", selectedMusicTitle)
+            }
+            findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
         }
 
         binding.btnChangeMusic.setOnClickListener {
-            findNavController().navigate(R.id.action_memoriesFragment_to_musicFragment)
+            val bundle = android.os.Bundle().apply {
+                putString("selected_track_id", selectedMusicTrackId)
+                putString("selected_music_title", selectedMusicTitle)
+            }
+            findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
         }
 
         binding.btnCreateVideo.setOnClickListener {
@@ -408,22 +592,25 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val finalAudioPath = selectedMusicAudioFilePath ?: stateHandle?.get<String?>("selected_music_file_path")
             val finalImageUrl = selectedMusicImageUrl ?: stateHandle?.get<String?>("selected_music_image_url")
 
+            isGeneratingVideo = true
             binding.btnCreateVideo.isEnabled = false
             showLoading(
                 title = getString(R.string.loading_creating_video),
                 subtitle = getString(R.string.loading_preparing_images)
             )
 
-            viewLifecycleOwner.lifecycleScope.launch {
+            lifecycleScope.launch {
                 try {
                     // 1. Tải nhạc nền nếu cần
                     var resolvedAudioPath = finalAudioPath
                     val hasValidAudioFile = !resolvedAudioPath.isNullOrBlank() && File(resolvedAudioPath).let { it.exists() && it.length() > 0 }
                     if (!hasValidAudioFile && !finalAudioUrl.isNullOrBlank()) {
-                        showLoading(
-                            title = getString(R.string.loading_downloading_music),
-                            subtitle = getString(R.string.loading_please_wait)
-                        )
+                        if (isAdded) {
+                            showLoading(
+                                title = getString(R.string.loading_downloading_music),
+                                subtitle = getString(R.string.loading_please_wait)
+                            )
+                        }
                         val downloaded = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
                             requireContext(),
                             finalAudioUrl
@@ -452,33 +639,53 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         transitions = transitions,
                         aspectRatio = selectedAspectRatio,
                         onProgress = { progress, _ ->
-                            showLoading(
-                                title = getString(R.string.loading_creating_video),
-                                subtitle = getString(R.string.loading_processing_progress, progress)
-                            )
+                            if (isAdded) {
+                                showLoading(
+                                    title = getString(R.string.loading_creating_video),
+                                    subtitle = getString(R.string.loading_processing_progress, progress)
+                                )
+                            }
                         }
                     )
 
-                    if (!isAdded || view == null) return@launch
-                    hideLoading()
-                    binding.btnCreateVideo.isEnabled = true
+                    isGeneratingVideo = false
 
                     if (generatedVideoFile.exists() && generatedVideoFile.length() > 0) {
-                        navigateToVideoResult(
+                        val bundle = VideoResultFragment.createBundle(
                             videoPath = generatedVideoFile.absolutePath,
-                            finalTrack = finalTrack,
-                            finalAudioUrl = finalAudioUrl,
-                            finalAudioPath = resolvedAudioPath,
-                            finalImageUrl = finalImageUrl
+                            photos = selectedPhotos.map { it.toString() },
+                            track = finalTrack,
+                            audioUrl = finalAudioUrl,
+                            audioPath = resolvedAudioPath,
+                            imageUrl = finalImageUrl
                         )
+
+                        if (isResumed && isAdded) {
+                            hideLoading()
+                            bindingOrNull?.btnCreateVideo?.isEnabled = true
+                            findNavController().navigateSafe(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
+                        } else {
+                            // Defer navigation until app comes back to foreground
+                            pendingVideoResultBundle = bundle
+                        }
                     } else {
-                        Toast.makeText(requireContext(), getString(R.string.toast_cannot_create_video_file), Toast.LENGTH_SHORT).show()
+                        if (isResumed && isAdded) {
+                            hideLoading()
+                            bindingOrNull?.btnCreateVideo?.isEnabled = true
+                            Toast.makeText(requireContext(), getString(R.string.toast_cannot_create_video_file), Toast.LENGTH_SHORT).show()
+                        } else {
+                            pendingVideoErrorMsg = getString(R.string.toast_cannot_create_video_file)
+                        }
                     }
                 } catch (e: Exception) {
-                    if (!isAdded || view == null) return@launch
-                    hideLoading()
-                    binding.btnCreateVideo.isEnabled = true
-                    Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                    isGeneratingVideo = false
+                    if (isResumed && isAdded) {
+                        hideLoading()
+                        bindingOrNull?.btnCreateVideo?.isEnabled = true
+                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                    } else {
+                        pendingVideoErrorMsg = e.message ?: ""
+                    }
                 }
             }
         }
@@ -499,6 +706,12 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             audioPath = finalAudioPath,
             imageUrl = finalImageUrl
         )
-        findNavController().navigate(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
+        if (isResumed && isAdded) {
+            hideLoading()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            findNavController().navigateSafe(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
+        } else {
+            pendingVideoResultBundle = bundle
+        }
     }
 }

@@ -95,7 +95,8 @@ et nettes</string>
     <string name="memories_upload_title">Télécharger des photos depuis la galerie</string>
     <string name="memories_photos_count">%1$d photos</string>
     <string name="tap_to_select_photos">Appuyez pour choisir des photos</string>
-    <string name="select_multiple_photos">Sélectionnez 1 ou plusieurs photos (JPG, PNG)</string>
+    <string name="select_multiple_photos">Sélectionnez jusqu\'à 10 photos (JPG, PNG)</string>
+    <string name="select_max_photos_format">Sélectionnez jusqu\'à %d photos (JPG, PNG)</string>
     <string name="tap_to_manage_photos">Appuyez pour afficher et gérer les photos</string>
     <string name="btn_add_photos">Ajouter des photos</string>
     <string name="btn_view_photos">Voir les photos</string>
