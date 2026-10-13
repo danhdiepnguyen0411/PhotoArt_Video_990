@@ -15,7 +15,7 @@
         android:src="@drawable/intro_bg"
         android:contentDescription="@null" />
 
-    <!-- Top Header -->
+    <!-- Top Header - chiều cao cố định để không bị giật khi đổi ngôn ngữ -->
     <LinearLayout
         android:id="@+id/llHeader"
         android:layout_width="match_parent"
@@ -34,18 +34,19 @@
 
             <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_circle_back"
+                android:contentDescription="@string/btn_back"
+                android:elevation="1dp"
                 android:padding="8dp"
                 android:src="@drawable/ic_arrow_back"
                 android:visibility="gone"
-                app:tint="#17327C"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible"
-                android:contentDescription="@string/btn_back" />
+                app:tint="#2D7DF6"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/tvLanguageTitle"
@@ -53,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_bold"
                 android:text="@string/language_title"
-                android:textColor="#17327C"
+                android:textColor="#2D7DF6"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -64,8 +65,8 @@
 
         <TextView
             android:id="@+id/tvLanguageDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="6dp"
             android:fontFamily="@font/inter_regular"
@@ -73,7 +74,9 @@
             android:paddingHorizontal="12dp"
             android:text="@string/language_choose_desc"
             android:textColor="#7B8EB5"
-            android:textSize="13.5sp" />
+            android:textSize="13.5sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Language List with smooth fading edge -->
@@ -103,7 +106,7 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <!-- Confirm Button (Elevated on top of the bottom fade scrim) -->
-    <androidx.appcompat.widget.AppCompatButton
+    <FrameLayout
         android:id="@+id/btnConfirm"
         android:layout_width="match_parent"
         android:layout_height="52dp"
@@ -111,19 +114,41 @@
         android:layout_marginBottom="32dp"
         android:elevation="6dp"
         android:translationZ="6dp"
-        android:enabled="false"
         android:alpha="0.5"
         android:background="@drawable/bg_btn_primary"
-        android:drawableEnd="@drawable/ic_arrow_forward_white"
-        android:drawableTint="@color/white"
-        android:fontFamily="@font/inter_bold"
-        android:paddingHorizontal="24dp"
-        android:text="@string/btn_confirm"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:clickable="true"
+        android:focusable="true"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:pointerIcon="hand">
+
+            <TextView
+                android:id="@+id/tvConfirmText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="@string/btn_confirm"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/ivConfirmArrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="6dp"
+                android:src="@drawable/ic_arrow_forward_white"
+                android:contentDescription="@null" />
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- Animated Click Hand GIF Tutorial Overlay (from 600Y_TREE_SCAN) -->
     <ImageView

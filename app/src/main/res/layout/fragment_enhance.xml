@@ -15,27 +15,20 @@
         android:paddingTop="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_circle_back"
             android:clickable="true"
+            android:contentDescription="@string/btn_back"
+            android:elevation="1dp"
             android:focusable="true"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="999dp"
-            app:cardElevation="0dp"
-            app:cardPreventCornerOverlap="false"
-            app:strokeWidth="0dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#2D7DF6"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/btn_back"
-                android:src="@drawable/ic_chevron_left" />
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/layoutTopTitle"
@@ -53,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ai_create_title"
-                android:textColor="#3250C9"
+                android:textColor="#2D5BE3"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -63,31 +56,8 @@
                 android:layout_marginStart="4dp"
                 android:contentDescription="Sparkle"
                 android:src="@drawable/ic_sparkle_chip"
-                app:tint="#6B5CE7" />
+                app:tint="#2D5BE3" />
         </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnFavorite"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="999dp"
-            app:cardElevation="0dp"
-            app:cardPreventCornerOverlap="false"
-            app:strokeWidth="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:contentDescription="Favorite"
-                android:src="@drawable/ic_heart_outline"
-                app:tint="#5B6FF6" />
-        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -139,14 +109,14 @@
                             android:layout_height="16dp"
                             android:contentDescription="Sparkle"
                             android:src="@drawable/ic_sparkle_chip"
-                            app:tint="#3556D4" />
+                            app:tint="#2D5BE3" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:text="@string/enter_prompt_hint"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="15.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -166,10 +136,11 @@
                             android:hint="@string/prompt_hint"
                             android:importantForAutofill="no"
                             android:inputType="textMultiLine"
+                            android:maxLength="500"
                             android:paddingHorizontal="14dp"
                             android:paddingTop="12dp"
                             android:paddingBottom="24dp"
-                            android:textColor="#102148"
+                            android:textColor="#1E293B"
                             android:textColorHint="#94A3B8"
                             android:textSize="13.5sp" />
 
@@ -198,14 +169,14 @@
                             android:layout_height="16dp"
                             android:contentDescription="Sparkle"
                             android:src="@drawable/ic_sparkle_chip"
-                            app:tint="#3556D4" />
+                            app:tint="#2D5BE3" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:text="@string/prompt_suggestions"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="15.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -226,11 +197,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_anime"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -243,11 +214,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_fantasy"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -259,11 +230,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_pet"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -284,11 +255,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_cyberpunk"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -301,11 +272,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_nature"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -317,11 +288,11 @@
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
                             android:drawablePadding="4dp"
-                            android:drawableTint="#5373F2"
+                            android:drawableTint="#2D5BE3"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_portrait"
-                            android:textColor="#3250C9"
+                            android:textColor="#2D5BE3"
                             android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -342,14 +313,14 @@
                     android:layout_height="18dp"
                     android:contentDescription="Sparkle"
                     android:src="@drawable/ic_sparkle_chip"
-                    app:tint="#3556D4" />
+                    app:tint="#2D5BE3" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:text="@string/prompt_style"
-                    android:textColor="#3250C9"
+                    android:textColor="#2D5BE3"
                     android:textSize="17.5sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -525,7 +496,7 @@
     <LinearLayout
         android:id="@+id/btnGeneratePrompt"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_btn_ai_create"
@@ -536,8 +507,8 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:contentDescription="Magic"
             android:src="@drawable/ic_wand_magic" />
 
@@ -549,6 +520,13 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Arrow"
+            android:src="@drawable/ic_arrow_forward_white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

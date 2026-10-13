@@ -34,7 +34,10 @@ class PreferencesManager(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_HAS_COMPLETED_INTRO, value).apply()
 
     var languageCode: String
-        get() = prefs.getString(KEY_LANGUAGE_CODE, "en") ?: "en"
+        get() {
+            val code = prefs.getString(KEY_LANGUAGE_CODE, null)
+            return if (!code.isNullOrEmpty()) code else "en"
+        }
         set(value) = prefs.edit().putString(KEY_LANGUAGE_CODE, value).apply()
 
     var languageName: String

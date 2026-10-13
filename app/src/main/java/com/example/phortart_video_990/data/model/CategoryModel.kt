@@ -29,7 +29,7 @@ data class CategoryModel(
         get() {
             val raw = name.ifBlank { code }.trim()
             if (raw.equals("ALL", ignoreCase = true) || raw.equals("Tất cả", ignoreCase = true)) {
-                return "Tất cả"
+                return if (isMusicCategory) "Dành cho bạn" else "Tất cả"
             }
             val cleaned = if (isMusicCategory && raw.startsWith("MUSIC_", ignoreCase = true)) {
                 raw.substring(6)

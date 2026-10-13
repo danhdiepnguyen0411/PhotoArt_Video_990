@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">إلغاء التثبيت</string>
     <string name="shortcut_uninstall_desc">إلغاء تثبيت PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">أعد ذكرياتك إلى الحياة</string>
     <string name="splash_loading">جارٍ التحميل %1$d%%...</string>
     <string name="language_title">اختر اللغة</string>
@@ -13,17 +13,14 @@
     <string name="btn_next">التالي</string>
     <string name="btn_skip">تخطي</string>
     <string name="btn_get_started">ابدأ الآن</string>
-    <string name="intro_1_title">تجميع الصور،
-إنشاء فيديو</string>
+    <string name="intro_1_title">تجميع الصور،\nإنشاء فيديو</string>
     <string name="intro_1_desc">حول لحظاتك المفضلة
 إلى مقاطع فيديو مفعمة بالحياة
 خلال ثوانٍ معدودة.</string>
-    <string name="intro_2_title">إنشاء الصور عبر
-أوامر الذكاء الاصطناعي</string>
+    <string name="intro_2_title">إنشاء الصور عبر\nأوامر الذكاء الاصطناعي</string>
     <string name="intro_2_desc">صف ما تتخيله،
 وسيحوله الذكاء الاصطناعي إلى عمل فني مذهل.</string>
-    <string name="intro_3_title">إحياء الصور
-القديمة والضبابية</string>
+    <string name="intro_3_title">إحياء الصور\nالقديمة والضبابية</string>
     <string name="intro_3_desc">استرجع الصور الباهتة والمشوشة
 واحتفظ بأعز الذكريات نقية.</string>
     <string name="nav_home">الرئيسية</string>

@@ -36,8 +36,9 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             insets
         }
 
+        binding.etPromptInput.filters = arrayOf(android.text.InputFilter.LengthFilter(500))
         binding.etPromptInput.doAfterTextChanged { text ->
-            val count = text?.length ?: 0
+            val count = (text?.length ?: 0).coerceAtMost(500)
             binding.tvPromptCounter.text = "$count/500"
         }
 
@@ -47,12 +48,6 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
     override fun initListener() {
         binding.btnBack.setOnClickListener {
             if (isAdded) findNavController().safePopBackStack()
-        }
-
-        binding.btnFavorite.setOnClickListener {
-            if (isAdded && context != null) {
-                Toast.makeText(requireContext(), getString(R.string.toast_saved_to_favorites), Toast.LENGTH_SHORT).show()
-            }
         }
 
         // Suggestion chips

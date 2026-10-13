@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Desinstalar</string>
     <string name="shortcut_uninstall_desc">Desinstalar PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Haz que los recuerdos cobren vida</string>
     <string name="splash_loading">Cargando %1$d%%...</string>
     <string name="language_title">Seleccionar idioma</string>
@@ -13,17 +13,14 @@
     <string name="btn_next">Siguiente</string>
     <string name="btn_skip">Omitir</string>
     <string name="btn_get_started">Empezar</string>
-    <string name="intro_1_title">Une fotos,
-crea videos</string>
+    <string name="intro_1_title">Une fotos,\ncrea videos</string>
     <string name="intro_1_desc">Convierte tus momentos favoritos
 en videos dinámicos en cuestión de
 segundos.</string>
-    <string name="intro_2_title">Crea imágenes con
-prompts de IA</string>
+    <string name="intro_2_title">Crea imágenes con\nprompts de IA</string>
     <string name="intro_2_desc">Describe lo que imaginas
 y la IA lo transformará en una imagen increíble.</string>
-    <string name="intro_3_title">Restaura fotos
-antiguas y borrosas</string>
+    <string name="intro_3_title">Restaura fotos\nantiguas y borrosas</string>
     <string name="intro_3_desc">Mejora imágenes borrosas o dañadas
 y conserva recuerdos imborrables.</string>
     <string name="nav_home">Inicio</string>

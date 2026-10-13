@@ -3,7 +3,7 @@
     <string name="app_name">PHOTO ART &amp; VIDEO</string>
     <string name="shortcut_uninstall">Uninstall</string>
     <string name="shortcut_uninstall_desc">Uninstall PHOTO ART &amp; VIDEO</string>
-    <string name="splash_title">PHOTO ART &amp; VIDEO</string>
+    <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Make memories live again</string>
     <string name="splash_loading">Loading %1$d%%...</string>
     <string name="language_title">Select Language</string>
@@ -13,19 +13,12 @@
     <string name="btn_next">Next</string>
     <string name="btn_skip">Skip</string>
     <string name="btn_get_started">Get Started</string>
-    <string name="intro_1_title">Merge Photos,
-Create Videos</string>
-    <string name="intro_1_desc">Turn your favorite moments
-into vivid videos in just a few
-seconds.</string>
-    <string name="intro_2_title">Generate Images
-with AI Prompts</string>
-    <string name="intro_2_desc">Describe what you imagine,
-and AI will turn it into stunning visuals.</string>
-    <string name="intro_3_title">Restore Old &amp;
-Blurry Photos</string>
-    <string name="intro_3_desc">Restore blurry, faded pictures
-and preserve unforgettable memories.</string>
+    <string name="intro_1_title">Merge Photos,\nCreate Videos</string>
+    <string name="intro_1_desc">Turn your favorite moments\ninto vivid videos in just a few seconds.</string>
+    <string name="intro_2_title">Generate Images\nwith AI Prompts</string>
+    <string name="intro_2_desc">Describe what you imagine, and AI will turn it into stunning visuals.</string>
+    <string name="intro_3_title">Restore Old &amp;\nBlurry Photos</string>
+    <string name="intro_3_desc">Restore blurry, faded pictures and preserve unforgettable memories.</string>
     <string name="nav_home">Home</string>
     <string name="nav_template">Template</string>
     <string name="nav_music">Music</string>
@@ -44,8 +37,10 @@ With AI Prompt</string>
 Photos</string>
     <string name="func_01_memories">Merge Photos to Video</string>
     <string name="func_02_restore">Restore Old Photos</string>
-    <string name="func_03_enhance">AI Prompt Image</string>
-    <string name="func_04_music">Add Music</string>
+    <string name="func_03_enhance">AI Prompt Art</string>
+    <string name="func_04_music">Select Music</string>
+    <string name="search_music_hint">Search songs, artists...</string>
+    <string name="btn_next_step">Next</string>
     <string name="func_05_upscale">Upscale Photo</string>
     <string name="banner_1_chip">AI Photo &amp; Video</string>
     <string name="banner_1_title">Turn your photos
@@ -96,7 +91,7 @@ as new</string>
     <string name="btn_save_to_device">Save to Device</string>
     <string name="btn_share">Share</string>
     <string name="processing_video">Processing video...</string>
-    <string name="memories_title">Gom ảnh tạo Video</string>
+    <string name="memories_title">Create Video from Photos</string>
     <string name="your_photos">Ảnh của bạn</string>
     <string name="selected_x_photos">Đã chọn %1$d ảnh</string>
     <string name="no_photos_selected">Chưa chọn ảnh nào</string>
@@ -249,6 +244,7 @@ a premium experience.</string>
     <string name="toast_deleted_from_history">Deleted from history</string>
     <string name="toast_prompt_copied">Prompt copied to clipboard!</string>
     <string name="toast_feature_in_progress">Feature in progress</string>
+    <string name="toast_please_select_music">Please select a song</string>
 
     <!-- Auto-added localized feature keys -->
     <string name="prompt_hint">E.g., Anime girl in white dress standing in a flower field...</string>

@@ -44,20 +44,20 @@ class MusicCategoryAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: CategoryModel) {
-            val context = binding.root.context
-            binding.tvCategoryName.text = category.displayName
+            val isAll = category.code.equals("ALL", ignoreCase = true) ||
+                    category.name.equals("Tất cả", ignoreCase = true) ||
+                    category.code.isBlank()
+            binding.tvCategoryName.text = if (isAll) "Dành cho bạn" else category.displayName
 
             val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
                     (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))
 
             if (isSelected) {
                 binding.llCategoryChip.setBackgroundResource(R.drawable.bg_category_chip_selected)
-                binding.tvCategoryName.setTextColor(context.getColor(R.color.white))
-                binding.ivMusicChipIcon.setColorFilter(context.getColor(R.color.white))
+                binding.tvCategoryName.setTextColor(android.graphics.Color.WHITE)
             } else {
                 binding.llCategoryChip.setBackgroundResource(R.drawable.bg_category_chip_unselected)
-                binding.tvCategoryName.setTextColor(context.getColor(R.color.muted))
-                binding.ivMusicChipIcon.setColorFilter(context.getColor(R.color.muted))
+                binding.tvCategoryName.setTextColor(android.graphics.Color.parseColor("#7A8FB8"))
             }
 
             binding.root.setOnClickListener {

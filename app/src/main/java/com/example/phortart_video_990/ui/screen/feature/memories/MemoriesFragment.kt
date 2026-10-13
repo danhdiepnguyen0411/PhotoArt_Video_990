@@ -69,10 +69,12 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
         val initialTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
             ?: stateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
+        val initialSubtitle = args?.getString("selected_music_subtitle")?.takeIf { it.isNotBlank() }
+            ?: stateHandle?.get<String>("selected_music_subtitle")?.takeIf { it.isNotBlank() }
         if (!initialTitle.isNullOrBlank()) {
             selectedMusicTitle = initialTitle
             binding.tvSelectedMusicTitle.text = initialTitle
-            binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
+            binding.tvSelectedMusicSubtitle.text = initialSubtitle ?: "Billie Eilish • 03:20"
         }
 
         val initialAudioUrl = args?.getString("selected_music_audio_url")
@@ -109,7 +111,13 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 if (!musicTitle.isNullOrBlank()) {
                     selectedMusicTitle = musicTitle
                     binding.tvSelectedMusicTitle.text = musicTitle
-                    binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
+                }
+            }
+
+        stateHandle?.getLiveData<String>("selected_music_subtitle")
+            ?.observe(viewLifecycleOwner) { subtitle ->
+                if (!subtitle.isNullOrBlank()) {
+                    binding.tvSelectedMusicSubtitle.text = subtitle
                 }
             }
 
@@ -250,8 +258,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     private fun updateRatioUi() {
-        val activeColor = Color.parseColor("#4A6BF8")
-        val inactiveColor = Color.parseColor("#506584")
+        val activeColor = Color.parseColor("#8489F8")
+        val inactiveColor = Color.parseColor("#64748B")
 
         when (selectedAspectRatio) {
             "9:16" -> {
