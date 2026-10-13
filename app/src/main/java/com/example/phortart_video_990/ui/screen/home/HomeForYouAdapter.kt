@@ -118,13 +118,8 @@ class HomeForYouAdapter(
                 )
             }
 
-            binding.llDurationBadge.setOnClickListener {
-                if (onPlayClick != null) {
-                    onPlayClick.invoke(item, position)
-                } else {
-                    onItemClick(item)
-                }
-            }
+            binding.llDurationBadge.isClickable = false
+            binding.llDurationBadge.isFocusable = false
 
             binding.root.setOnClickListener {
                 onItemClick(item)
