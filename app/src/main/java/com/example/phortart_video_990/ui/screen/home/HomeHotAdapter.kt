@@ -86,13 +86,8 @@ class HomeHotAdapter(
                 )
             }
 
-            binding.ivPlayIcon.setOnClickListener {
-                if (onPlayClick != null) {
-                    onPlayClick.invoke(item, position)
-                } else {
-                    onItemClick(item)
-                }
-            }
+            binding.ivPlayIcon.isClickable = false
+            binding.ivPlayIcon.isFocusable = false
 
             binding.root.setOnClickListener {
                 onItemClick(item)
