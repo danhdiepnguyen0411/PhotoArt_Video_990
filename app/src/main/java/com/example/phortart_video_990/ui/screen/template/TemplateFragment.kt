@@ -41,6 +41,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             selectedCategoryCode = viewModel.selectedCategoryCode.value
         ) { selectedCategory ->
             stopAudio()
+            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+                .recordSelectedCategory(selectedCategory.code)
             viewModel.selectCategory(selectedCategory)
         }
         binding.rvTemplateCategories.layoutManager =
@@ -52,6 +54,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             items = emptyList(),
             onItemClick = { selectedMusic ->
                 stopAudio()
+                com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+                    .recordSelectedCategory(selectedMusic.category)
                 val bundle = Bundle().apply {
                     putString("selected_music_title", selectedMusic.title)
                     putString("selected_music_audio_url", selectedMusic.safeAudioUrl)

@@ -51,6 +51,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             selectedCategoryCode = selectedCategoryCode
         ) { selectedCategory ->
             selectedCategoryCode = selectedCategory.code
+            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+                .recordSelectedCategory(selectedCategory.code)
             loadMusicTracks(selectedCategory.code)
         }
         binding.rvMusicCategories.layoutManager =
@@ -261,6 +263,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     }
 
     private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+            .recordSelectedCategory(track.category)
         if (isTabMode) {
             val bundle = android.os.Bundle().apply {
                 putString("selected_music_title", track.title)

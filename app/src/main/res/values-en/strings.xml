@@ -34,8 +34,8 @@ and preserve unforgettable memories.</string>
     <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
     <string name="home_see_all">See all</string>
     <string name="home_recent_history">Recent History</string>
-    <string name="home_suggestions">Trending Music</string>
-    <string name="home_hot_templates">Hot Music</string>
+    <string name="home_suggestions">For You</string>
+    <string name="home_hot_templates">Hot</string>
     <string name="feature_video_title">Merge Photos
 To Video</string>
     <string name="feature_prompt_title">Generate Image

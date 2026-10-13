@@ -28,7 +28,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
 
             binding.topBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset
+                topMargin = statusBarInset 
             }
             binding.btnGeneratePrompt.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = navBarInset + (24 * resources.displayMetrics.density).toInt()
