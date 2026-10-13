@@ -33,9 +33,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private val templateRepository = TemplateRepository()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
 
-    private lateinit var recentHistoryAdapter: HomeMediaAdapter
-    private lateinit var trendingMusicAdapter: HomeMusicAdapter
-    private lateinit var hotMusicAdapter: HomeMusicAdapter
+    private lateinit var recentHistoryAdapter: HomeRecentHistoryAdapter
+    private lateinit var forYouAdapter: HomeForYouAdapter
+    private lateinit var hotTemplateAdapter: HomeHotAdapter
 
     private var mediaPlayer: MediaPlayer? = null
     private var activePlayingTrackId: String? = null
@@ -77,15 +77,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setupHeader()
         setupBanners()
         setupRecentHistory()
-        setupTrendingMusic()
-        setupHotMusic()
-        loadApiMusic()
+        setupForYouTemplates()
+        setupHotTemplates()
+        loadHomeData()
     }
 
     override fun onResume() {
         super.onResume()
         setupBanners()
         loadRecentHistory()
+        refreshRecommendations()
         checkCustomNotificationPermission()
     }
 
@@ -151,11 +152,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
 
         binding.btnSeeAllSuggestions.setOnClickListener {
-            (parentFragment as? MainFragment)?.selectTab(1)
+            if (canNavigate()) {
+                val navController = parentFragment?.parentFragment?.findNavController()
+                    ?: parentFragment?.findNavController()
+                    ?: findNavController()
+                navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)
+            }
         }
 
         binding.btnSeeAllTemplates.setOnClickListener {
-            (parentFragment as? MainFragment)?.selectTab(1)
+            if (canNavigate()) {
+                val navController = parentFragment?.parentFragment?.findNavController()
+                    ?: parentFragment?.findNavController()
+                    ?: findNavController()
+                navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)
+            }
         }
 
         binding.swipeRefreshLayout.setColorSchemeColors(
@@ -165,7 +176,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.swipeRefreshLayout.setOnRefreshListener {
             setupBanners()
             loadRecentHistory()
-            loadApiMusic()
+            loadHomeData()
         }
 
         binding.btnPro.setOnClickListener {
@@ -237,9 +248,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupRecentHistory() {
-        recentHistoryAdapter = HomeMediaAdapter(emptyList()) { item ->
+        recentHistoryAdapter = HomeRecentHistoryAdapter(emptyList()) { item ->
             val historyItems = historyRepository.getHistoryList()
-            val matched = historyItems.find { it.title == item.label || (item.imageUrl != null && it.imageUrl == item.imageUrl) }
+            val matched = historyItems.find { it.title == item.title || (item.imageUrl != null && it.imageUrl == item.imageUrl) }
             if (matched != null) {
                 val bundle = android.os.Bundle().apply {
                     putString(
@@ -261,47 +272,54 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun loadRecentHistory() {
         val historyItems = historyRepository.getHistoryList()
-        val mediaItems = historyItems.map { item ->
-            HomeMediaItemModel(
-                label = item.title,
-                category = item.type,
-                imageUrl = item.imageUrl,
-                imageUri = item.imageUri,
-                iconRes = R.drawable.ic_badge_image
-            )
+        val displayList = if (historyItems.isNotEmpty()) {
+            historyItems
+        } else {
+            com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultRecentHistory()
         }
-        recentHistoryAdapter.submitList(mediaItems)
-        binding.llRecentHistorySection.visibility = if (mediaItems.isEmpty()) View.GONE else View.VISIBLE
+        recentHistoryAdapter.submitList(displayList)
+        binding.llRecentHistorySection.visibility = View.VISIBLE
     }
 
-    private fun setupTrendingMusic() {
-        trendingMusicAdapter = HomeMusicAdapter(
+    private fun setupForYouTemplates() {
+        forYouAdapter = HomeForYouAdapter(
             items = emptyList(),
-            onTrackClick = { track -> onMusicTrackSelected(track) },
-            onPlayClick = { track, pos -> toggleAudioPreview(track, pos, isTrending = true) }
+            onItemClick = { template -> onTemplateSelected(template) },
+            onPlayClick = { template, pos -> toggleAudioPreview(template, pos, isForYou = true) }
         )
         binding.rvSuggestions.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvSuggestions.adapter = trendingMusicAdapter
+        binding.rvSuggestions.adapter = forYouAdapter
     }
 
-    private fun setupHotMusic() {
-        hotMusicAdapter = HomeMusicAdapter(
+    private fun setupHotTemplates() {
+        hotTemplateAdapter = HomeHotAdapter(
             items = emptyList(),
-            onTrackClick = { track -> onMusicTrackSelected(track) },
-            onPlayClick = { track, pos -> toggleAudioPreview(track, pos, isTrending = false) }
+            onItemClick = { template -> onTemplateSelected(template) },
+            onPlayClick = { template, pos -> toggleAudioPreview(template, pos, isForYou = false) }
         )
         binding.rvHotTemplates.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvHotTemplates.adapter = hotMusicAdapter
+        binding.rvHotTemplates.adapter = hotTemplateAdapter
     }
 
-    private fun onMusicTrackSelected(track: TemplateModel) {
+    private fun onTemplateSelected(template: TemplateModel) {
         stopAudio()
+        // Record template category usage to boost category ranking for future sessions and priority
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+            .recordSelectedCategory(template.category)
+
         val bundle = android.os.Bundle().apply {
-            putString("selected_music_title", track.title)
-            putString("selected_music_audio_url", track.safeAudioUrl)
-            putString("selected_music_image_url", track.safeImageUrl)
+            putString("template_code", template.id)
+            putString("template_title", template.title)
+            putString("template_category", template.category)
+            putString("template_thumb", template.safeImageUrl)
+            putString("template_audio_url", template.safeAudioUrl)
+            putString("selected_music_title", template.title)
+            putString("selected_music_audio_url", template.safeAudioUrl)
+            putString("selected_music_image_url", template.safeImageUrl)
+            putFloat("selected_template_duration_sec", template.durationSeconds.toFloat())
+            putInt("selected_template_photo_count", template.targetPhotoCount)
         }
         val navController = parentFragment?.parentFragment?.findNavController()
             ?: parentFragment?.findNavController()
@@ -309,20 +327,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
     }
 
-    private fun toggleAudioPreview(track: TemplateModel, position: Int, isTrending: Boolean) {
-        val targetAdapter = if (isTrending) trendingMusicAdapter else hotMusicAdapter
+    private fun setAdapterLoading(isForYou: Boolean, position: Int) {
+        if (isForYou) forYouAdapter.setLoadingState(position) else hotTemplateAdapter.setLoadingState(position)
+    }
 
-        if (activePlayingTrackId == track.id) {
+    private fun setAdapterPlaying(isForYou: Boolean, position: Int, isPlaying: Boolean) {
+        if (isForYou) forYouAdapter.setPlayingState(position, isPlaying) else hotTemplateAdapter.setPlayingState(position, isPlaying)
+    }
+
+    private fun toggleAudioPreview(template: TemplateModel, position: Int, isForYou: Boolean) {
+        if (activePlayingTrackId == template.id) {
             stopAudio()
             return
         }
 
         stopAudio()
 
-        val audioUrl = track.safeAudioUrl
+        val audioUrl = template.safeAudioUrl
         if (audioUrl.isNullOrBlank()) return
 
-        targetAdapter.setLoadingState(position)
+        setAdapterLoading(isForYou, position)
 
         previewJob = viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -330,7 +354,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 if (!isAdded || view == null) return@launch
 
                 if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
-                    targetAdapter.setPlayingState(position, false)
+                    setAdapterPlaying(isForYou, position, false)
                     return@launch
                 }
 
@@ -338,8 +362,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     setDataSource(cachedFile.absolutePath)
                     setOnPreparedListener { mp ->
                         mp.start()
-                        activePlayingTrackId = track.id
-                        targetAdapter.setPlayingState(position, true)
+                        activePlayingTrackId = template.id
+                        setAdapterPlaying(isForYou, position, true)
                     }
                     setOnCompletionListener {
                         stopAudio()
@@ -351,7 +375,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     prepareAsync()
                 }
             } catch (e: Exception) {
-                targetAdapter.setPlayingState(position, false)
+                setAdapterPlaying(isForYou, position, false)
             }
         }
     }
@@ -367,22 +391,58 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         } catch (_: Exception) {}
         mediaPlayer = null
         activePlayingTrackId = null
-        trendingMusicAdapter.setPlayingState(-1, false)
-        hotMusicAdapter.setPlayingState(-1, false)
+        forYouAdapter.setPlayingState(-1, false)
+        hotTemplateAdapter.setPlayingState(-1, false)
     }
 
-    private fun loadApiMusic() {
+    private var cachedMusicTracks: List<TemplateModel> = emptyList()
+
+    private fun refreshRecommendations() {
+        if (!isAdded) return
+        val currentPool = cachedMusicTracks
+        val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+            .recommendForYouTemplates(requireContext(), currentPool)
+        forYouAdapter.submitList(recommended)
+
+        val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
+        val defaultHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultHotTemplates()
+        val availableHot = (currentPool + defaultHot)
+            .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
+            .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
+        hotTemplateAdapter.submitList(availableHot.take(8))
+    }
+
+    private fun loadHomeData() {
+        // 1. Immediately recommend and display templates using the ranking, priority, and anti-collision engine
+        val initialForYou = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+            .recommendForYouTemplates(requireContext(), emptyList())
+        forYouAdapter.submitList(initialForYou)
+
+        val forYouKeys = initialForYou.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
+        val initialHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+            .getDefaultHotTemplates()
+            .filterNot { forYouKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
+        hotTemplateAdapter.submitList(initialHot)
+
+        // 2. Fetch music tracks from API in background and apply ranking, priority, and anti-collision
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val tracks = templateRepository.getMusicTracks()
-                if (tracks.isNotEmpty()) {
-                    val trending = tracks.take(8)
-                    val hot = if (tracks.size > 8) tracks.drop(8).take(8) else tracks
-                    trendingMusicAdapter.submitList(trending)
-                    hotMusicAdapter.submitList(hot)
+                val apiMusicTracks = templateRepository.getMusicTracks()
+                if (apiMusicTracks.isNotEmpty()) {
+                    cachedMusicTracks = apiMusicTracks
+                    val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+                        .recommendForYouTemplates(requireContext(), apiMusicTracks)
+                    forYouAdapter.submitList(recommended)
+
+                    val recKeys = recommended.map { it.id.ifBlank { it.title }.trim().lowercase() }.toSet()
+                    val defaultHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper.getDefaultHotTemplates()
+                    val availableHot = (apiMusicTracks + defaultHot)
+                        .distinctBy { it.id.ifBlank { it.title }.trim().lowercase() }
+                        .filterNot { recKeys.contains(it.id.ifBlank { it.title }.trim().lowercase()) }
+                    hotTemplateAdapter.submitList(availableHot.take(8))
                 }
-            } catch (e: Exception) {
-                // Keep empty list or fallback
+            } catch (_: Exception) {
+                // Keep default recommendation and hot music lists
             } finally {
                 bindingOrNull?.swipeRefreshLayout?.postDelayed({
                     if (isAdded && bindingOrNull != null) {

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="120dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#EFF2F7"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top Thumbnail Container with Pill Badges -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp">
+
+            <ImageView
+                android:id="@+id/ivHistoryThumb"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Thumbnail"
+                tools:src="@drawable/history_1" />
+
+            <!-- Pill Badges Overlay on Bottom-Start -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Duration Pill (e.g., 00:16) -->
+                <LinearLayout
+                    android:id="@+id/llDurationPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="2dp">
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:contentDescription="Play"
+                        android:src="@drawable/ic_play_small"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        tools:text="00:16" />
+                </LinearLayout>
+
+                <!-- Photo Count Pill (e.g., 6) -->
+                <LinearLayout
+                    android:id="@+id/llPhotoCountPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="2dp">
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:contentDescription="Photos"
+                        android:src="@drawable/ic_badge_image"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvPhotoCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        tools:text="6" />
+                </LinearLayout>
+
+                <!-- Single Photo Pill (e.g., Ảnh) -->
+                <LinearLayout
+                    android:id="@+id/llPhotoOnlyPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="2dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:contentDescription="Photo"
+                        android:src="@drawable/ic_badge_image"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvPhotoOnlyText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="Ảnh"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- Bottom Info Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvHistoryTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="#17237A"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter_bold"
+                android:textStyle="bold"
+                tools:text="Cùng nhau đ..." />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:contentDescription="Calendar"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="#8E9BB0" />
+
+                <TextView
+                    android:id="@+id/tvHistoryDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:textColor="#8E9BB0"
+                    android:textSize="10.5sp"
+                    tools:text="26/06/2024" />
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:contentDescription="Arrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#8E9BB0" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

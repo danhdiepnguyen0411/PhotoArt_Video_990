@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="120dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#EFF2F7"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top Thumbnail Container with Pill Badges -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp">
+
+            <ImageView
+                android:id="@+id/ivTemplateThumb"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Template Thumbnail"
+                tools:src="@drawable/suggestion_ai_effect" />
+
+            <!-- Pill Badges Overlay on Bottom-Start -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Duration / Play Preview Pill -->
+                <LinearLayout
+                    android:id="@+id/llDurationBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="2dp">
+
+                    <ImageView
+                        android:id="@+id/ivPlayIcon"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:contentDescription="Play"
+                        android:src="@drawable/ic_play_small"
+                        app:tint="@color/white" />
+
+                    <ProgressBar
+                        android:id="@+id/pbLoading"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/white"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        tools:text="00:12" />
+                </LinearLayout>
+
+                <!-- Photo Count Pill -->
+                <LinearLayout
+                    android:id="@+id/llPhotoCountPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="2dp">
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:contentDescription="Photos"
+                        android:src="@drawable/ic_badge_image"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvPhotoCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        tools:text="5" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- Bottom Info Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvTemplateTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="#17237A"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter_bold"
+                android:textStyle="bold"
+                tools:text="Phong cách ..." />
+
+            <TextView
+                android:id="@+id/tvCategoryTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/bg_tag_ai_effect"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:singleLine="true"
+                android:textColor="#7C3AED"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                tools:text="AI Effect" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

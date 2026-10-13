@@ -39,6 +39,48 @@ data class TemplateModel(
                 videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true ||
                 imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true
 
+    val categoryDisplayName: String
+        get() {
+            var raw = category.trim()
+            if (raw.startsWith("MUSIC_", ignoreCase = true)) {
+                raw = raw.substring(6)
+            } else if (raw.startsWith("AI_", ignoreCase = true)) {
+                raw = "AI " + raw.substring(3)
+            }
+            if (raw.isBlank()) return "Hot"
+            return when (raw.uppercase().replace("-", "_").replace(" ", "_")) {
+                "HIPHOP", "HIP_HOP" -> "Hip Hop"
+                "EDM", "ELECTRONIC" -> "EDM"
+                "LOFI", "LO_FI" -> "Lofi"
+                "POP" -> "Pop"
+                "CHILL" -> "Chill"
+                "CINEMATIC" -> "Cinematic"
+                "BASS" -> "Bass"
+                "ROCK" -> "Rock"
+                "ACOUSTIC" -> "Acoustic"
+                "RNB", "R_B", "R&B" -> "R&B"
+                "JAZZ" -> "Jazz"
+                "DANCE" -> "Dance"
+                "AI_DANCE" -> "AI Dance"
+                "AI_EFFECT" -> "AI Effect"
+                "AI_STYLE" -> "AI Style"
+                "FANTASY" -> "Fantasy"
+                "PORTRAIT" -> "Portrait"
+                "TRENDY" -> "Trendy"
+                "SELFIE" -> "Selfie"
+                "VINTAGE" -> "Vintage"
+                else -> {
+                    if (raw.contains("_")) {
+                        raw.split("_").joinToString(" ") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+                    } else if (raw.length > 3 && raw.all { it.isUpperCase() }) {
+                        raw.lowercase().replaceFirstChar { it.uppercase() }
+                    } else {
+                        raw
+                    }
+                }
+            }
+        }
+
     val durationSeconds: Int
         get() {
             val d = displayDuration
