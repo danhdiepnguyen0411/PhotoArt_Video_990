@@ -28,13 +28,15 @@
         android:id="@+id/tvHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:fontFamily="@font/inter_bold"
+        android:letterSpacing="-0.02"
         android:text="@string/ai_create_title"
-        android:textColor="#102148"
-        android:textSize="18sp"
+        android:textColor="#2A34C9"
+        android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/btnBack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
         app:layout_constraintTop_toTopOf="@+id/btnBack" />
 
     <!-- Center Content: 3D Illustration, Circular Progress, and Status Texts -->

@@ -108,6 +108,9 @@ tinh khôi</string>
     <string name="choose_bg_song">Chọn bài hát nền</string>
     <string name="browse_ai_music_catalog">Nhấn để duyệt danh mục nhạc AI</string>
     <string name="video_result_title">Gom kỷ niệm</string>
+    <string name="memories_of_us">Kỷ niệm của chúng ta</string>
+    <string name="video_subtitle_format">Tạo bởi AI · %1$s · %2$s</string>
+    <string name="video_subtitle_no_music_format">Tạo bởi AI · %1$s</string>
     <string name="no_music_selected">Chưa chọn nhạc</string>
     <string name="btn_save">Lưu</string>
     <string name="exporting_video_merging_music">Đang xuất video &amp; ghép nhạc...</string>

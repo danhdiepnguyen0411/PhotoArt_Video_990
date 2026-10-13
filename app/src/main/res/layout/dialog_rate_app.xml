@@ -128,20 +128,21 @@
     <!-- Not now Text -->
     <TextView
         android:id="@+id/btnNotNow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_btn_dialog_cancel"
+        android:clickable="true"
+        android:focusable="true"
         android:fontFamily="@font/inter"
         app:fontFamily="@font/inter"
         android:gravity="center"
         android:letterSpacing="0.02"
         android:lineHeight="20sp"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
+        app:lineHeight="20sp"
         android:text="@string/btn_rate_not_now"
-        android:textColor="#4B5563"
-        android:textFontWeight="400"
+        android:textColor="#64748B"
+        android:textFontWeight="500"
         android:textSize="14sp" />
 
 </LinearLayout>

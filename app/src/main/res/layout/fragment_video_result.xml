@@ -50,7 +50,7 @@
         android:layout_marginBottom="12dp"
         app:cardBackgroundColor="#CFE0F7"
         app:cardCornerRadius="22dp"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:layout_constraintBottom_toTopOf="@+id/cardVideoInfo"
         app:layout_constraintTop_toBottomOf="@+id/llTopBar">
 
@@ -125,6 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
+                    android:fontFamily="@font/inter_semibold"
                     android:text="00:00 / 00:15"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
@@ -150,9 +151,9 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="#EBFFFFFF"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
+        app:cardElevation="3dp"
         app:layout_constraintBottom_toTopOf="@+id/llActions">
 
         <LinearLayout
@@ -163,10 +164,10 @@
             android:paddingHorizontal="14dp"
             android:paddingVertical="12dp">
 
-            <!-- Thumb / Cover Icon (.fl-video-thumb) -->
+            <!-- Thumb Icon (.fl-video-thumb) -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
@@ -178,19 +179,11 @@
                     android:background="@drawable/bg_thumb_gradient">
 
                     <ImageView
-                        android:id="@+id/ivMusicCover"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/ivDefaultThumbIcon"
+                        android:id="@+id/ivThumbIcon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_feature_photo"
-                        app:tint="#FFFFFF" />
+                        android:src="@drawable/ic_video_thumb_image" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -207,8 +200,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
+                    android:fontFamily="@font/inter_bold"
                     android:maxLines="1"
-                    android:text="@string/no_music_selected"
+                    android:text="@string/memories_of_us"
                     android:textColor="#2A34C9"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -218,7 +212,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="00:15"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/inter_medium"
+                    android:maxLines="1"
+                    android:text="Tạo bởi AI · 0:15"
                     android:textColor="#8296BC"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -226,8 +223,8 @@
             <!-- Note Icon (.fl-video-note) with Animation -->
             <FrameLayout
                 android:id="@+id/flVideoNote"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_note_circle">
 
@@ -236,7 +233,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_note_music" />
+                    android:src="@drawable/ic_video_note_double" />
             </FrameLayout>
 
         </LinearLayout>
@@ -249,72 +246,94 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="28dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="horizontal"
+        android:paddingVertical="4dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Save button (.fl-btn-ghost) -->
-        <LinearLayout
-            android:id="@+id/btnSave"
+        <!-- Save button Card (.fl-btn-ghost) -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="48dp"
             android:layout_marginEnd="6dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_btn_ghost"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/ic_download"
-                app:tint="#7188B5" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btn_save"
-                android:textColor="#7188B5"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Share button (GradientButton) -->
-        <FrameLayout
-            android:id="@+id/btnShare"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_btn_primary"
-            android:clickable="true"
-            android:focusable="true">
+            android:layout_weight="0.4"
+            app:cardBackgroundColor="#D8E7FD"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="3dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center_vertical"
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_btn_video_save"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_share_line"
-                    app:tint="#FFFFFF" />
+                    android:src="@drawable/ic_download"
+                    app:tint="#3D6FE8" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/btn_share"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="@string/btn_save"
+                    android:textColor="#3D6FE8"
+                    android:textSize="14.5sp"
                     android:textStyle="bold" />
             </LinearLayout>
-        </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Share button Card (GradientButton) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="0.6"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp">
+
+            <FrameLayout
+                android:id="@+id/btnShare"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_btn_video_share"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="6dp"
+                        android:src="@drawable/ic_share_line"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
+                        android:text="@string/btn_share"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14.5sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
