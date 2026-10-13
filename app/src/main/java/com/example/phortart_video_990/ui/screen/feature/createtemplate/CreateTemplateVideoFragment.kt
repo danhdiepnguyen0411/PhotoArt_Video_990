@@ -13,7 +13,10 @@ import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.AppLoadingDialog
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.ImageCompressor
+import com.example.phortart_video_990.core.utils.ShimmerDrawable
 import com.example.phortart_video_990.core.utils.VideoGenerator
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.data.repository.TemplateRepository
@@ -50,11 +53,53 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
     private var loadingDialog: AppLoadingDialog? = null
 
+    private var isGeneratingVideo = false
+    private var pendingResultBundle: Bundle? = null
+    private var pendingErrorMsg: String? = null
+
     // Photo picker launcher (Only 1 image)
     private val pickSingleImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             selectedPhotoUri = uri
             updateSelectedPhotoUi()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.getString("saved_photo_uri")?.let {
+            selectedPhotoUri = Uri.parse(it)
+        }
+        savedInstanceState?.getString("saved_template_code")?.let {
+            if (it.isNotBlank()) templateCode = it
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        selectedPhotoUri?.let { outState.putString("saved_photo_uri", it.toString()) }
+        if (templateCode.isNotBlank()) outState.putString("saved_template_code", templateCode)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // If video generation finished while in background, navigate now safely!
+        pendingResultBundle?.let { bundle ->
+            pendingResultBundle = null
+            hideLoadingDialog()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            findNavController().navigateSafe(R.id.action_createTemplateVideoFragment_to_templateVideoResultFragment, bundle)
+            return
+        }
+
+        // If error occurred while in background, show error toast now!
+        pendingErrorMsg?.let { errorMsg ->
+            pendingErrorMsg = null
+            hideLoadingDialog()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            context?.let { ctx ->
+                Toast.makeText(ctx, getString(R.string.toast_error_occurred, errorMsg), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -69,13 +114,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         binding.tvTemplateCategory.text = getString(R.string.template_requirement_one_photo, templateCategory)
 
         if (templateThumbnailUrl.isNotBlank()) {
+            val shimmerPlaceholder = ShimmerDrawable(cornerRadius = 14f)
             binding.ivTemplateThumb.load(templateThumbnailUrl) {
                 crossfade(true)
-                placeholder(R.drawable.template_trendy)
-                error(R.drawable.template_trendy)
+                placeholder(shimmerPlaceholder)
+                error(shimmerPlaceholder)
             }
         } else {
-            binding.ivTemplateThumb.setImageResource(R.drawable.template_trendy)
+            binding.ivTemplateThumb.setImageDrawable(ShimmerDrawable(cornerRadius = 14f))
         }
 
         updateSelectedPhotoUi()
@@ -145,7 +191,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
     override fun initListener() {
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().safePopBackStack()
         }
 
         binding.cardUploadPhoto.setOnClickListener {
@@ -157,7 +203,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         }
 
         binding.cardSelectMusic.setOnClickListener {
-            findNavController().navigate(R.id.action_createTemplateVideoFragment_to_musicFragment)
+            findNavController().navigateSafe(R.id.action_createTemplateVideoFragment_to_musicFragment)
         }
 
         binding.btnCreateVideo.setOnClickListener {
@@ -172,16 +218,19 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     private fun processAndGenerateVideo(photoUri: Uri) {
+        isGeneratingVideo = true
         binding.btnCreateVideo.isEnabled = false
         showLoadingDialog(getString(R.string.loading_preparing_image), getString(R.string.loading_please_wait))
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             try {
                 // 1. Tải nhạc nền nếu người dùng có chọn nhạc (Optional)
                 val audioUrl = selectedMusicAudioUrl
                 var audioPath = selectedMusicAudioFilePath
                 if (!audioUrl.isNullOrBlank() && (audioPath.isNullOrBlank() || !File(audioPath).exists())) {
-                    loadingDialog?.updateMessage(getString(R.string.loading_downloading_music), getString(R.string.loading_please_wait))
+                    if (isAdded) {
+                        loadingDialog?.updateMessage(getString(R.string.loading_downloading_music), getString(R.string.loading_please_wait))
+                    }
                     val downloaded = AudioCacheManager.getOrDownloadAudio(requireContext(), audioUrl)
                     if (downloaded != null && downloaded.exists()) {
                         audioPath = downloaded.absolutePath
@@ -190,12 +239,19 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
                 // 2. Chuyển Uri thành File và nén qua ImageCompressor
-                loadingDialog?.updateMessage(getString(R.string.loading_processing_input_image), getString(R.string.loading_compressing_optimizing))
+                if (isAdded) {
+                    loadingDialog?.updateMessage(getString(R.string.loading_processing_input_image), getString(R.string.loading_compressing_optimizing))
+                }
                 val rawFile = withContext(Dispatchers.IO) { copyUriToFile(photoUri) }
                 if (rawFile == null || !rawFile.exists()) {
-                    hideLoadingDialog()
-                    binding.btnCreateVideo.isEnabled = true
-                    Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
+                    isGeneratingVideo = false
+                    if (isResumed && isAdded) {
+                        hideLoadingDialog()
+                        bindingOrNull?.btnCreateVideo?.isEnabled = true
+                        Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
+                    } else {
+                        pendingErrorMsg = getString(R.string.toast_cannot_read_image)
+                    }
                     return@launch
                 }
 
@@ -204,7 +260,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
                 // 3. Gọi backend processImageEditing
-                loadingDialog?.updateMessage(getString(R.string.loading_sending_video_request), getString(R.string.loading_backend_ai_processing))
+                if (isAdded) {
+                    loadingDialog?.updateMessage(getString(R.string.loading_sending_video_request), getString(R.string.loading_backend_ai_processing))
+                }
                 val codeToUse = templateCode.ifBlank { "ai_effect_default" }
 
                 val processResult = templateRepository.processImageEditing(
@@ -218,9 +276,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     // Nếu lỗi mạng / timeout thử lấy requestId từ error nếu có
                     val reqId = templateRepository.extractRequestId(null)
                     if (reqId.isNullOrBlank()) {
-                        hideLoadingDialog()
-                        binding.btnCreateVideo.isEnabled = true
-                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_LONG).show()
+                        isGeneratingVideo = false
+                        if (isResumed && isAdded) {
+                            hideLoadingDialog()
+                            bindingOrNull?.btnCreateVideo?.isEnabled = true
+                            Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_LONG).show()
+                        } else {
+                            pendingErrorMsg = errorMsg
+                        }
                         return@launch
                     }
                 }
@@ -233,16 +296,20 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                 // 4. Nếu chưa có video trực tiếp mà có requestId -> Poll kết quả
                 if (videoUrl.isNullOrBlank() && !requestId.isNullOrBlank()) {
-                    loadingDialog?.updateMessage(getString(R.string.loading_generating_video_ai), getString(R.string.loading_processing_progress, 30))
+                    if (isAdded) {
+                        loadingDialog?.updateMessage(getString(R.string.loading_generating_video_ai), getString(R.string.loading_processing_progress, 30))
+                    }
                     val pollResult = templateRepository.pollImageEditingResult(
                         requestId = requestId,
                         intervalMillis = 5_000L,
                         timeoutMillis = 180_000L,
                         onProgress = { progress ->
-                            loadingDialog?.updateMessage(
-                                getString(R.string.loading_generating_video_ai),
-                                getString(R.string.loading_processing_progress, progress)
-                            )
+                            if (isAdded) {
+                                loadingDialog?.updateMessage(
+                                    getString(R.string.loading_generating_video_ai),
+                                    getString(R.string.loading_processing_progress, progress)
+                                )
+                            }
                         }
                     )
 
@@ -250,9 +317,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                         videoUrl = templateRepository.extractVideoUrl(pollResult.getOrNull())
                     } else {
                         val pollError = pollResult.exceptionOrNull()?.message ?: getString(R.string.loading_timeout_error)
-                        hideLoadingDialog()
-                        binding.btnCreateVideo.isEnabled = true
-                        Toast.makeText(requireContext(), getString(R.string.toast_process_video_failed, pollError), Toast.LENGTH_LONG).show()
+                        isGeneratingVideo = false
+                        if (isResumed && isAdded) {
+                            hideLoadingDialog()
+                            bindingOrNull?.btnCreateVideo?.isEnabled = true
+                            Toast.makeText(requireContext(), getString(R.string.toast_process_video_failed, pollError), Toast.LENGTH_LONG).show()
+                        } else {
+                            pendingErrorMsg = pollError
+                        }
                         return@launch
                     }
                 }
@@ -261,7 +333,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 var finalLocalVideoPath: String? = null
 
                 if (!videoUrl.isNullOrBlank()) {
-                    loadingDialog?.updateMessage(getString(R.string.loading_preparing_video), getString(R.string.loading_storing_local))
+                    if (isAdded) {
+                        loadingDialog?.updateMessage(getString(R.string.loading_preparing_video), getString(R.string.loading_storing_local))
+                    }
                     val rawVideoFile = if (File(videoUrl).exists()) {
                         File(videoUrl)
                     } else {
@@ -272,7 +346,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                     if (rawVideoFile != null && rawVideoFile.exists()) {
                         val mergedFile = if (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank()) {
-                            loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
+                            if (isAdded) {
+                                loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
+                            }
                             val outMerged = File(requireContext().cacheDir, "merged_ai_${System.currentTimeMillis()}.mp4")
                             val audioSource = audioPath?.takeIf { File(it).exists() } ?: audioUrl.orEmpty()
                             val muxSuccess = VideoGenerator.mergeAudioIntoVideo(
@@ -298,8 +374,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
                 }
 
-                hideLoadingDialog()
-                binding.btnCreateVideo.isEnabled = true
+                isGeneratingVideo = false
 
                 // 6. Điều hướng sang màn xem video kết quả và tự động lưu vào Lịch sử
                 if (!finalLocalVideoPath.isNullOrBlank()) {
@@ -310,9 +385,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
             } catch (e: Exception) {
-                hideLoadingDialog()
-                binding.btnCreateVideo.isEnabled = true
-                Toast.makeText(requireContext(), getString(R.string.toast_error_occurred, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                isGeneratingVideo = false
+                if (isResumed && isAdded) {
+                    hideLoadingDialog()
+                    bindingOrNull?.btnCreateVideo?.isEnabled = true
+                    Toast.makeText(requireContext(), getString(R.string.toast_error_occurred, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                } else {
+                    pendingErrorMsg = e.message ?: ""
+                }
             }
         }
     }
@@ -325,7 +405,13 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             putString(TemplateVideoResultFragment.ARG_MUSIC_FILE_PATH, audioPath)
             putString(TemplateVideoResultFragment.ARG_MUSIC_IMAGE_URL, selectedMusicImageUrl)
         }
-        findNavController().navigate(R.id.action_createTemplateVideoFragment_to_templateVideoResultFragment, bundle)
+        if (isResumed && isAdded) {
+            hideLoadingDialog()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            findNavController().navigateSafe(R.id.action_createTemplateVideoFragment_to_templateVideoResultFragment, bundle)
+        } else {
+            pendingResultBundle = bundle
+        }
     }
 
     private fun saveToHistory(localVideoPath: String, photoUri: String) {

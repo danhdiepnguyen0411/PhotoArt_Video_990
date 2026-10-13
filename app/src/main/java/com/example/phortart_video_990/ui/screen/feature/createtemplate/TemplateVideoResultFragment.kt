@@ -4,6 +4,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +16,8 @@ import com.example.phortart_video_990.core.dialog.AppDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.ShareUtils
 import com.example.phortart_video_990.core.utils.VideoGenerator
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentTemplateVideoResultBinding
@@ -45,6 +48,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
     private var isExporting = false
+    private var lastShareClickTime = 0L
 
     // Playback state
     private var isPlaying = false
@@ -341,14 +345,6 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
             togglePlayback()
         }
 
-        binding.cardMusicInfo.setOnClickListener {
-            binding.videoView.pause()
-            externalAudioPlayer?.pause()
-            isPlaying = false
-            updatePlayStateUi(false)
-            findNavController().navigate(R.id.action_templateVideoResultFragment_to_musicFragment)
-        }
-
         binding.btnSave.setOnClickListener {
             it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
                 it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
@@ -357,6 +353,8 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         }
 
         binding.btnShare.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - lastShareClickTime < 1000L) return@setOnClickListener
+            lastShareClickTime = SystemClock.elapsedRealtime()
             it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
                 it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
                 handleShare()

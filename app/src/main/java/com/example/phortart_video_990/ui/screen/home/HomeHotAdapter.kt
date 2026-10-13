@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.core.utils.ShimmerDrawable
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.databinding.ItemHomeHotCardBinding
 
@@ -59,13 +60,16 @@ class HomeHotAdapter(
             binding.tvDuration.text = item.displayDuration
             binding.tvPhotoCount.text = item.displayPhotoCount
 
-            val fallbackRes = item.localImageRes ?: R.drawable.template_fantasy
-            val imageSource: Any = item.localImageRes ?: item.safeImageUrl?.takeIf { it.isNotBlank() } ?: fallbackRes
+            // Image Thumbnail with shimmer loading light beam (NO static template images as placeholder)
+            val shimmerPlaceholder = ShimmerDrawable()
+            val imageSource: Any = item.safeImageUrl?.takeIf { it.isNotBlank() }
+                ?: item.localImageRes
+                ?: ""
 
             binding.ivTemplateThumb.load(imageSource) {
                 crossfade(true)
-                placeholder(fallbackRes)
-                error(fallbackRes)
+                placeholder(shimmerPlaceholder)
+                error(shimmerPlaceholder)
             }
 
             val isPlaying = position == playingPosition

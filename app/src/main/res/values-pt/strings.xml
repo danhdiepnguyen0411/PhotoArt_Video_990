@@ -95,7 +95,8 @@ folha</string>
     <string name="memories_upload_title">Enviar fotos da galeria</string>
     <string name="memories_photos_count">%1$d fotos</string>
     <string name="tap_to_select_photos">Toque para selecionar fotos</string>
-    <string name="select_multiple_photos">Selecione 1 ou mais fotos (JPG, PNG)</string>
+    <string name="select_multiple_photos">Selecione até 10 fotos (JPG, PNG)</string>
+    <string name="select_max_photos_format">Selecione até %d fotos (JPG, PNG)</string>
     <string name="tap_to_manage_photos">Toque para ver e gerenciar fotos</string>
     <string name="btn_add_photos">Adicionar fotos</string>
     <string name="btn_view_photos">Ver fotos</string>

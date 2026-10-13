@@ -44,6 +44,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
                 .recordSelectedCategory(selectedCategory.code)
             viewModel.selectCategory(selectedCategory)
+            scrollToTop()
         }
         binding.rvTemplateCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -200,34 +201,58 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                     }
                 }
                 launch {
+                    var lastCategoryCode: String? = null
                     viewModel.selectedCategoryCode.collect { code ->
                         categoryAdapter.setSelected(code)
+                        if (lastCategoryCode != null && lastCategoryCode != code) {
+                            scrollToTop()
+                        }
+                        lastCategoryCode = code
                     }
                 }
                 launch {
                     viewModel.templates.collect { list ->
                         templateAdapter.submitList(list)
                         val isLoading = viewModel.isLoading.value
-                        binding.llEmptyState.visibility = if (list.isEmpty() && !isLoading) View.VISIBLE else View.GONE
+                        if (!isLoading) {
+                            binding.layoutSkeletonLoading.root.visibility = View.GONE
+                            binding.rvTemplates.visibility = View.VISIBLE
+                            binding.llEmptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                        }
+                        scrollToTop()
                     }
                 }
                 launch {
                     viewModel.isLoading.collect { loading ->
-                        if (!binding.swipeRefreshLayout.isRefreshing) {
-                            binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
+                        binding.pbLoading.visibility = View.GONE
+                        if (loading) {
+                            if (!binding.swipeRefreshLayout.isRefreshing || templateAdapter.itemCount == 0) {
+                                binding.layoutSkeletonLoading.root.visibility = View.VISIBLE
+                                binding.rvTemplates.visibility = View.GONE
+                            }
+                            binding.llEmptyState.visibility = View.GONE
                         } else {
-                            binding.pbLoading.visibility = View.GONE
-                        }
-                        if (!loading) {
+                            binding.layoutSkeletonLoading.root.visibility = View.GONE
+                            binding.rvTemplates.visibility = View.VISIBLE
                             binding.swipeRefreshLayout.postDelayed({
                                 if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
                             }, 500L)
                             binding.llEmptyState.visibility = if (viewModel.templates.value.isEmpty()) View.VISIBLE else View.GONE
-                        } else {
-                            binding.llEmptyState.visibility = View.GONE
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun scrollToTop() {
+        binding.rvTemplates.stopScroll()
+        val layoutManager = binding.rvTemplates.layoutManager as? LinearLayoutManager
+        layoutManager?.scrollToPositionWithOffset(0, 0)
+        binding.rvTemplates.post {
+            if (isAdded && view != null) {
+                binding.rvTemplates.stopScroll()
+                (binding.rvTemplates.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
             }
         }
     }

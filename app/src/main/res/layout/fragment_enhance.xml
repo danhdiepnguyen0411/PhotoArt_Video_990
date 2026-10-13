@@ -26,7 +26,7 @@
             android:focusable="true"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#2D7DF6"
+            app:tint="#4A7BFE"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,18 +45,20 @@
                 android:id="@+id/tvTopTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
                 android:text="@string/ai_create_title"
-                android:textColor="#2D5BE3"
-                android:textSize="20sp"
+                android:textColor="#3A8BF5"
+                android:textSize="26sp"
                 android:textStyle="bold" />
 
             <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginStart="4dp"
+                android:id="@+id/ivTopTitleSparkle"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="6dp"
                 android:contentDescription="Sparkle"
                 android:src="@drawable/ic_sparkle_chip"
-                app:tint="#2D5BE3" />
+                app:tint="#6F86F4" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -86,9 +88,10 @@
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
+                app:cardElevation="1dp"
                 app:cardPreventCornerOverlap="false"
-                app:strokeWidth="0dp">
+                app:strokeColor="#EEF3FC"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -105,19 +108,20 @@
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
                             android:contentDescription="Sparkle"
                             android:src="@drawable/ic_sparkle_chip"
-                            app:tint="#2D5BE3" />
+                            app:tint="#7A63EE" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/inter_bold"
                             android:text="@string/enter_prompt_hint"
-                            android:textColor="#2D5BE3"
-                            android:textSize="15.5sp"
+                            android:textColor="#5B7DF0"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -140,9 +144,9 @@
                             android:paddingHorizontal="14dp"
                             android:paddingTop="12dp"
                             android:paddingBottom="24dp"
-                            android:textColor="#1E293B"
-                            android:textColorHint="#94A3B8"
-                            android:textSize="13.5sp" />
+                            android:textColor="#2B3990"
+                            android:textColorHint="#A7B3E6"
+                            android:textSize="14sp" />
 
                         <TextView
                             android:id="@+id/tvPromptCounter"
@@ -152,8 +156,8 @@
                             android:layout_marginEnd="14dp"
                             android:layout_marginBottom="10dp"
                             android:text="0/500"
-                            android:textColor="#94A3B8"
-                            android:textSize="11.5sp" />
+                            android:textColor="#8A96C8"
+                            android:textSize="12sp" />
                     </FrameLayout>
 
                     <!-- Section 2: Gợi ý prompt -->
@@ -165,18 +169,19 @@
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
                             android:contentDescription="Sparkle"
                             android:src="@drawable/ic_sparkle_chip"
-                            app:tint="#2D5BE3" />
+                            app:tint="#7A63EE" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/inter_bold"
                             android:text="@string/prompt_suggestions"
-                            android:textColor="#2D5BE3"
+                            android:textColor="#5B7DF0"
                             android:textSize="15.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -191,51 +196,54 @@
                         <TextView
                             android:id="@+id/chipAnimeGirl"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_anime"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/chipFantasy"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_fantasy"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/chipCutePet"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_pet"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -249,51 +257,54 @@
                         <TextView
                             android:id="@+id/chipCyberpunk"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_cyberpunk"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/chipNature"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_nature"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/chipPortrait"
                             android:layout_width="0dp"
-                            android:layout_height="34dp"
+                            android:layout_height="38dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_prompt_chip"
                             android:drawableStart="@drawable/ic_sparkle_chip"
-                            android:drawablePadding="4dp"
-                            android:drawableTint="#2D5BE3"
+                            android:drawablePadding="5dp"
+                            android:drawableTint="#6F7CF2"
+                            android:fontFamily="@font/inter_medium"
                             android:gravity="center"
                             android:paddingHorizontal="8dp"
                             android:text="@string/prompt_chip_portrait"
-                            android:textColor="#2D5BE3"
-                            android:textSize="12sp"
+                            android:textColor="#5A72D8"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -309,19 +320,20 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:contentDescription="Sparkle"
                     android:src="@drawable/ic_sparkle_chip"
-                    app:tint="#2D5BE3" />
+                    app:tint="#7A63EE" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="@string/prompt_style"
-                    android:textColor="#2D5BE3"
-                    android:textSize="17.5sp"
+                    android:textColor="#5B7DF0"
+                    android:textSize="21sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -348,7 +360,7 @@
                         android:focusable="true"
                         app:cardCornerRadius="18dp"
                         app:cardElevation="0dp"
-                        app:strokeColor="#3B82F6"
+                        app:strokeColor="#7F8CF6"
                         app:strokeWidth="2.5dp">
 
                         <FrameLayout
@@ -360,7 +372,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/template_trendy" />
+                                android:src="@drawable/suggestion_ai_effect" />
 
                             <!-- Bottom Gradient Scrim for text readability -->
                             <View
@@ -372,21 +384,28 @@
                             <!-- Hot Badge -->
                             <LinearLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="22dp"
                                 android:layout_gravity="top|start"
                                 android:layout_margin="8dp"
                                 android:background="@drawable/bg_badge_hot"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:paddingHorizontal="7dp"
-                                android:paddingVertical="3dp">
+                                android:paddingStart="7dp"
+                                android:paddingEnd="8dp">
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:contentDescription="Flame"
+                                    android:src="@drawable/ic_flame" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/prompt_badge_hot"
+                                    android:layout_marginStart="3dp"
+                                    android:text="Hot"
                                     android:textColor="@color/white"
-                                    android:textSize="10.5sp"
+                                    android:textSize="11sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
 
@@ -425,7 +444,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/history_3" />
+                                android:src="@drawable/suggestion_ai_dance" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -466,7 +485,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/suggestion_ai_portrait" />
+                                android:src="@drawable/template_trendy" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -499,9 +518,11 @@
         android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="24dp"
+        android:alpha="0.4"
         android:background="@drawable/bg_btn_ai_create"
-        android:clickable="true"
-        android:focusable="true"
+        android:clickable="false"
+        android:enabled="false"
+        android:focusable="false"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">

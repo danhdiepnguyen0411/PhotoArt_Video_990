@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.core.utils.ShimmerDrawable
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
 import com.example.phortart_video_990.databinding.ItemHomeMediaCardBinding
 
@@ -38,13 +39,14 @@ class HomeMediaAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HomeMediaItemModel) {
-            val fallbackRes = if (item.imageRes != 0) item.imageRes else R.drawable.template_selfie
-            val source: Any = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null } ?: fallbackRes
+            val shimmerPlaceholder = ShimmerDrawable()
+            val source: Any = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null }
+                ?: (if (item.imageRes != 0) item.imageRes else "") ?: ""
 
             binding.ivMediaThumb.load(source) {
                 crossfade(true)
-                placeholder(fallbackRes)
-                error(fallbackRes)
+                placeholder(shimmerPlaceholder)
+                error(shimmerPlaceholder)
             }
 
 

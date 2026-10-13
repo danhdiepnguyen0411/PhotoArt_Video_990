@@ -95,7 +95,8 @@ y nítidas</string>
     <string name="memories_upload_title">Subir fotos de la galería</string>
     <string name="memories_photos_count">%1$d fotos</string>
     <string name="tap_to_select_photos">Toca para seleccionar fotos</string>
-    <string name="select_multiple_photos">Selecciona 1 o más fotos (JPG, PNG)</string>
+    <string name="select_multiple_photos">Selecciona hasta 10 fotos (JPG, PNG)</string>
+    <string name="select_max_photos_format">Selecciona hasta %d fotos (JPG, PNG)</string>
     <string name="tap_to_manage_photos">Toca para ver y administrar fotos</string>
     <string name="btn_add_photos">Añadir fotos</string>
     <string name="btn_view_photos">Ver fotos</string>

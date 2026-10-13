@@ -12,11 +12,12 @@ import com.example.phortart_video_990.databinding.ItemMusicTrackBinding
 
 class MusicAdapter(
     private var tracks: List<TemplateModel>,
+    private var initialSelectedTrackId: String? = null,
     private val onTrackSelected: (TemplateModel, Int) -> Unit,
     private val onPreviewClick: (TemplateModel, Int) -> Unit
 ) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
-    private var selectedTrackId: String? = null
+    private var selectedTrackId: String? = initialSelectedTrackId
     private var currentlyPlayingIndex: Int = -1
     private var isPlaying: Boolean = false
     private var currentlyLoadingPreviewIndex: Int = -1
@@ -30,7 +31,7 @@ class MusicAdapter(
 
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
         val track = tracks[position]
-        val isSelected = track.id == selectedTrackId || (selectedTrackId.isNullOrEmpty() && position == 0 && tracks.isNotEmpty())
+        val isSelected = track.id == selectedTrackId
         val isThisPlaying = (position == currentlyPlayingIndex && isPlaying)
         val isThisLoadingPreview = (position == currentlyLoadingPreviewIndex)
         holder.bind(track, isSelected, isThisPlaying, isThisLoadingPreview)
@@ -44,7 +45,7 @@ class MusicAdapter(
         isPlaying = false
         currentlyLoadingPreviewIndex = -1
 
-        // Default to first track if none selected yet
+        // Default to first track ONLY if no selection has ever been made
         if (selectedTrackId == null && newList.isNotEmpty()) {
             selectedTrackId = newList[0].id
         }
@@ -52,6 +53,7 @@ class MusicAdapter(
     }
 
     fun setSelectedTrackId(id: String?) {
+        if (selectedTrackId == id) return
         val oldIndex = tracks.indexOfFirst { it.id == selectedTrackId }
         selectedTrackId = id
         val newIndex = tracks.indexOfFirst { it.id == selectedTrackId }
@@ -60,8 +62,11 @@ class MusicAdapter(
         if (newIndex != -1 && newIndex != oldIndex) notifyItemChanged(newIndex)
     }
 
+    fun getSelectedTrackId(): String? = selectedTrackId
+
     fun getSelectedTrack(): TemplateModel? {
-        return tracks.find { it.id == selectedTrackId } ?: tracks.firstOrNull()
+        return tracks.find { it.id == selectedTrackId }
+            ?: (if (selectedTrackId == null) tracks.firstOrNull() else null)
     }
 
     fun setPreviewLoading(index: Int) {
@@ -106,13 +111,8 @@ class MusicAdapter(
             binding.tvTrackTitle.text = track.title
             binding.tvTrackTitle.isSelected = true
 
-            // Artist / Category
-            val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
-                track.category.substring(6)
-            } else {
-                track.category
-            }).ifBlank { "Photo AI" }
-            binding.tvTrackArtist.text = artistText
+            // Category name is hidden on items per request
+            binding.tvTrackArtist.visibility = View.GONE
 
             // Duration
             binding.tvTrackDuration.text = track.displayDuration
@@ -147,15 +147,8 @@ class MusicAdapter(
                 binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_play_circle)
             } else if (isSelected) {
                 binding.pbLoading.visibility = View.GONE
-                if (isCurrentPlaying) {
-                    binding.ivPlayIcon.visibility = View.VISIBLE
-                    binding.ivPlayIcon.setImageResource(R.drawable.ic_pause_small)
-                    binding.ivPlayIcon.setColorFilter(Color.WHITE)
-                    binding.ivCheckIcon.visibility = View.GONE
-                } else {
-                    binding.ivPlayIcon.visibility = View.GONE
-                    binding.ivCheckIcon.visibility = View.VISIBLE
-                }
+                binding.ivPlayIcon.visibility = View.GONE
+                binding.ivCheckIcon.visibility = View.VISIBLE
                 binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_check_circle)
             } else {
                 binding.pbLoading.visibility = View.GONE
@@ -163,19 +156,19 @@ class MusicAdapter(
                 binding.ivPlayIcon.visibility = View.VISIBLE
                 binding.ivPlayIcon.setColorFilter(Color.parseColor("#6A4FE0"))
                 binding.flActionContainer.setBackgroundResource(R.drawable.bg_track_play_circle)
-
-                if (isCurrentPlaying) {
-                    binding.ivPlayIcon.setImageResource(R.drawable.ic_pause_small)
-                } else {
-                    binding.ivPlayIcon.setImageResource(R.drawable.ic_play_small)
-                }
+                binding.ivPlayIcon.setImageResource(R.drawable.ic_play_small)
             }
 
-            // Clicking play action circle
+            // Clicking action circle (checkmark or play)
             binding.flActionContainer.setOnClickListener {
                 val pos = bindingAdapterPosition
                 if (pos != RecyclerView.NO_POSITION) {
-                    onPreviewClick(track, pos)
+                    if (isSelected) {
+                        onPreviewClick(track, pos)
+                    } else {
+                        setSelectedTrackId(track.id)
+                        onTrackSelected(track, pos)
+                    }
                 }
             }
 

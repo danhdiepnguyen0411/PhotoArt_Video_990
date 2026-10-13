@@ -16,9 +16,12 @@ import com.example.phortart_video_990.core.dialog.AppDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.ShareUtils
 import com.example.phortart_video_990.core.utils.VideoGenerator
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentVideoResultBinding
+import android.os.SystemClock
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -51,6 +54,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
     private var isExporting = false
+    private var lastShareClickTime = 0L
 
     override fun initView() {
         val args = arguments
@@ -500,10 +504,12 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
             }
 
             if (videoToShare != null && videoToShare.exists()) {
+                val thumb = photoUris.firstOrNull()
                 val success = ShareUtils.shareVideo(
                     context = requireContext(),
                     filePath = videoToShare.absolutePath,
-                    chooserTitle = getString(R.string.share_video_memories_title)
+                    chooserTitle = getString(R.string.share_video_memories_title),
+                    thumbnailPath = thumb
                 )
                 if (!success) {
                     Toast.makeText(requireContext(), getString(R.string.toast_cannot_share_video), Toast.LENGTH_SHORT).show()
@@ -535,18 +541,12 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         }
 
         binding.btnShare.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - lastShareClickTime < 1000L) return@setOnClickListener
+            lastShareClickTime = SystemClock.elapsedRealtime()
             it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
                 it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
                 handleShare()
             }.start()
-        }
-
-        binding.cardVideoInfo.setOnClickListener {
-            binding.videoView.pause()
-            externalAudioPlayer?.pause()
-            isPlaying = false
-            updatePlayStateUi(false)
-            findNavController().navigate(R.id.action_videoResultFragment_to_musicFragment)
         }
     }
 

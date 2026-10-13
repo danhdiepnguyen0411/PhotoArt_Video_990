@@ -11,14 +11,17 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentMusicBinding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -32,18 +35,61 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
     private var musicCategories: List<CategoryModel> = listOf(CategoryModel.ALL)
     private var selectedCategoryCode: String = "ALL"
     private var currentSearchQuery: String = ""
+    private var selectedTrackId: String? = null
+    private var savedScrollPosition: Int = -1
+    private var savedScrollOffset: Int = 0
 
     private var mediaPlayer: MediaPlayer? = null
-    private var currentPlayingPosition: Int = -1
     private var audioActionJob: Job? = null
+    private var loadJob: Job? = null
     private var isStartMergeFlow: Boolean = false
 
     private val isTabMode: Boolean
         get() = (parentFragment is com.example.phortart_video_990.ui.screen.main.MainFragment) ||
                 (parentFragment?.parentFragment is com.example.phortart_video_990.ui.screen.main.MainFragment)
 
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.getString("saved_music_track_id")?.let {
+            selectedTrackId = it
+        }
+        savedInstanceState?.getString("saved_category_code")?.let {
+            selectedCategoryCode = it
+        }
+        savedInstanceState?.getInt("saved_scroll_pos", -1)?.let {
+            if (it >= 0) savedScrollPosition = it
+        }
+        savedInstanceState?.getInt("saved_scroll_offset", 0)?.let {
+            savedScrollOffset = it
+        }
+    }
+
+    override fun onSaveInstanceState(outState: android.os.Bundle) {
+        super.onSaveInstanceState(outState)
+        captureScrollPosition()
+        outState.putString("saved_music_track_id", selectedTrackId)
+        outState.putString("saved_category_code", selectedCategoryCode)
+        outState.putBoolean("is_start_merge_flow", isStartMergeFlow)
+        outState.putInt("saved_scroll_pos", savedScrollPosition)
+        outState.putInt("saved_scroll_offset", savedScrollOffset)
+    }
+
     override fun initView() {
         isStartMergeFlow = arguments?.getBoolean("is_start_merge_flow", false) ?: false
+
+        // Restore selected track ID from arguments, nav savedStateHandle, or persistent preferences
+        if (selectedTrackId.isNullOrBlank()) {
+            val navStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+            selectedTrackId = arguments?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+                ?: navStateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
+                ?: com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext()).lastSelectedMusicTrackId
+        }
+
+        if (savedScrollPosition == -1) {
+            val pref = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+            savedScrollPosition = pref.lastMusicScrollPosition
+            savedScrollOffset = pref.lastMusicScrollOffset
+        }
 
         if (isTabMode) {
             binding.btnBack.visibility = View.GONE
@@ -58,64 +104,133 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             categories = musicCategories,
             selectedCategoryCode = selectedCategoryCode
         ) { selectedCategory ->
-            selectedCategoryCode = selectedCategory.code
-            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
-                .recordSelectedCategory(selectedCategory.code)
-            applyFilter()
-
+            if (!selectedCategoryCode.equals(selectedCategory.code, ignoreCase = true)) {
+                selectedCategoryCode = selectedCategory.code
+                savedScrollPosition = 0
+                savedScrollOffset = 0
+                context?.let { ctx ->
+                    val p = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
+                    p.lastMusicScrollPosition = 0
+                    p.lastMusicScrollOffset = 0
+                    p.recordSelectedCategory(selectedCategory.code)
+                }
+                applyFilter()
+            }
         }
         binding.rvMusicCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvMusicCategories.adapter = categoryAdapter
 
-        // Setup vertical music tracks list
+        // Setup vertical music tracks list with remembered selection
         musicAdapter = MusicAdapter(
             tracks = emptyList(),
-            onTrackSelected = { _, _ ->
-                // Selected state is updated inside MusicAdapter
+            initialSelectedTrackId = selectedTrackId,
+            onTrackSelected = { track, _ ->
+                selectAndPlayTrack(track, autoPlay = true)
             },
-            onPreviewClick = { track, position ->
-                toggleAudioPreview(track, position)
+            onPreviewClick = { track, _ ->
+                if (track.id == selectedTrackId) {
+                    toggleMiniPlayerPlayback()
+                } else {
+                    selectAndPlayTrack(track, autoPlay = true)
+                }
             }
         )
+        musicAdapter.stateRestorationPolicy = androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         binding.rvMusicTracks.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMusicTracks.adapter = musicAdapter
+
+        binding.rvMusicTracks.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val pos = lm.findFirstVisibleItemPosition()
+                if (pos != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                    val v = lm.findViewByPosition(pos)
+                    val offset = v?.top ?: 0
+                    savedScrollPosition = pos
+                    savedScrollOffset = offset
+                    context?.let { ctx ->
+                        val p = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
+                        p.lastMusicScrollPosition = pos
+                        p.lastMusicScrollOffset = offset
+                    }
+                }
+            }
+        })
 
         loadCategoriesAndTracks()
     }
 
     override fun initListener() {
-        binding.swipeRefreshLayout.setColorSchemeColors(
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                stopAudio()
+                findNavController().safePopBackStack()
+            }
+        })
+
+        val b = bindingOrNull ?: return
+
+        b.swipeRefreshLayout.setColorSchemeColors(
             android.graphics.Color.parseColor("#4A7BFE"),
             android.graphics.Color.parseColor("#9153EE")
         )
-        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
-            binding.rvMusicTracks.canScrollVertically(-1)
+        b.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            bindingOrNull?.rvMusicTracks?.canScrollVertically(-1) ?: false
         }
-        binding.swipeRefreshLayout.setOnRefreshListener {
+        b.swipeRefreshLayout.setOnRefreshListener {
             loadCategoriesAndTracks()
         }
 
-        binding.btnBack.setOnClickListener {
+        b.btnBack.setOnClickListener {
             stopAudio()
-            findNavController().popBackStack()
+            findNavController().safePopBackStack()
+        }
+
+        // Mini player play/pause toggle button
+        b.btnMiniPlayPause.setOnClickListener {
+            toggleMiniPlayerPlayback()
+        }
+
+        // Tap mini player card to locate selected song in list
+        b.cardMiniPlayer.setOnClickListener {
+            val curId = selectedTrackId ?: return@setOnClickListener
+            val targetIndex = (b.rvMusicTracks.adapter as? MusicAdapter)?.let { adapter ->
+                (0 until adapter.itemCount).indexOfFirst { pos ->
+                    allMusicTracks.getOrNull(pos)?.id == curId
+                }
+            } ?: -1
+            if (targetIndex >= 0) {
+                (b.rvMusicTracks.layoutManager as? LinearLayoutManager)
+                    ?.scrollToPositionWithOffset(targetIndex, 40)
+            }
         }
 
         // Search text watcher
-        binding.etSearchMusic.addTextChangedListener { text ->
-            currentSearchQuery = text?.toString()?.trim() ?: ""
-            binding.ivClearSearch.visibility = if (currentSearchQuery.isNotEmpty()) View.VISIBLE else View.GONE
-            applyFilter()
+        b.etSearchMusic.addTextChangedListener { text ->
+            val newQuery = text?.toString()?.trim() ?: ""
+            if (newQuery != currentSearchQuery) {
+                currentSearchQuery = newQuery
+                savedScrollPosition = 0
+                savedScrollOffset = 0
+                bindingOrNull?.ivClearSearch?.visibility = if (currentSearchQuery.isNotEmpty()) View.VISIBLE else View.GONE
+                applyFilter()
+            }
         }
 
-        binding.ivClearSearch.setOnClickListener {
-            binding.etSearchMusic.setText("")
+        b.ivClearSearch.setOnClickListener {
+            savedScrollPosition = 0
+            savedScrollOffset = 0
+            bindingOrNull?.etSearchMusic?.setText("")
         }
 
-        binding.etSearchMusic.setOnEditorActionListener { _, actionId, _ ->
+        b.etSearchMusic.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                imm?.hideSoftInputFromWindow(binding.etSearchMusic.windowToken, 0)
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                bindingOrNull?.let { safeBinding ->
+                    imm?.hideSoftInputFromWindow(safeBinding.etSearchMusic.windowToken, 0)
+                }
                 true
             } else {
                 false
@@ -123,42 +238,90 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         }
 
         // Bottom Continue button
-        binding.btnConfirmMusic.setOnClickListener {
+        b.btnConfirmMusic.setOnClickListener {
             onContinueClicked()
         }
     }
 
-    private fun loadCategoriesAndTracks() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!binding.swipeRefreshLayout.isRefreshing) {
-                binding.pbLoading.visibility = View.VISIBLE
+    private fun captureScrollPosition() {
+        val lm = bindingOrNull?.rvMusicTracks?.layoutManager as? LinearLayoutManager ?: return
+        val pos = lm.findFirstVisibleItemPosition()
+        if (pos != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+            val v = lm.findViewByPosition(pos)
+            val offset = v?.top ?: 0
+            savedScrollPosition = pos
+            savedScrollOffset = offset
+            context?.let { ctx ->
+                val p = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
+                p.lastMusicScrollPosition = pos
+                p.lastMusicScrollOffset = offset
             }
-            binding.llEmptyState.visibility = View.GONE
+        }
+    }
+
+    private fun loadCategoriesAndTracks() {
+        loadJob?.cancel()
+        loadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val b = bindingOrNull ?: return@launch
+            if (!b.swipeRefreshLayout.isRefreshing) {
+                b.pbLoading.visibility = View.VISIBLE
+            }
+            b.llEmptyState.visibility = View.GONE
             try {
                 // Load music categories from API
                 val apiMusicCategories = repository.getMusicCategories()
+                if (!isAdded || view == null || bindingOrNull == null) return@launch
                 musicCategories = apiMusicCategories
-                categoryAdapter.submitList(musicCategories)
+                if (::categoryAdapter.isInitialized) {
+                    categoryAdapter.submitList(musicCategories)
+                }
 
                 // Load all music tracks initially
                 val tracks = repository.getMusicTracks(categoryCode = "ALL")
+                if (!isAdded || view == null || bindingOrNull == null) return@launch
                 allMusicTracks = tracks
 
                 // Dynamically discover extra categories from tracks
                 discoverExtraMusicCategories(tracks)
 
+                // Match initial title if selectedTrackId is still null
+                val initialTitle = arguments?.getString("selected_music_title")
+                if (selectedTrackId.isNullOrBlank() && !initialTitle.isNullOrBlank()) {
+                    val found = tracks.find { it.title.equals(initialTitle, ignoreCase = true) }
+                    if (found != null) {
+                        selectedTrackId = found.id
+                    }
+                }
+
                 // Apply initial category & search filter
                 applyFilter()
+
+                // Display initial selected track in mini player if available
+                val initialTrack = allMusicTracks.find { it.id == selectedTrackId }
+                    ?: allMusicTracks.firstOrNull()
+                if (initialTrack != null) {
+                    if (selectedTrackId.isNullOrBlank()) {
+                        selectedTrackId = initialTrack.id
+                        musicAdapter.setSelectedTrackId(initialTrack.id)
+                    }
+                    selectAndPlayTrack(initialTrack, autoPlay = false)
+                }
             } catch (e: Exception) {
-                binding.llEmptyState.visibility = View.VISIBLE
+                if (e is CancellationException) {
+                    throw e
+                }
+                bindingOrNull?.llEmptyState?.visibility = View.VISIBLE
             } finally {
-                binding.pbLoading.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
+                bindingOrNull?.pbLoading?.visibility = View.GONE
+                bindingOrNull?.swipeRefreshLayout?.isRefreshing = false
             }
         }
     }
 
     private fun applyFilter() {
+        val b = bindingOrNull ?: return
+        if (!isAdded || view == null) return
+
         stopAudio()
         var filtered = allMusicTracks
 
@@ -186,11 +349,52 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             }
         }
 
-        musicAdapter.submitList(filtered)
-        binding.llEmptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        if (::musicAdapter.isInitialized) {
+            if (!selectedTrackId.isNullOrBlank()) {
+                musicAdapter.setSelectedTrackId(selectedTrackId)
+            }
+            musicAdapter.submitList(filtered)
+        }
+        b.llEmptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+
+        // Update mini player with currently selected track
+        val currentSelectedTrack = allMusicTracks.find { it.id == selectedTrackId }
+        if (currentSelectedTrack != null) {
+            b.cardMiniPlayer.visibility = View.VISIBLE
+            b.tvMiniTrackTitle.text = currentSelectedTrack.title
+            b.tvMiniTrackDuration.text = currentSelectedTrack.displayDuration
+            if (!currentSelectedTrack.safeImageUrl.isNullOrBlank()) {
+                b.ivMiniCover.load(currentSelectedTrack.safeImageUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_func_music)
+                    error(R.drawable.ic_func_music)
+                }
+            } else {
+                b.ivMiniCover.setImageResource(R.drawable.ic_func_music)
+            }
+        }
+
+        val selectedIndex = filtered.indexOfFirst { it.id == selectedTrackId }
+        val targetPos = if (savedScrollPosition in 0 until filtered.size) savedScrollPosition else -1
+        val targetOffset = savedScrollOffset
+
+        b.rvMusicTracks.post {
+            if (isAdded && view != null && bindingOrNull != null) {
+                bindingOrNull?.rvMusicTracks?.stopScroll()
+                val lm = bindingOrNull?.rvMusicTracks?.layoutManager as? LinearLayoutManager
+                if (targetPos >= 0) {
+                    lm?.scrollToPositionWithOffset(targetPos, targetOffset)
+                } else if (selectedIndex >= 0) {
+                    lm?.scrollToPositionWithOffset(selectedIndex, 40)
+                } else {
+                    lm?.scrollToPositionWithOffset(0, 0)
+                }
+            }
+        }
     }
 
     private fun discoverExtraMusicCategories(tracks: List<TemplateModel>) {
+        if (!isAdded || view == null || bindingOrNull == null) return
         val currentCats = musicCategories.toMutableList()
         var updated = false
         val existingCodes = currentCats.map { it.code.lowercase() }.toSet()
@@ -205,41 +409,109 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         }
         if (updated) {
             musicCategories = currentCats
-            categoryAdapter.submitList(currentCats)
+            if (::categoryAdapter.isInitialized) {
+                categoryAdapter.submitList(currentCats)
+            }
         }
     }
 
-    private fun toggleAudioPreview(track: TemplateModel, position: Int) {
+    private fun selectAndPlayTrack(track: TemplateModel, autoPlay: Boolean = true) {
+        selectedTrackId = track.id
+        context?.let { ctx ->
+            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx).lastSelectedMusicTrackId = track.id
+        }
+        findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_track_id", track.id)
+        if (::musicAdapter.isInitialized) {
+            musicAdapter.setSelectedTrackId(track.id)
+        }
+
+        val b = bindingOrNull ?: return
+        b.cardMiniPlayer.visibility = View.VISIBLE
+        b.tvMiniTrackTitle.text = track.title
+        b.tvMiniTrackDuration.text = track.displayDuration
+
+        if (!track.safeImageUrl.isNullOrBlank()) {
+            b.ivMiniCover.load(track.safeImageUrl) {
+                crossfade(true)
+                placeholder(R.drawable.ic_func_music)
+                error(R.drawable.ic_func_music)
+            }
+        } else {
+            b.ivMiniCover.setImageResource(R.drawable.ic_func_music)
+        }
+
+        if (autoPlay) {
+            playTrackAudio(track)
+        } else {
+            b.waveView.setPlaying(false)
+            b.pbMiniLoading.visibility = View.GONE
+            b.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            b.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+        }
+    }
+
+    private fun toggleMiniPlayerPlayback() {
+        val b = bindingOrNull ?: return
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+            b.waveView.setPlaying(false)
+            b.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+            b.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            b.pbMiniLoading.visibility = View.GONE
+        } else if (mediaPlayer != null) {
+            mediaPlayer?.start()
+            b.waveView.setPlaying(true)
+            b.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_pause_small)
+            b.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            b.pbMiniLoading.visibility = View.GONE
+        } else {
+            val track = allMusicTracks.find { it.id == selectedTrackId }
+                ?: (if (::musicAdapter.isInitialized) musicAdapter.getSelectedTrack() else null)
+            if (track != null) {
+                playTrackAudio(track)
+            }
+        }
+    }
+
+    private fun playTrackAudio(track: TemplateModel) {
         val audioUrl = track.safeAudioUrl
         if (audioUrl.isNullOrBlank()) {
-            Toast.makeText(requireContext(), getString(R.string.toast_music_preview_unavailable), Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(it, getString(R.string.toast_music_preview_unavailable), Toast.LENGTH_SHORT).show()
+            }
+            bindingOrNull?.waveView?.setPlaying(false)
+            bindingOrNull?.ivMiniPlayPauseIcon?.setImageResource(R.drawable.ic_play_small)
+            bindingOrNull?.ivMiniPlayPauseIcon?.visibility = View.VISIBLE
+            bindingOrNull?.pbMiniLoading?.visibility = View.GONE
             return
         }
 
-        audioActionJob?.cancel()
-        audioActionJob = null
+        stopAudioKeepMiniPlayer()
 
-        if (currentPlayingPosition == position && mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.pause()
-            musicAdapter.setPlayingState(position, false)
-            return
-        }
-
-        stopAudio()
-
-        musicAdapter.setPreviewLoading(position)
+        val b = bindingOrNull ?: return
+        b.ivMiniPlayPauseIcon.visibility = View.GONE
+        b.pbMiniLoading.visibility = View.VISIBLE
+        b.waveView.setPlaying(false)
 
         audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
+            val ctx = context ?: return@launch
             val cachedFile = AudioCacheManager.getOrDownloadAudio(
-                requireContext(),
+                ctx,
                 audioUrl
             )
 
-            if (!isAdded || view == null) return@launch
+            if (!isAdded || view == null || bindingOrNull == null) return@launch
 
             if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
-                musicAdapter.clearAllLoading()
-                Toast.makeText(requireContext(), getString(R.string.toast_cannot_download_preview), Toast.LENGTH_SHORT).show()
+                bindingOrNull?.let { safeBinding ->
+                    safeBinding.pbMiniLoading.visibility = View.GONE
+                    safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+                    safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+                    safeBinding.waveView.setPlaying(false)
+                }
+                context?.let {
+                    Toast.makeText(it, getString(R.string.toast_cannot_download_preview), Toast.LENGTH_SHORT).show()
+                }
                 return@launch
             }
 
@@ -253,31 +525,70 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                     )
                     setDataSource(cachedFile.absolutePath)
                     setOnPreparedListener { mp ->
+                        if (!isAdded || view == null || bindingOrNull == null) {
+                            mp.release()
+                            return@setOnPreparedListener
+                        }
                         mp.start()
-                        currentPlayingPosition = position
-                        musicAdapter.setPlayingState(position, true)
+                        bindingOrNull?.let { safeBinding ->
+                            safeBinding.pbMiniLoading.visibility = View.GONE
+                            safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+                            safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_pause_small)
+                            safeBinding.waveView.setPlaying(true)
+                        }
                     }
                     setOnCompletionListener {
-                        musicAdapter.setPlayingState(position, false)
-                        currentPlayingPosition = -1
+                        bindingOrNull?.let { safeBinding ->
+                            safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+                            safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+                            safeBinding.waveView.setPlaying(false)
+                        }
                     }
                     setOnErrorListener { _, _, _ ->
-                        musicAdapter.setPlayingState(position, false)
-                        currentPlayingPosition = -1
+                        bindingOrNull?.let { safeBinding ->
+                            safeBinding.pbMiniLoading.visibility = View.GONE
+                            safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+                            safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+                            safeBinding.waveView.setPlaying(false)
+                        }
                         true
                     }
                     prepareAsync()
                 }
             } catch (e: Exception) {
-                musicAdapter.setPlayingState(position, false)
+                bindingOrNull?.let { safeBinding ->
+                    safeBinding.pbMiniLoading.visibility = View.GONE
+                    safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+                    safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+                    safeBinding.waveView.setPlaying(false)
+                }
             }
         }
     }
 
+    private fun stopAudioKeepMiniPlayer() {
+        audioActionJob?.cancel()
+        audioActionJob = null
+        try {
+            if (mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.stop()
+            }
+            mediaPlayer?.release()
+        } catch (_: Exception) {
+            // Ignored
+        } finally {
+            mediaPlayer = null
+        }
+    }
+
     private fun onContinueClicked() {
+        captureScrollPosition()
+        if (!::musicAdapter.isInitialized) return
         val selectedTrack = musicAdapter.getSelectedTrack()
         if (selectedTrack == null) {
-            Toast.makeText(requireContext(), getString(R.string.toast_please_select_music), Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(it, getString(R.string.toast_please_select_music), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -289,42 +600,45 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             return
         }
 
+        val b = bindingOrNull ?: return
         // Show loading state on bottom Continue button
-        binding.btnConfirmMusic.isEnabled = false
-        binding.ivConfirmArrow.visibility = View.GONE
-        binding.pbConfirmLoading.visibility = View.VISIBLE
+        b.btnConfirmMusic.isEnabled = false
+        b.ivConfirmArrow.visibility = View.GONE
+        b.pbConfirmLoading.visibility = View.VISIBLE
 
         audioActionJob?.cancel()
         audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
+            val ctx = context ?: return@launch
             val cachedFile = AudioCacheManager.getOrDownloadAudio(
-                requireContext(),
+                ctx,
                 audioUrl
             )
 
-            if (!isAdded || view == null) return@launch
+            if (!isAdded || view == null || bindingOrNull == null) return@launch
 
-            binding.btnConfirmMusic.isEnabled = true
-            binding.pbConfirmLoading.visibility = View.GONE
-            binding.ivConfirmArrow.visibility = View.VISIBLE
+            bindingOrNull?.btnConfirmMusic?.isEnabled = true
+            bindingOrNull?.pbConfirmLoading?.visibility = View.GONE
+            bindingOrNull?.ivConfirmArrow?.visibility = View.VISIBLE
 
             returnTrackResult(selectedTrack, cachedFile?.absolutePath)
         }
     }
 
     private fun returnTrackResult(track: TemplateModel, cachedFilePath: String?) {
-
-        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
+        captureScrollPosition()
+        val ctx = context ?: return
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
             .recordSelectedCategory(track.category)
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
+            .lastSelectedMusicTrackId = track.id
+        selectedTrackId = track.id
+        findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_track_id", track.id)
 
-        val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
-            track.category.substring(6)
-        } else {
-            track.category
-        }).ifBlank { "Photo AI" }
-        val musicSubtitle = "$artistText • ${track.displayDuration}"
+        val musicSubtitle = track.displayDuration
 
         if (isTabMode) {
             val bundle = android.os.Bundle().apply {
+                putString("selected_track_id", track.id)
                 putString("selected_music_title", track.title)
                 putString("selected_music_subtitle", musicSubtitle)
                 putString("selected_music_audio_url", track.safeAudioUrl)
@@ -339,6 +653,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
         } else if (isStartMergeFlow) {
             val bundle = android.os.Bundle().apply {
+                putString("selected_track_id", track.id)
                 putString("selected_music_title", track.title)
                 putString("selected_music_subtitle", musicSubtitle)
                 putString("selected_music_audio_url", track.safeAudioUrl)
@@ -350,6 +665,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             findNavController().navigateSafe(R.id.action_musicFragment_to_memoriesFragment, bundle)
         } else {
             // Return selected music title, audio URL, cached local path, and cover image to parent screen
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "selected_track_id",
+                track.id
+            )
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "selected_music_title",
                 track.title
@@ -379,36 +698,33 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 track.targetPhotoCount
             )
 
-            findNavController().popBackStack()
+            findNavController().safePopBackStack()
         }
     }
 
     private fun stopAudio() {
-        audioActionJob?.cancel()
-        audioActionJob = null
-        try {
-            if (mediaPlayer?.isPlaying == true) {
-                mediaPlayer?.stop()
-            }
-            mediaPlayer?.release()
-        } catch (e: Exception) {
-            // Ignored
-        } finally {
-            mediaPlayer = null
-            if (currentPlayingPosition != -1) {
-                musicAdapter.setPlayingState(currentPlayingPosition, false)
-                currentPlayingPosition = -1
-            }
+        stopAudioKeepMiniPlayer()
+        bindingOrNull?.let { safeBinding ->
+            safeBinding.waveView.setPlaying(false)
+            safeBinding.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+            safeBinding.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            safeBinding.pbMiniLoading.visibility = View.GONE
+        }
+        if (isAdded && bindingOrNull != null && ::musicAdapter.isInitialized) {
             musicAdapter.clearAllLoading()
         }
     }
 
     override fun onPause() {
+        captureScrollPosition()
         stopAudio()
         super.onPause()
     }
 
     override fun onDestroyView() {
+        captureScrollPosition()
+        loadJob?.cancel()
+        loadJob = null
         audioActionJob?.cancel()
         audioActionJob = null
         stopAudio()

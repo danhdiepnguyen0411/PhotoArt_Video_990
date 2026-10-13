@@ -39,10 +39,7 @@ class TemplateViewModel(
             _isLoading.value = true
             try {
                 // 1. Fetch real music tracks from API
-                var realMusicTracks = repository.getMusicTracks(categoryCode = "ALL")
-                if (realMusicTracks.isEmpty()) {
-                    realMusicTracks = repository.getDefaultMusicTracks()
-                }
+                val realMusicTracks = repository.getMusicTracks(categoryCode = "ALL")
                 allMusicList = realMusicTracks
 
                 // 2. Fetch music categories from API
@@ -80,10 +77,9 @@ class TemplateViewModel(
                 val selectedCat = categoriesList.find { it.code.equals(currentCode, ignoreCase = true) }
                 _templates.value = filterMusic(realMusicTracks, currentCode, selectedCat?.name)
             } catch (e: Exception) {
-                val fallback = repository.getDefaultMusicTracks()
-                allMusicList = fallback
-                _templates.value = fallback
-                _categories.value = repository.getDefaultMusicCategories()
+                allMusicList = emptyList()
+                _templates.value = emptyList()
+                _categories.value = listOf(CategoryModel.ALL)
             } finally {
                 _isLoading.value = false
             }
