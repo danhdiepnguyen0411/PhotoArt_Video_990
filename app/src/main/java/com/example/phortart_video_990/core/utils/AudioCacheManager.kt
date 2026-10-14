@@ -47,6 +47,8 @@ object AudioCacheManager {
         return File(getCacheFolder(context), "$hash.mp3")
     }
 
+    private const val TAG = "PhotoArt_VideoGen"
+
     /**
      * Kiểm tra xem file audio tương ứng với URL đã được tải về cache chưa.
      */
@@ -64,9 +66,12 @@ object AudioCacheManager {
 
         val targetFile = getCachedFile(context, url)
         if (targetFile.exists() && targetFile.length() > 0) {
+            android.util.Log.d(TAG, "[AudioCache] Cache hit: ${targetFile.absolutePath} (${targetFile.length() / 1024} KB)")
             return@withContext targetFile
         }
 
+        android.util.Log.i(TAG, "[AudioCache] Downloading audio from: $url")
+        val startTime = System.currentTimeMillis()
         val tempFile = File(getCacheFolder(context), "${hashUrl(url)}_temp.download")
         try {
             val request = Request.Builder()
@@ -75,8 +80,14 @@ object AudioCacheManager {
                 .build()
 
             httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return@withContext null
-                val body = response.body ?: return@withContext null
+                if (!response.isSuccessful) {
+                    android.util.Log.e(TAG, "[AudioCache] HTTP error ${response.code} downloading audio: $url")
+                    return@withContext null
+                }
+                val body = response.body ?: run {
+                    android.util.Log.e(TAG, "[AudioCache] Response body is null for: $url")
+                    return@withContext null
+                }
 
                 FileOutputStream(tempFile).use { out ->
                     body.byteStream().buffered(32 * 1024).copyTo(out, bufferSize = 32 * 1024)
@@ -86,13 +97,15 @@ object AudioCacheManager {
             if (tempFile.exists() && tempFile.length() > 0) {
                 if (targetFile.exists()) targetFile.delete()
                 tempFile.renameTo(targetFile)
+                android.util.Log.i(TAG, "[AudioCache] Downloaded successfully: ${targetFile.absolutePath} (${targetFile.length() / 1024} KB) in ${System.currentTimeMillis() - startTime}ms")
                 return@withContext targetFile
             } else {
                 tempFile.delete()
+                android.util.Log.e(TAG, "[AudioCache] Downloaded file is empty or missing: $url")
                 return@withContext null
             }
         } catch (e: Exception) {
-            // Không throw crash, dọn file tạm khi timeout hoặc coroutine bị cancel
+            android.util.Log.e(TAG, "[AudioCache] Exception downloading audio: ${e.message}", e)
             if (tempFile.exists()) tempFile.delete()
             return@withContext null
         }

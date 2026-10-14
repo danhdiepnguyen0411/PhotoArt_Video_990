@@ -141,12 +141,13 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     }
 
     private fun updateMusicInfoUi() {
-        val title = musicTitle?.takeIf { it.isNotBlank() } ?: getString(R.string.no_music_selected)
-        binding.tvVideoTitle.text = getString(R.string.memories_of_us)
-        binding.tvVideoSubtitle.text = if (!musicTitle.isNullOrBlank()) {
-            getString(R.string.video_subtitle_format, formatTime(videoDurationSec), title)
+        val title = musicTitle?.takeIf { it.isNotBlank() }
+        if (!title.isNullOrBlank()) {
+            binding.tvVideoTitle.text = title
+            binding.tvVideoSubtitle.text = getString(R.string.video_subtitle_no_music_format, formatTime(videoDurationSec))
         } else {
-            getString(R.string.video_subtitle_no_music_format, formatTime(videoDurationSec))
+            binding.tvVideoTitle.text = getString(R.string.memories_of_us)
+            binding.tvVideoSubtitle.text = getString(R.string.video_subtitle_no_music_format, formatTime(videoDurationSec))
         }
     }
 
@@ -349,7 +350,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     private fun startNoteMusicAnimation() {
         if (!musicTitle.isNullOrBlank() || !musicAudioUrl.isNullOrBlank()) {
             if (noteIconAnimator == null) {
-                noteIconAnimator = ObjectAnimator.ofFloat(binding.flVideoNote, View.ROTATION, -15f, 15f).apply {
+                noteIconAnimator = ObjectAnimator.ofFloat(binding.ivNoteMusic, View.ROTATION, -12f, 12f).apply {
                     duration = 380
                     repeatMode = ValueAnimator.REVERSE
                     repeatCount = ValueAnimator.INFINITE
@@ -358,7 +359,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
             if (noteIconAnimator?.isStarted != true) {
                 noteIconAnimator?.start()
             }
-            binding.flVideoNote.animate().scaleX(1.15f).scaleY(1.15f).setDuration(200).start()
+            binding.ivNoteMusic.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start()
         } else {
             stopNoteMusicAnimation()
         }
@@ -367,7 +368,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     private fun stopNoteMusicAnimation() {
         noteIconAnimator?.cancel()
         noteIconAnimator = null
-        bindingOrNull?.flVideoNote?.animate()?.rotation(0f)?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
+        bindingOrNull?.ivNoteMusic?.animate()?.rotation(0f)?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
     }
 
     private fun updateTimeUi(timeSec: Float) {
@@ -496,12 +497,10 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
             }
 
             if (videoToShare != null && videoToShare.exists()) {
-                val thumb = photoUris.firstOrNull()
                 val success = ShareUtils.shareVideo(
                     context = requireContext(),
                     filePath = videoToShare.absolutePath,
-                    chooserTitle = getString(R.string.share_video_memories_title),
-                    thumbnailPath = thumb
+                    chooserTitle = getString(R.string.share_video_memories_title)
                 )
                 if (!success) {
                     Toast.makeText(requireContext(), getString(R.string.toast_cannot_share_video), Toast.LENGTH_SHORT).show()
@@ -515,6 +514,14 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     override fun initListener() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        binding.cardVideoInfo.setOnClickListener {
+            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment)
+        }
+
+        binding.flVideoNote.setOnClickListener {
+            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment)
         }
 
         binding.cardVideoStage.setOnClickListener {
