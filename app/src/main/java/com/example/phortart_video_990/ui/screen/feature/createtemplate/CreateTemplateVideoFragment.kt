@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -54,14 +55,82 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private var loadingDialog: AppLoadingDialog? = null
 
     private var isGeneratingVideo = false
+    private var generateVideoJob: kotlinx.coroutines.Job? = null
     private var pendingResultBundle: Bundle? = null
     private var pendingErrorMsg: String? = null
 
-    // Photo picker launcher (Only 1 image)
-    private val pickSingleImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private fun cancelVideoGeneration() {
+        if (isGeneratingVideo) {
+            isGeneratingVideo = false
+            generateVideoJob?.cancel()
+            generateVideoJob = null
+            pendingResultBundle = null
+            pendingErrorMsg = null
+            hideLoadingDialog()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            context?.let { ctx ->
+                Toast.makeText(ctx, getString(R.string.toast_video_cancelled), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun copyUriToAppCache(uri: Uri): Uri {
+        return try {
+            val scheme = uri.scheme
+            if (scheme == "file") {
+                val f = File(uri.path ?: "")
+                if (f.exists() && f.length() > 0) return uri
+            }
+            val cacheDir = File(requireContext().cacheDir, "template_photos").apply { mkdirs() }
+            val fileName = "photo_${System.currentTimeMillis()}_${(1000..9999).random()}.jpg"
+            val targetFile = File(cacheDir, fileName)
+
+            requireContext().contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(targetFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            if (targetFile.exists() && targetFile.length() > 0) {
+                Uri.fromFile(targetFile)
+            } else {
+                uri
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            uri
+        }
+    }
+
+    // Native Photo Picker launcher (Media Picker)
+    private val pickSingleVisualMediaLauncher = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
         if (uri != null) {
-            selectedPhotoUri = uri
+            selectedPhotoUri = copyUriToAppCache(uri)
             updateSelectedPhotoUi()
+        }
+    }
+
+    private val fallbackSingleImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            selectedPhotoUri = copyUriToAppCache(uri)
+            updateSelectedPhotoUi()
+        }
+    }
+
+    private fun launchSinglePhotoPicker() {
+        try {
+            pickSingleVisualMediaLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        } catch (e: Exception) {
+            try {
+                fallbackSingleImageLauncher.launch("image/*")
+            } catch (ex: Exception) {
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_gallery), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -190,16 +259,27 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     override fun initListener() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isGeneratingVideo) {
+                    cancelVideoGeneration()
+                } else {
+                    isEnabled = false
+                    findNavController().safePopBackStack()
+                }
+            }
+        })
+
         binding.btnBack.setOnClickListener {
             findNavController().safePopBackStack()
         }
 
         binding.cardUploadPhoto.setOnClickListener {
-            pickSingleImageLauncher.launch("image/*")
+            launchSinglePhotoPicker()
         }
 
         binding.btnChangePhoto.setOnClickListener {
-            pickSingleImageLauncher.launch("image/*")
+            launchSinglePhotoPicker()
         }
 
         binding.cardSelectMusic.setOnClickListener {
@@ -220,9 +300,15 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private fun processAndGenerateVideo(photoUri: Uri) {
         isGeneratingVideo = true
         binding.btnCreateVideo.isEnabled = false
-        showLoadingDialog(getString(R.string.loading_preparing_image), getString(R.string.loading_please_wait))
+        showLoadingDialog(
+            title = getString(R.string.loading_preparing_image),
+            subtitle = getString(R.string.loading_please_wait),
+            cancelable = true,
+            onCancel = { cancelVideoGeneration() }
+        )
 
-        lifecycleScope.launch {
+        generateVideoJob?.cancel()
+        generateVideoJob = lifecycleScope.launch {
             try {
                 // 1. Tải nhạc nền nếu người dùng có chọn nhạc (Optional)
                 val audioUrl = selectedMusicAudioUrl
@@ -384,7 +470,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     navigateToResult(null, photoUri.toString(), audioPath)
                 }
 
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                isGeneratingVideo = false
+                hideLoadingDialog()
+                bindingOrNull?.btnCreateVideo?.isEnabled = true
             } catch (e: Exception) {
+                if (!isGeneratingVideo) return@launch
                 isGeneratingVideo = false
                 if (isResumed && isAdded) {
                     hideLoadingDialog()
@@ -393,6 +484,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 } else {
                     pendingErrorMsg = e.message ?: ""
                 }
+            } finally {
+                generateVideoJob = null
             }
         }
     }
@@ -450,11 +543,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         }
     }
 
-    private fun showLoadingDialog(title: String, subtitle: String) {
+    private fun showLoadingDialog(title: String, subtitle: String, cancelable: Boolean = false, onCancel: (() -> Unit)? = null) {
         if (loadingDialog == null) {
-            loadingDialog = AppLoadingDialog.show(requireContext(), title, subtitle, cancelable = false)
+            loadingDialog = AppLoadingDialog.show(requireContext(), title, subtitle, cancelable = cancelable, onCancel = onCancel)
         } else {
             loadingDialog?.updateMessage(title, subtitle)
+            if (cancelable || onCancel != null) {
+                loadingDialog?.setCancelAction(cancelable, onCancel)
+            }
             if (!loadingDialog!!.isShowing) {
                 loadingDialog?.show()
             }
@@ -467,6 +563,11 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     override fun onDestroyView() {
+        if (isGeneratingVideo) {
+            generateVideoJob?.cancel()
+            generateVideoJob = null
+            isGeneratingVideo = false
+        }
         hideLoadingDialog()
         super.onDestroyView()
     }

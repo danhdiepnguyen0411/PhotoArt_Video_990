@@ -41,8 +41,6 @@ class MusicAdapter(
 
     fun submitList(newList: List<TemplateModel>) {
         tracks = newList
-        currentlyPlayingIndex = -1
-        isPlaying = false
         currentlyLoadingPreviewIndex = -1
 
         // Default to first track ONLY if no selection has ever been made
@@ -63,6 +61,11 @@ class MusicAdapter(
     }
 
     fun getSelectedTrackId(): String? = selectedTrackId
+
+    fun getTrackPosition(id: String?): Int {
+        if (id == null) return -1
+        return tracks.indexOfFirst { it.id == id }
+    }
 
     fun getSelectedTrack(): TemplateModel? {
         return tracks.find { it.id == selectedTrackId }

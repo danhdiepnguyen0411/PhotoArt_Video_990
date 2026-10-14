@@ -3,6 +3,7 @@ package com.example.phortart_video_990.ui.screen.history
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
@@ -84,17 +85,39 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
     private fun applyFilter() {
         val filtered = when (currentFilterKey) {
             "VIDEO" -> userHistoryItems.filter {
-                it.type.contains("video", ignoreCase = true) || it.type.contains("Gom", ignoreCase = true)
+                it.type.contains("video", ignoreCase = true) ||
+                        it.type.contains("Gom", ignoreCase = true) ||
+                        it.type.contains("Template", ignoreCase = true) ||
+                        it.isVideo
             }
             "PROMPT" -> userHistoryItems.filter {
-                it.type.contains("prompt", ignoreCase = true)
+                it.type.contains("prompt", ignoreCase = true) ||
+                        it.type.contains("nâng cấp", ignoreCase = true) ||
+                        it.type.contains("enhance", ignoreCase = true)
             }
             "RESTORE" -> userHistoryItems.filter {
-                it.type.contains("phục", ignoreCase = true) || it.type.contains("restore", ignoreCase = true)
+                it.type.contains("phục", ignoreCase = true) ||
+                        it.type.contains("restore", ignoreCase = true)
             }
             else -> userHistoryItems
         }
 
+        val isGrid = currentFilterKey != "ALL"
+        if (isGrid) {
+            if (binding.rvHistory.layoutManager !is GridLayoutManager) {
+                binding.rvHistory.layoutManager = GridLayoutManager(requireContext(), 3)
+            }
+            val padHorizontal = (16 * resources.displayMetrics.density).toInt()
+            binding.rvHistory.setPadding(padHorizontal, binding.rvHistory.paddingTop, padHorizontal, binding.rvHistory.paddingBottom)
+        } else {
+            if (binding.rvHistory.layoutManager !is LinearLayoutManager || binding.rvHistory.layoutManager is GridLayoutManager) {
+                binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
+            }
+            val padHorizontal = (20 * resources.displayMetrics.density).toInt()
+            binding.rvHistory.setPadding(padHorizontal, binding.rvHistory.paddingTop, padHorizontal, binding.rvHistory.paddingBottom)
+        }
+
+        historyAdapter.setGridMode(isGrid)
         historyAdapter.updateData(filtered)
         binding.llEmptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }

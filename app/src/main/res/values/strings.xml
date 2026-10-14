@@ -145,7 +145,7 @@ tinh khôi</string>
     <string name="history_title">Lịch sử</string>
     <string name="history_subtitle">Xem lại những bức ảnh bạn đã chỉnh sửa và lưu giữ tại đây.</string>
     <string name="history_tab_all">Tất cả</string>
-    <string name="history_tab_video">Tạo video</string>
+    <string name="history_tab_video">Gom ảnh</string>
     <string name="history_tab_prompt">Prompt AI</string>
     <string name="history_tab_restore">Khôi phục</string>
     <string name="history_empty_title">Chưa có bản lưu nào</string>
@@ -240,6 +240,7 @@ tốt hơn.</string>
     <string name="toast_select_at_least_1_photo">Vui lòng chọn ít nhất 1 ảnh để tạo video</string>
     <string name="toast_max_photos_limit">Chỉ có thể chọn tối đa %1$d ảnh cho video này</string>
     <string name="toast_cannot_create_video_file">Không thể tạo file video. Vui lòng thử lại!</string>
+    <string name="toast_video_cancelled">Đã hủy tạo video</string>
     <string name="toast_video_file_not_found">Không tìm thấy file video!</string>
     <string name="toast_cannot_save_video">Không thể lưu video!</string>
     <string name="toast_music_preview_unavailable">Bản nhạc xem trước không khả dụng</string>
@@ -335,4 +336,5 @@ tốt hơn.</string>
     <string name="btn_picker_confirm">Xác nhận (%1$d/%2$d)</string>
     <string name="toast_permission_needed_for_photos">Cần cấp quyền truy cập để chọn ảnh từ thư viện</string>
     <string name="picker_empty_photos">Không tìm thấy ảnh nào trong thư viện thiết bị</string>
+    <string name="toast_cannot_open_gallery">Không thể mở thư viện ảnh</string>
 </resources>
