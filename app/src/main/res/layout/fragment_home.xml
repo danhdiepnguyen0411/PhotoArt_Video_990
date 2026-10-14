@@ -79,221 +79,186 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- 3 Core Feature Cards (0.64 Aspect Ratio, Centered 3D Icons, Soft Pastel Gradient) -->
+        <!-- 4 Core Feature Cards matching Screenshot 1 -->
         <LinearLayout
             android:id="@+id/llFeatureCards"
             android:layout_width="match_parent"
-            android:layout_height="182dp"
+            android:layout_height="124dp"
             android:layout_marginTop="16dp"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
+            android:paddingHorizontal="14dp">
 
-            <!-- Feature 1: Gom ảnh tạo video (Tone Violet) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cardFeatureVideo"
+            <!-- Feature 1: Tạo video nhảy (Tone Pink) -->
+            <LinearLayout
+                android:id="@+id/cardFeatureDance"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="3dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_feature_violet"
+                android:background="@drawable/bg_feature_pink"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:padding="8dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
 
-                <!-- 3D Art Icon Centered at Top -->
                 <ImageView
-                    android:id="@+id/ivFeatureVideo"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginTop="2dp"
-                    android:contentDescription="Create Video"
+                    android:id="@+id/ivFeatureDance"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Dance Video"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/feature_create_video"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:src="@drawable/feature_dance" />
 
-                <!-- Feature Title -->
                 <TextView
-                    android:id="@+id/tvFeatureVideoTitle"
-                    android:layout_width="0dp"
+                    android:id="@+id/tvFeatureDanceTitle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="@font/inter_black"
-                    app:fontFamily="@font/inter_black"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/inter_bold"
+                    app:fontFamily="@font/inter_bold"
+                    android:gravity="center"
                     android:includeFontPadding="false"
-                    android:letterSpacing="-0.02"
-                    android:lineSpacingMultiplier="1.15"
-                    android:text="@string/feature_video_title"
+                    android:letterSpacing="-0.01"
+                    android:lineSpacingMultiplier="1.1"
+                    android:text="@string/feature_dance_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
-                    android:textSize="13.5sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ivFeatureVideo" />
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-                <!-- Circular White Arrow Badge at Bottom Right -->
-                <FrameLayout
-                    android:id="@+id/flArrowVideo"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_feature_arrow"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginBottom="2dp"
-                    android:layout_marginEnd="2dp">
-
-                    <ImageView
-                        android:id="@+id/ivArrowVideo"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="Next"
-                        android:src="@drawable/ic_arrow_right_feature"
-                        app:tint="#6A4FE0" />
-                </FrameLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Feature 2: Tạo ảnh prompt AI (Tone Blue) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <!-- Feature 2: Tạo ảnh bằng text (Tone Blue) -->
+            <LinearLayout
                 android:id="@+id/cardFeaturePrompt"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="4dp"
+                android:layout_marginHorizontal="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_feature_blue"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:padding="8dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
 
-                <!-- 3D Art Icon Centered at Top -->
                 <ImageView
                     android:id="@+id/ivFeaturePrompt"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:contentDescription="AI Prompt"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/feature_ai_prompt"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:src="@drawable/feature_ai_prompt" />
 
-                <!-- Feature Title -->
                 <TextView
                     android:id="@+id/tvFeaturePromptTitle"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="@font/inter_black"
-                    app:fontFamily="@font/inter_black"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/inter_bold"
+                    app:fontFamily="@font/inter_bold"
+                    android:gravity="center"
                     android:includeFontPadding="false"
-                    android:letterSpacing="-0.02"
-                    android:lineSpacingMultiplier="1.15"
+                    android:letterSpacing="-0.01"
+                    android:lineSpacingMultiplier="1.1"
                     android:text="@string/feature_prompt_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
-                    android:textSize="13.5sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ivFeaturePrompt" />
-
-                <!-- Circular White Arrow Badge at Bottom Right -->
-                <FrameLayout
-                    android:id="@+id/flArrowPrompt"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_feature_arrow"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginBottom="2dp"
-                    android:layout_marginEnd="2dp">
-
-                    <ImageView
-                        android:id="@+id/ivArrowPrompt"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="Next"
-                        android:src="@drawable/ic_arrow_right_feature"
-                        app:tint="#3D86F4" />
-                </FrameLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <!-- Feature 3: Hồi sinh ảnh cũ (Tone Mint) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:id="@+id/cardFeatureRestore"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="4dp"
+                android:layout_marginHorizontal="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_feature_mint"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:padding="8dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
 
-                <!-- 3D Art Icon Centered at Top -->
                 <ImageView
                     android:id="@+id/ivFeatureRestore"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:contentDescription="Restore Photo"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/feature_restore_photo"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:src="@drawable/feature_restore_photo" />
 
-                <!-- Feature Title -->
                 <TextView
                     android:id="@+id/tvFeatureRestoreTitle"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
-                    android:fontFamily="@font/inter_black"
-                    app:fontFamily="@font/inter_black"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/inter_bold"
+                    app:fontFamily="@font/inter_bold"
+                    android:gravity="center"
                     android:includeFontPadding="false"
-                    android:letterSpacing="-0.02"
-                    android:lineSpacingMultiplier="1.15"
+                    android:letterSpacing="-0.01"
+                    android:lineSpacingMultiplier="1.1"
                     android:text="@string/feature_restore_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
-                    android:textSize="13.5sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ivFeatureRestore" />
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-                <!-- Circular White Arrow Badge at Bottom Right -->
-                <FrameLayout
-                    android:id="@+id/flArrowRestore"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_feature_arrow"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginBottom="2dp"
-                    android:layout_marginEnd="2dp">
+            <!-- Feature 4: Gom ảnh tạo video (Tone Violet) -->
+            <LinearLayout
+                android:id="@+id/cardFeatureVideo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_feature_violet"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
 
-                    <ImageView
-                        android:id="@+id/ivArrowRestore"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="Next"
-                        android:src="@drawable/ic_arrow_right_feature"
-                        app:tint="#1BB57A" />
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/ivFeatureVideo"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Create Video"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/feature_create_video" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tvFeatureVideoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/inter_bold"
+                    app:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.01"
+                    android:lineSpacingMultiplier="1.1"
+                    android:text="@string/feature_video_title"
+                    android:textAlignment="center"
+                    android:textColor="#16296B"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -388,11 +353,21 @@
 
         </LinearLayout>
 
+        <!-- Dancing Categories Filter Chips -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvHomeCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp" />
+
         <!-- Section 2: Gợi ý chủ đề cho bạn -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout

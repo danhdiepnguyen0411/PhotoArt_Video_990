@@ -29,12 +29,22 @@
     <string name="home_recent_history">Lịch sử gần đây</string>
     <string name="home_suggestions">Dành riêng cho bạn</string>
     <string name="home_hot_templates">Hot</string>
-    <string name="feature_video_title">Gom ảnh
-tạo video</string>
+    <string name="feature_dance_title">Tạo video
+nhảy</string>
     <string name="feature_prompt_title">Tạo ảnh bằng
-prompt AI</string>
+text</string>
     <string name="feature_restore_title">Hồi sinh
 ảnh cũ</string>
+    <string name="feature_video_title">Gom ảnh
+tạo video</string>
+    <string name="dance_video_title">Tạo video nhảy</string>
+    <string name="dance_upload_title">Tải ảnh lên từ thư viện</string>
+    <string name="dance_upload_card_title">Nhấn để chọn ảnh từ thư viện</string>
+    <string name="dance_upload_card_desc">Chọn 1 hoặc nhiều ảnh (JPG, PNG)</string>
+    <string name="dance_select_template">Chọn template</string>
+    <string name="dance_bg_music">Nhạc nền</string>
+    <string name="btn_create_dance_video">Tạo video nhảy</string>
+    <string name="toast_please_select_photo">Vui lòng chọn ảnh từ thư viện để tạo video</string>
     <string name="func_01_memories">Gom ảnh tạo video</string>
     <string name="func_02_restore">Hồi sinh ảnh cũ</string>
     <string name="func_03_enhance">Tạo ảnh prompt AI</string>
@@ -337,4 +347,7 @@ tốt hơn.</string>
     <string name="toast_permission_needed_for_photos">Cần cấp quyền truy cập để chọn ảnh từ thư viện</string>
     <string name="picker_empty_photos">Không tìm thấy ảnh nào trong thư viện thiết bị</string>
     <string name="toast_cannot_open_gallery">Không thể mở thư viện ảnh</string>
+    <string name="toast_music_url_empty">Không thể phát âm thanh xem trước</string>
+    <string name="loading_preparing_image_data">Đang chuẩn bị dữ liệu hình ảnh...</string>
+    <string name="loading_preparing_bg_music">Đang chuẩn bị nhạc nền...</string>
 </resources>

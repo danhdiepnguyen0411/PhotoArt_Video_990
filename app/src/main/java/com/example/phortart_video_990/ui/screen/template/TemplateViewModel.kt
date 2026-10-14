@@ -27,8 +27,8 @@ class TemplateViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // All music tracks from API
-    private var allMusicList: List<TemplateModel> = emptyList()
+    // All dancing templates from API
+    private var allDancingList: List<TemplateModel> = emptyList()
 
     init {
         loadData()
@@ -38,30 +38,30 @@ class TemplateViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Fetch real music tracks from API
-                val realMusicTracks = repository.getMusicTracks(categoryCode = "ALL")
-                allMusicList = realMusicTracks
+                // 1. Fetch real dancing templates from API
+                val realDancingTemplates = repository.getDancingTemplates()
+                allDancingList = realDancingTemplates
 
-                // 2. Fetch music categories from API
-                val apiMusicCategories = repository.getMusicCategories()
+                // 2. Fetch dancing categories from API
+                val apiDancingCategories = repository.getDancingCategories()
                 val categoriesList = mutableListOf(CategoryModel.ALL)
 
-                val validMusicCategories = apiMusicCategories.filter {
+                val validDancingCategories = apiDancingCategories.filter {
                     it.active && it.name.isNotBlank() &&
                             !it.code.equals("ALL", ignoreCase = true) &&
                             !it.name.equals("ALL", ignoreCase = true) &&
                             !it.name.equals("Tất cả", ignoreCase = true)
                 }
-                categoriesList.addAll(validMusicCategories)
+                categoriesList.addAll(validDancingCategories)
 
-                // 3. Dynamically discover any music categories from music tracks
+                // 3. Dynamically discover any dancing categories from templates
                 val existingCodes = categoriesList.map { it.code.lowercase() }.toMutableSet()
                 existingCodes.addAll(categoriesList.map { it.name.lowercase() })
 
-                realMusicTracks.forEach { item ->
+                realDancingTemplates.forEach { item ->
                     val cat = item.category.trim()
-                    if (cat.isNotBlank()) {
-                        val cleanCat = cat.removePrefix("MUSIC_")
+                    if (cat.isNotBlank() && !cat.startsWith("MUSIC_", ignoreCase = true)) {
+                        val cleanCat = cat.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
                         if (!existingCodes.contains(cat.lowercase()) && !existingCodes.contains(cleanCat.lowercase())) {
                             existingCodes.add(cat.lowercase())
                             existingCodes.add(cleanCat.lowercase())
@@ -75,11 +75,11 @@ class TemplateViewModel(
                 // Filter for current selected category
                 val currentCode = _selectedCategoryCode.value
                 val selectedCat = categoriesList.find { it.code.equals(currentCode, ignoreCase = true) }
-                _templates.value = filterMusic(realMusicTracks, currentCode, selectedCat?.name)
+                _templates.value = filterTemplates(realDancingTemplates, currentCode, selectedCat?.name)
             } catch (e: Exception) {
-                allMusicList = emptyList()
+                allDancingList = emptyList()
                 _templates.value = emptyList()
-                _categories.value = listOf(CategoryModel.ALL)
+                _categories.value = repository.getDefaultDancingCategories()
             } finally {
                 _isLoading.value = false
             }
@@ -89,11 +89,11 @@ class TemplateViewModel(
     fun selectCategory(category: CategoryModel) {
         if (_selectedCategoryCode.value != category.code) {
             _selectedCategoryCode.value = category.code
-            _templates.value = filterMusic(allMusicList, category.code, category.name)
+            _templates.value = filterTemplates(allDancingList, category.code, category.name)
         }
     }
 
-    private fun filterMusic(
+    private fun filterTemplates(
         list: List<TemplateModel>,
         categoryCode: String,
         categoryName: String?
@@ -103,15 +103,17 @@ class TemplateViewModel(
                 categoryCode.equals("Tất cả", ignoreCase = true)
         if (isAll) return list
 
-        val target = categoryCode.trim()
-        val cleanTarget = target.removePrefix("MUSIC_").replace("_", " ").lowercase()
+        val target = categoryCode.trim().lowercase()
+        val cleanTarget = target.replace("_", " ")
 
         return list.filter { item ->
-            val itemCat = item.category.trim()
-            val cleanItemCat = itemCat.removePrefix("MUSIC_").replace("_", " ").lowercase()
+            val itemCat = item.category.trim().lowercase()
+            val cleanItemCat = itemCat.replace("_", " ")
             cleanItemCat == cleanTarget ||
-                    itemCat.equals(target, ignoreCase = true) ||
-                    (!categoryName.isNullOrBlank() && itemCat.equals(categoryName, ignoreCase = true))
+                    itemCat == target ||
+                    (!categoryName.isNullOrBlank() && itemCat == categoryName.trim().lowercase()) ||
+                    itemCat.contains(target) ||
+                    (!categoryName.isNullOrBlank() && itemCat.contains(categoryName.trim().lowercase()))
         }
     }
 }

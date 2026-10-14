@@ -25,6 +25,16 @@ data class CategoryModel(
                 groupCode.equals("AI_TOOL", ignoreCase = true) ||
                 groupName.equals("AI_TOOL", ignoreCase = true)
 
+    val isDanceCategory: Boolean
+        get() = groupCode.equals("DANCING", ignoreCase = true) ||
+                groupCode.equals("DANCE", ignoreCase = true) ||
+                groupName.equals("DANCING", ignoreCase = true) ||
+                groupName.equals("DANCE", ignoreCase = true) ||
+                code.contains("DANCE", ignoreCase = true) ||
+                name.contains("DANCE", ignoreCase = true) ||
+                name.contains("NHẢY", ignoreCase = true) ||
+                name.contains("VŨ ĐIỆU", ignoreCase = true)
+
     val displayName: String
         get() {
             val raw = name.ifBlank { code }.trim()

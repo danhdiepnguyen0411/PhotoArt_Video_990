@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardTrack"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E8EEF8"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp">
+
+        <!-- Track Cover Artwork (42x42dp rounded 10dp matching design) -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivTrackCover"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:contentDescription="Track Cover"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_func_music"
+            app:shapeAppearanceOverlay="@style/Rounded10ImageView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Track Title & Duration -->
+        <LinearLayout
+            android:id="@+id/llTrackInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="6dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/waveView"
+            app:layout_constraintStart_toEndOf="@+id/ivTrackCover"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvTrackTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/inter_bold"
+                android:singleLine="true"
+                android:textColor="#1B2A78"
+                android:textSize="14.5sp"
+                android:textStyle="bold"
+                tools:text="Waacking" />
+
+            <TextView
+                android:id="@+id/tvTrackDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="#8296BC"
+                android:textSize="12sp"
+                tools:text="00:17" />
+
+        </LinearLayout>
+
+        <!-- Audio Waveform Visualizer (Appears when audio is playing) -->
+        <com.example.phortart_video_990.ui.screen.feature.music.AudioWaveformView
+            android:id="@+id/waveView"
+            android:layout_width="54dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/flActionContainer"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+        <!-- Right Action Button: Checkmark (when selected) OR Play/Pause circle (when unselected) -->
+        <FrameLayout
+            android:id="@+id/flActionContainer"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_track_play_circle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Play / Pause Icon -->
+            <ImageView
+                android:id="@+id/ivPlayIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="Play/Pause"
+                android:src="@drawable/ic_play_small"
+                app:tint="#6A4FE0" />
+
+            <!-- Checkmark Icon (visible when track is selected) -->
+            <ImageView
+                android:id="@+id/ivCheckIcon"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:contentDescription="Selected"
+                android:src="@drawable/ic_check"
+                android:visibility="gone"
+                app:tint="@color/white" />
+
+            <!-- Loading Spinner -->
+            <ProgressBar
+                android:id="@+id/pbLoading"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="#6A4FE0"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
