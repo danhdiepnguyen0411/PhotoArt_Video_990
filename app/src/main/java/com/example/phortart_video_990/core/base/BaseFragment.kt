@@ -44,7 +44,8 @@ abstract class BaseFragment<VB : ViewBinding>(
     fun showLoading(
         title: String? = null,
         subtitle: String? = null,
-        cancelable: Boolean = false
+        cancelable: Boolean = false,
+        onCancel: (() -> Unit)? = null
     ) {
         val ctx = context ?: return
         if (appLoadingDialog == null) {
@@ -52,10 +53,14 @@ abstract class BaseFragment<VB : ViewBinding>(
                 context = ctx,
                 title = title,
                 subtitle = subtitle,
-                cancelable = cancelable
+                cancelable = cancelable,
+                onCancel = onCancel
             )
         } else {
             appLoadingDialog?.updateMessage(title ?: getString(R.string.loading_creating_video), subtitle)
+            if (cancelable || onCancel != null) {
+                appLoadingDialog?.setCancelAction(cancelable, onCancel)
+            }
             if (appLoadingDialog?.isShowing != true) {
                 try {
                     appLoadingDialog?.show()

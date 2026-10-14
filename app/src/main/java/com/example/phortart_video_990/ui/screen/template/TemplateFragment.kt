@@ -40,7 +40,6 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             categories = viewModel.categories.value,
             selectedCategoryCode = viewModel.selectedCategoryCode.value
         ) { selectedCategory ->
-            stopAudio()
             com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
                 .recordSelectedCategory(selectedCategory.code)
             viewModel.selectCategory(selectedCategory)
@@ -90,7 +89,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         val audioUrl = track.safeAudioUrl
         if (audioUrl.isNullOrBlank()) return
 
-        templateAdapter.setLoadingState(position)
+        templateAdapter.setLoadingTrack(track.id)
 
         previewJob = viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -98,7 +97,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                 if (!isAdded || view == null) return@launch
 
                 if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
-                    templateAdapter.setPlayingState(position, false)
+                    templateAdapter.setPlayingTrack(track.id, false)
                     return@launch
                 }
 
@@ -107,7 +106,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                     setOnPreparedListener { mp ->
                         mp.start()
                         activePlayingTrackId = track.id
-                        templateAdapter.setPlayingState(position, true)
+                        templateAdapter.setPlayingTrack(track.id, true)
                     }
                     setOnCompletionListener {
                         stopAudio()
@@ -119,7 +118,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                     prepareAsync()
                 }
             } catch (e: Exception) {
-                templateAdapter.setPlayingState(position, false)
+                templateAdapter.setPlayingTrack(track.id, false)
             }
         }
     }
@@ -136,7 +135,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         mediaPlayer = null
         activePlayingTrackId = null
         if (::templateAdapter.isInitialized) {
-            templateAdapter.setPlayingState(-1, false)
+            templateAdapter.setPlayingTrack(null, false)
         }
     }
 
