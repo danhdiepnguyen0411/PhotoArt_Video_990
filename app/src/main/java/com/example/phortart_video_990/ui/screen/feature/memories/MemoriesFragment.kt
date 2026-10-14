@@ -19,6 +19,7 @@ import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ import java.io.FileOutputStream
 class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesBinding::inflate) {
 
     companion object {
+        private const val TAG = "PhotoArt_VideoGen"
         private const val SAVED_PHOTOS_KEY = "saved_selected_photos"
     }
 
@@ -589,7 +591,11 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         })
 
         binding.btnCreateVideo.setOnClickListener {
+            Log.i(TAG, "==========================================================")
+            Log.i(TAG, ">>> [MEMORIES] User clicked Create Video button. Selected photos: ${selectedPhotos.size}")
+            Log.i(TAG, "==========================================================")
             if (selectedPhotos.isEmpty()) {
+                Log.w(TAG, "[MEMORIES] No photos selected!")
                 Toast.makeText(requireContext(), getString(R.string.toast_select_at_least_1_photo), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -599,6 +605,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val finalAudioUrl = selectedMusicAudioUrl ?: stateHandle?.get<String?>("selected_music_audio_url")
             val finalAudioPath = selectedMusicAudioFilePath ?: stateHandle?.get<String?>("selected_music_file_path")
             val finalImageUrl = selectedMusicImageUrl ?: stateHandle?.get<String?>("selected_music_image_url")
+
+            Log.i(TAG, "[MEMORIES] Music params: track=$finalTrack, url=$finalAudioUrl, path=$finalAudioPath")
 
             isGeneratingVideo = true
             binding.btnCreateVideo.isEnabled = false
@@ -616,6 +624,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     var resolvedAudioPath = finalAudioPath
                     val hasValidAudioFile = !resolvedAudioPath.isNullOrBlank() && File(resolvedAudioPath).let { it.exists() && it.length() > 0 }
                     if (!hasValidAudioFile && !finalAudioUrl.isNullOrBlank()) {
+                        Log.i(TAG, "[MEMORIES] Preparing audio track: checking/downloading $finalAudioUrl")
                         if (isAdded) {
                             showLoading(
                                 title = getString(R.string.loading_downloading_music),
@@ -629,6 +638,9 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         if (downloaded != null && downloaded.exists() && downloaded.length() > 0) {
                             resolvedAudioPath = downloaded.absolutePath
                             selectedMusicAudioFilePath = resolvedAudioPath
+                            Log.i(TAG, "[MEMORIES] Audio ready at: $resolvedAudioPath (${downloaded.length() / 1024} KB)")
+                        } else {
+                            Log.w(TAG, "[MEMORIES] Audio download failed or empty, will proceed without custom audio or stream directly")
                         }
                     }
 
@@ -642,6 +654,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
                     // Nguồn âm thanh (ưu tiên file nội bộ đã tải)
                     val audioSource = resolvedAudioPath?.takeIf { File(it).exists() } ?: finalAudioUrl
+
+                    Log.i(TAG, "MemoriesFragment: Invoking VideoGenerator for $photoCount photos, duration=${videoDurationSec}s, audio=$audioSource")
 
                     // 3. Render video MP4 hoàn chỉnh (ảnh + chuyển cảnh + ghép nhạc + tỷ lệ khung hình)
                     val generatedVideoFile = VideoGenerator.generateMp4FromPhotos(
@@ -667,6 +681,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     isGeneratingVideo = false
 
                     if (generatedVideoFile.exists() && generatedVideoFile.length() > 0) {
+                        Log.i(TAG, "MemoriesFragment: Video generated successfully at: ${generatedVideoFile.absolutePath} (${generatedVideoFile.length() / 1024} KB)")
                         val bundle = VideoResultFragment.createBundle(
                             videoPath = generatedVideoFile.absolutePath,
                             photos = selectedPhotos.map { it.toString() },
@@ -685,6 +700,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             pendingVideoResultBundle = bundle
                         }
                     } else {
+                        Log.e(TAG, "MemoriesFragment: Video file is empty or missing: ${generatedVideoFile.absolutePath}")
                         if (isResumed && isAdded) {
                             hideLoading()
                             bindingOrNull?.btnCreateVideo?.isEnabled = true
@@ -695,10 +711,12 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     }
                 } catch (e: kotlinx.coroutines.CancellationException) {
                     // Người dùng đã nhấn hủy/thoát: không hiển thị lỗi và không chuyển màn hình
+                    Log.i(TAG, "MemoriesFragment: Video generation cancelled by user.")
                     isGeneratingVideo = false
                     hideLoading()
                     bindingOrNull?.btnCreateVideo?.isEnabled = true
                 } catch (e: Exception) {
+                    Log.e(TAG, "MemoriesFragment: Video generation failed with exception: ${e.message}", e)
                     if (!isGeneratingVideo) return@launch
                     isGeneratingVideo = false
                     if (isResumed && isAdded) {

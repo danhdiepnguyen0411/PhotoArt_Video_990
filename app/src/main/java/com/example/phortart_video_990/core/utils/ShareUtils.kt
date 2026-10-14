@@ -61,37 +61,17 @@ object ShareUtils {
             val authority = "${context.packageName}.fileprovider"
             val contentUri = FileProvider.getUriForFile(context, authority, shareFile)
 
-            val thumbFile = if (!thumbnailPath.isNullOrBlank()) {
-                val cleanThumb = thumbnailPath.removePrefix("file://")
-                val f = File(cleanThumb)
-                if (f.exists() && f.length() > 0) f else extractVideoThumbnail(context, shareFile)
-            } else {
-                extractVideoThumbnail(context, shareFile)
-            }
-
-            val thumbUri = if (thumbFile != null && thumbFile.exists()) {
-                try {
-                    FileProvider.getUriForFile(context, authority, thumbFile)
-                } catch (e: Exception) {
-                    null
-                }
-            } else null
-
-            val previewUri = thumbUri ?: contentUri
-            val previewMime = if (thumbUri != null) "image/jpeg" else "video/mp4"
-
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "video/mp4"
                 putExtra(Intent.EXTRA_STREAM, contentUri)
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                val clipData = ClipData(effectiveTitle, arrayOf(previewMime), ClipData.Item(previewUri))
-                this.clipData = clipData
+                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                clipData = sendIntent.clipData
+                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 if (context !is Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -99,10 +79,12 @@ object ShareUtils {
             }
 
             try {
-                context.grantUriPermission("android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                if (thumbUri != null) {
-                    context.grantUriPermission("android", thumbUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val resInfoList = context.packageManager.queryIntentActivities(chooserIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+                for (resolveInfo in resInfoList) {
+                    val packageName = resolveInfo.activityInfo.packageName
+                    context.grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
+                context.grantUriPermission("android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } catch (_: Exception) {}
 
             context.startActivity(chooserIntent)
@@ -255,7 +237,7 @@ object ShareUtils {
 
     private fun ensureVideoExtension(context: Context, file: File): File {
         if (file.extension.equals("mp4", ignoreCase = true)) return file
-        val dir = File(context.cacheDir, "shared_images").apply { mkdirs() }
+        val dir = File(context.cacheDir, "shared_videos").apply { mkdirs() }
         val target = File(dir, "${file.nameWithoutExtension.ifBlank { "video" }}.mp4")
         if (!target.exists() || target.length() != file.length()) {
             try {

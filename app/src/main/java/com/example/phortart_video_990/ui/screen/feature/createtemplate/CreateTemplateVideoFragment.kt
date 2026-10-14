@@ -23,6 +23,7 @@ import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentCreateTemplateVideoBinding
 import com.example.phortart_video_990.ui.screen.feature.memories.VideoResultFragment
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -287,8 +288,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         }
 
         binding.btnCreateVideo.setOnClickListener {
+            Log.i(TAG, "==========================================================")
+            Log.i(TAG, ">>> [TEMPLATE AI VIDEO] User clicked Create Video button.")
+            Log.i(TAG, "==========================================================")
             val photoUri = selectedPhotoUri
             if (photoUri == null) {
+                Log.w(TAG, "[TEMPLATE AI VIDEO] No photo selected!")
                 Toast.makeText(requireContext(), getString(R.string.toast_select_portrait_first), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -298,8 +303,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     private fun processAndGenerateVideo(photoUri: Uri) {
+        val overallStart = System.currentTimeMillis()
         isGeneratingVideo = true
         binding.btnCreateVideo.isEnabled = false
+        Log.i(TAG, ">>> processAndGenerateVideo started: templateCode='$templateCode', templateTitle='$templateTitle', photoUri=$photoUri")
+        Log.i(TAG, "Music configuration: audioUrl=$selectedMusicAudioUrl, localPath=$selectedMusicAudioFilePath")
+
         showLoadingDialog(
             title = getString(R.string.loading_preparing_image),
             subtitle = getString(R.string.loading_please_wait),
@@ -314,6 +323,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val audioUrl = selectedMusicAudioUrl
                 var audioPath = selectedMusicAudioFilePath
                 if (!audioUrl.isNullOrBlank() && (audioPath.isNullOrBlank() || !File(audioPath).exists())) {
+                    Log.i(TAG, "[Template Phase 1/5] Downloading background music: $audioUrl")
                     if (isAdded) {
                         loadingDialog?.updateMessage(getString(R.string.loading_downloading_music), getString(R.string.loading_please_wait))
                     }
@@ -321,15 +331,20 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     if (downloaded != null && downloaded.exists()) {
                         audioPath = downloaded.absolutePath
                         selectedMusicAudioFilePath = audioPath
+                        Log.i(TAG, "[Template Phase 1/5] Music ready at: $audioPath (${downloaded.length() / 1024} KB)")
+                    } else {
+                        Log.w(TAG, "[Template Phase 1/5] Music download failed, continuing without custom music")
                     }
                 }
 
                 // 2. Chuyển Uri thành File và nén qua ImageCompressor
+                Log.i(TAG, "[Template Phase 2/5] Preparing and compressing input photo: $photoUri")
                 if (isAdded) {
                     loadingDialog?.updateMessage(getString(R.string.loading_processing_input_image), getString(R.string.loading_compressing_optimizing))
                 }
                 val rawFile = withContext(Dispatchers.IO) { copyUriToFile(photoUri) }
                 if (rawFile == null || !rawFile.exists()) {
+                    Log.e(TAG, "[Template Phase 2/5] FATAL: Cannot copy photo Uri to local file!")
                     isGeneratingVideo = false
                     if (isResumed && isAdded) {
                         hideLoadingDialog()
@@ -344,12 +359,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val compressedFile = withContext(Dispatchers.IO) {
                     ImageCompressor.compressIfNeeded(requireContext(), rawFile)
                 }
+                Log.i(TAG, "[Template Phase 2/5] Photo prepared: ${compressedFile.name} (${compressedFile.length() / 1024} KB)")
 
                 // 3. Gọi backend processImageEditing
+                val codeToUse = templateCode.ifBlank { "ai_effect_default" }
+                Log.i(TAG, "[Template Phase 3/5] Requesting Backend AI video generation: code='$codeToUse'...")
                 if (isAdded) {
                     loadingDialog?.updateMessage(getString(R.string.loading_sending_video_request), getString(R.string.loading_backend_ai_processing))
                 }
-                val codeToUse = templateCode.ifBlank { "ai_effect_default" }
 
                 val processResult = templateRepository.processImageEditing(
                     file = compressedFile,
@@ -359,6 +376,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                 if (processResult.isFailure) {
                     val errorMsg = processResult.exceptionOrNull()?.message ?: "AI Error"
+                    Log.e(TAG, "[Template Phase 3/5] processImageEditing failed: $errorMsg")
                     // Nếu lỗi mạng / timeout thử lấy requestId từ error nếu có
                     val reqId = templateRepository.extractRequestId(null)
                     if (reqId.isNullOrBlank()) {
@@ -375,13 +393,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
                 val jsonResponse = processResult.getOrNull()
-                android.util.Log.d("CreateTemplateVideo", "Backend response: $jsonResponse")
+                Log.d(TAG, "[Template Phase 3/5] Backend response: $jsonResponse")
                 var videoUrl = templateRepository.extractVideoUrl(jsonResponse)
-                var requestId = templateRepository.extractRequestId(jsonResponse)
-                android.util.Log.d("CreateTemplateVideo", "Extracted videoUrl=$videoUrl, requestId=$requestId")
+                val requestId = templateRepository.extractRequestId(jsonResponse)
+                Log.i(TAG, "[Template Phase 3/5] Extracted direct videoUrl='$videoUrl', requestId='$requestId'")
 
                 // 4. Nếu chưa có video trực tiếp mà có requestId -> Poll kết quả
                 if (videoUrl.isNullOrBlank() && !requestId.isNullOrBlank()) {
+                    Log.i(TAG, "[Template Phase 4/5] Polling AI server for requestId='$requestId' (timeout=180s)...")
                     if (isAdded) {
                         loadingDialog?.updateMessage(getString(R.string.loading_generating_video_ai), getString(R.string.loading_processing_progress, 30))
                     }
@@ -390,6 +409,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                         intervalMillis = 5_000L,
                         timeoutMillis = 180_000L,
                         onProgress = { progress ->
+                            Log.d(TAG, "  Polling progress: $progress% for requestId=$requestId")
                             if (isAdded) {
                                 loadingDialog?.updateMessage(
                                     getString(R.string.loading_generating_video_ai),
@@ -401,8 +421,10 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                     if (pollResult.isSuccess) {
                         videoUrl = templateRepository.extractVideoUrl(pollResult.getOrNull())
+                        Log.i(TAG, "[Template Phase 4/5] Polling SUCCEEDED! videoUrl='$videoUrl'")
                     } else {
                         val pollError = pollResult.exceptionOrNull()?.message ?: getString(R.string.loading_timeout_error)
+                        Log.e(TAG, "[Template Phase 4/5] Polling FAILED: $pollError")
                         isGeneratingVideo = false
                         if (isResumed && isAdded) {
                             hideLoadingDialog()
@@ -419,6 +441,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 var finalLocalVideoPath: String? = null
 
                 if (!videoUrl.isNullOrBlank()) {
+                    Log.i(TAG, "[Template Phase 5/5] Downloading and saving video: $videoUrl")
                     if (isAdded) {
                         loadingDialog?.updateMessage(getString(R.string.loading_preparing_video), getString(R.string.loading_storing_local))
                     }
@@ -431,12 +454,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
 
                     if (rawVideoFile != null && rawVideoFile.exists()) {
+                        Log.i(TAG, "[Template Phase 5/5] Raw AI video downloaded: ${rawVideoFile.absolutePath} (${rawVideoFile.length() / 1024} KB)")
                         val mergedFile = if (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank()) {
                             if (isAdded) {
                                 loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
                             }
                             val outMerged = File(requireContext().cacheDir, "merged_ai_${System.currentTimeMillis()}.mp4")
                             val audioSource = audioPath?.takeIf { File(it).exists() } ?: audioUrl.orEmpty()
+                            Log.i(TAG, "[Template Phase 5/5] Merging audio track into AI video: audioSource=$audioSource")
                             val muxSuccess = VideoGenerator.mergeAudioIntoVideo(
                                 context = requireContext(),
                                 videoInputFile = rawVideoFile,
@@ -455,12 +480,18 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                             title = "Template_AI_${System.currentTimeMillis()}"
                         )
                         finalLocalVideoPath = permanentDoc.absolutePath
+                        Log.i(TAG, "[Template Phase 5/5] Permanent video document saved: $finalLocalVideoPath (${permanentDoc.length() / 1024} KB)")
                     } else {
                         finalLocalVideoPath = videoUrl
                     }
                 }
 
                 isGeneratingVideo = false
+                val totalElapsed = System.currentTimeMillis() - overallStart
+                Log.i(TAG, "==========================================================")
+                Log.i(TAG, ">>> [TEMPLATE AI VIDEO] COMPLETED in ${totalElapsed}ms (${totalElapsed / 1000}s)!")
+                Log.i(TAG, "Result video path: $finalLocalVideoPath")
+                Log.i(TAG, "==========================================================")
 
                 // 6. Điều hướng sang màn xem video kết quả và tự động lưu vào Lịch sử
                 if (!finalLocalVideoPath.isNullOrBlank()) {
@@ -471,10 +502,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 }
 
             } catch (e: kotlinx.coroutines.CancellationException) {
+                Log.w(TAG, "[TEMPLATE AI VIDEO] Video generation cancelled by user.")
                 isGeneratingVideo = false
                 hideLoadingDialog()
                 bindingOrNull?.btnCreateVideo?.isEnabled = true
             } catch (e: Exception) {
+                Log.e(TAG, "[TEMPLATE AI VIDEO] Video generation failed with exception: ${e.message}", e)
                 if (!isGeneratingVideo) return@launch
                 isGeneratingVideo = false
                 if (isResumed && isAdded) {
@@ -573,6 +606,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     companion object {
+        private const val TAG = "PhotoArt_VideoGen"
         const val ARG_TEMPLATE_CODE = "arg_template_code"
         const val ARG_TEMPLATE_TITLE = "arg_template_title"
         const val ARG_TEMPLATE_CATEGORY = "arg_template_category"
