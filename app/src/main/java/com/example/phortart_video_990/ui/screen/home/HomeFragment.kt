@@ -16,12 +16,15 @@ import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.BannerItemModel
+import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentHomeBinding
+import com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment
 import com.example.phortart_video_990.ui.screen.main.MainFragment
+import com.example.phortart_video_990.ui.screen.template.CategoryAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -32,6 +35,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private val templateRepository = TemplateRepository()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
+
+    private lateinit var homeCategoryAdapter: CategoryAdapter
+    private var selectedCategoryCode: String = "ALL"
 
     private lateinit var recentHistoryAdapter: HomeRecentHistoryAdapter
     private lateinit var forYouAdapter: HomeForYouAdapter
@@ -59,7 +65,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 highlight = getString(R.string.banner_1_highlight),
                 description = getString(R.string.banner_1_desc),
                 buttonText = getString(R.string.banner_1_btn),
-                targetFeature = "video"
+                targetFeature = "dance"
             ),
             BannerItemModel(
                 imageRes = R.drawable.banner_2,
@@ -85,6 +91,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun initView() {
         setupHeader()
         setupBanners()
+        setupHomeCategories()
         setupRecentHistory()
         setupForYouTemplates()
         setupHotTemplates()
@@ -152,9 +159,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     override fun initListener() {
-        // 3 Core Features
-        binding.cardFeatureVideo.setOnClickListener {
-            if (canNavigate()) navigateToFeature("video")
+        // 4 Core Features
+        binding.cardFeatureDance.setOnClickListener {
+            if (canNavigate()) navigateToFeature("dance")
         }
 
         binding.cardFeaturePrompt.setOnClickListener {
@@ -163,6 +170,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
         binding.cardFeatureRestore.setOnClickListener {
             if (canNavigate()) navigateToFeature("restore")
+        }
+
+        binding.cardFeatureVideo.setOnClickListener {
+            if (canNavigate()) navigateToFeature("video")
         }
 
         // See all actions -> switches to Tab 1 (Music)
@@ -310,6 +321,50 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.rvHotTemplates.adapter = hotTemplateAdapter
     }
 
+    private fun setupHomeCategories() {
+        homeCategoryAdapter = CategoryAdapter(
+            categories = listOf(CategoryModel.ALL),
+            selectedCategoryCode = selectedCategoryCode
+        ) { selectedCat ->
+            selectedCategoryCode = selectedCat.code
+            applyCategoryFilter(selectedCat)
+        }
+        binding.rvHomeCategories.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvHomeCategories.adapter = homeCategoryAdapter
+    }
+
+    private fun applyCategoryFilter(category: CategoryModel) {
+        val pool = cachedDancingTemplates
+        if (pool.isEmpty()) return
+
+        val isAll = category.code.isBlank() ||
+                category.code.equals("ALL", ignoreCase = true) ||
+                category.code.equals("Tất cả", ignoreCase = true)
+
+        if (isAll) {
+            val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+                .recommendForYouTemplates(requireContext(), pool, forceRefresh = false)
+            forYouAdapter.submitList(recommended)
+
+            val availableHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
+                .computeAndCacheHotTemplates(pool, recommended, forceRefresh = false)
+            hotTemplateAdapter.submitList(availableHot)
+        } else {
+            val target = category.code.trim().lowercase()
+            val targetName = category.name.trim().lowercase()
+            val filtered = pool.filter { item ->
+                val itemCat = item.category.trim().lowercase()
+                itemCat == target || itemCat == targetName || itemCat.contains(target) || itemCat.contains(targetName)
+            }
+            val displayPool = if (filtered.isNotEmpty()) filtered else pool
+            val forYou = displayPool.take(8)
+            val hot = if (displayPool.size > 8) displayPool.drop(8) else displayPool
+            forYouAdapter.submitList(forYou)
+            hotTemplateAdapter.submitList(hot)
+        }
+    }
+
     private fun onTemplateSelected(template: TemplateModel) {
         stopAudio()
         bindingOrNull?.let {
@@ -320,12 +375,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             .recordSelectedCategory(template.category)
 
         val bundle = android.os.Bundle().apply {
-            putString("selected_track_id", template.id)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, template.id)
             putString("template_code", template.id)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, template.title)
             putString("template_title", template.title)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, template.category)
             putString("template_category", template.category)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, template.safeImageUrl)
             putString("template_thumb", template.safeImageUrl)
             putString("template_audio_url", template.safeAudioUrl)
+            putString("selected_track_id", template.id)
             putString("selected_music_title", template.title)
             putString("selected_music_audio_url", template.safeAudioUrl)
             putString("selected_music_image_url", template.safeImageUrl)
@@ -335,7 +394,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         val navController = parentFragment?.parentFragment?.findNavController()
             ?: parentFragment?.findNavController()
             ?: findNavController()
-        navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
+        navController.navigateSafe(R.id.action_mainFragment_to_createTemplateVideoFragment, bundle)
     }
 
     private fun setAdapterLoading(isForYou: Boolean, position: Int) {
@@ -406,11 +465,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         hotTemplateAdapter.setPlayingState(-1, false)
     }
 
-    private var cachedMusicTracks: List<TemplateModel> = emptyList()
+    private var cachedDancingTemplates: List<TemplateModel> = emptyList()
 
     private fun refreshRecommendations() {
         if (!isAdded) return
-        val currentPool = cachedMusicTracks
+        val currentPool = cachedDancingTemplates
         if (currentPool.isEmpty()) return
         val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
             .recommendForYouTemplates(requireContext(), currentPool, forceRefresh = false)
@@ -442,22 +501,36 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         bindingOrNull?.layoutSkeletonHot?.root?.visibility = View.VISIBLE
         bindingOrNull?.rvHotTemplates?.visibility = View.GONE
 
-        // Fetch templates from API in background (NO hardcoded fake templates)
+        // Fetch dancing templates from API in background (NO hardcoded fake templates)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                var apiTracks = templateRepository.getMusicTracks()
-                if (apiTracks.isEmpty()) {
-                    apiTracks = templateRepository.getAllTemplateApps()
-                }
-                if (apiTracks.isNotEmpty()) {
-                    cachedMusicTracks = apiTracks
-                    val recommended = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-                        .recommendForYouTemplates(requireContext(), apiTracks, forceRefresh = forceRefresh)
-                    forYouAdapter.submitList(recommended)
+                // 1. Fetch dancing categories
+                val apiCategories = templateRepository.getDancingCategories()
+                val categoriesList = mutableListOf(CategoryModel.ALL)
+                categoriesList.addAll(apiCategories.filter { !it.code.equals("ALL", ignoreCase = true) })
 
-                    val availableHot = com.example.phortart_video_990.core.utils.TemplateRecommendationHelper
-                        .computeAndCacheHotTemplates(apiTracks, recommended, forceRefresh = forceRefresh)
-                    hotTemplateAdapter.submitList(availableHot)
+                // 2. Fetch dancing templates
+                var apiTracks = templateRepository.getDancingTemplates()
+                if (apiTracks.isEmpty()) {
+                    apiTracks = templateRepository.getAllTemplateApps().filter { !it.isMusic }
+                }
+
+                // 3. Dynamically discover categories from dancing templates
+                val existingCodes = categoriesList.map { it.code.lowercase() }.toMutableSet()
+                apiTracks.forEach { item ->
+                    val cat = item.category.trim()
+                    if (cat.isNotBlank() && !cat.startsWith("MUSIC_", ignoreCase = true)) {
+                        val cleanCat = cat.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+                        if (existingCodes.add(cat.lowercase())) {
+                            categoriesList.add(CategoryModel(code = cat, name = cleanCat, active = true))
+                        }
+                    }
+                }
+                homeCategoryAdapter.submitList(categoriesList)
+
+                if (apiTracks.isNotEmpty()) {
+                    cachedDancingTemplates = apiTracks
+                    applyCategoryFilter(CategoryModel(code = selectedCategoryCode, name = selectedCategoryCode))
 
                     bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE
                     bindingOrNull?.rvSuggestions?.visibility = View.VISIBLE
@@ -498,6 +571,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             ?: parentFragment?.findNavController()
             ?: findNavController()
         when (featureId) {
+            "dance" -> navController.navigateSafe(R.id.action_mainFragment_to_createTemplateVideoFragment)
             "video" -> {
                 val bundle = android.os.Bundle().apply {
                     putBoolean("is_start_merge_flow", true)
