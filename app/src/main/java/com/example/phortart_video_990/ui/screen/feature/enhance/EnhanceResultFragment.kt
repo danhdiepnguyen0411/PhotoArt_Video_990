@@ -41,12 +41,8 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
 
     override fun initView() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
 
-            binding.topBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset
-            }
             binding.btnShare.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = navBarInset + (20 * resources.displayMetrics.density).toInt()
             }
@@ -63,7 +59,7 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().popBackStack()
         }
 
@@ -124,10 +120,7 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
                 val success = ShareUtils.shareImage(
                     context = requireContext(),
                     imageSource = effectiveSource,
-                    chooserTitle = getString(R.string.share_artwork_title),
-                    caption = if (userPrompt.isNotBlank()) {
-                        "${getString(R.string.share_artwork_message, userPrompt)}\n$imageUrl".trim()
-                    } else null
+                    chooserTitle = getString(R.string.share_artwork_title)
                 )
                 if (!success && isAdded) {
                     Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()

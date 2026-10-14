@@ -177,22 +177,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupHeader() {
-        binding.tvBrandAi.post {
-            if (!isAdded || bindingOrNull == null) return@post
-            val tv = bindingOrNull?.tvBrandAi ?: return@post
-            val width = tv.paint.measureText(tv.text.toString()).coerceAtLeast(1f)
-            val shader = LinearGradient(
-                0f, 0f, width, 0f,
-                intArrayOf(
-                    Color.parseColor("#3D86F4"),
-                    Color.parseColor("#8A5CF0")
-                ),
-                null,
-                Shader.TileMode.CLAMP
-            )
-            tv.paint.shader = shader
-            tv.invalidate()
-        }
+        binding.headerHome.applyBrandAiGradient()
     }
 
     override fun initListener() {
@@ -238,7 +223,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             loadHomeData(forceRefresh = true)
         }
 
-        binding.btnPro.setOnClickListener {
+        binding.headerHome.setOnProClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
     }
@@ -364,6 +349,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             .recordSelectedCategory(template.category)
 
         val bundle = android.os.Bundle().apply {
+            putString("selected_track_id", template.id)
             putString("template_code", template.id)
             putString("template_title", template.title)
             putString("template_category", template.category)

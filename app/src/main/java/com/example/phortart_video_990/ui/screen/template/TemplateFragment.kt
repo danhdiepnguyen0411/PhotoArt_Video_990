@@ -33,8 +33,6 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     private var previewJob: kotlinx.coroutines.Job? = null
 
     override fun initView() {
-        setupTitleGradient()
-
         // Setup Dynamic Music Category Filter RecyclerView
         categoryAdapter = CategoryAdapter(
             categories = viewModel.categories.value,
@@ -57,6 +55,12 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                 com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
                     .recordSelectedCategory(selectedMusic.category)
                 val bundle = Bundle().apply {
+                    putString("selected_track_id", selectedMusic.id)
+                    putString("template_code", selectedMusic.id)
+                    putString("template_title", selectedMusic.title)
+                    putString("template_category", selectedMusic.category)
+                    putString("template_thumb", selectedMusic.safeImageUrl)
+                    putString("template_audio_url", selectedMusic.safeAudioUrl)
                     putString("selected_music_title", selectedMusic.title)
                     putString("selected_music_audio_url", selectedMusic.safeAudioUrl)
                     putString("selected_music_image_url", selectedMusic.safeImageUrl)
@@ -139,22 +143,6 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         }
     }
 
-    private fun setupTitleGradient() {
-        binding.tvTemplateHeaderTitle.post {
-            val paint = binding.tvTemplateHeaderTitle.paint
-            val width = paint.measureText(binding.tvTemplateHeaderTitle.text.toString())
-            if (width > 0) {
-                val textShader = LinearGradient(
-                    0f, 0f, width, 0f,
-                    intArrayOf(Color.parseColor("#4A7BFE"), Color.parseColor("#9153EE")),
-                    null,
-                    Shader.TileMode.CLAMP
-                )
-                binding.tvTemplateHeaderTitle.paint.shader = textShader
-                binding.tvTemplateHeaderTitle.invalidate()
-            }
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -193,7 +181,7 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             viewModel.loadData()
         }
 
-        binding.btnTemplatePro.setOnClickListener {
+        binding.headerTemplate.setOnProClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
     }

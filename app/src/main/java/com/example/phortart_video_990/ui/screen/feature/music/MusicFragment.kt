@@ -80,11 +80,19 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         isStartMergeFlow = arguments?.getBoolean("is_start_merge_flow", false) ?: false
 
         // Restore selected track ID from arguments, nav savedStateHandle, or persistent preferences
-        if (selectedTrackId.isNullOrBlank()) {
-            val navStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-            selectedTrackId = arguments?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
-                ?: navStateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
-                ?: com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext()).lastSelectedMusicTrackId
+        val navStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val passedTrackId = arguments?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+            ?: navStateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
+        val passedTitle = arguments?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
+            ?: navStateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
+        val passedAudioUrl = arguments?.getString("selected_music_audio_url")?.takeIf { it.isNotBlank() }
+            ?: navStateHandle?.get<String>("selected_music_audio_url")?.takeIf { it.isNotBlank() }
+
+        if (!passedTrackId.isNullOrBlank()) {
+            selectedTrackId = passedTrackId
+        } else if (passedTitle.isNullOrBlank() && passedAudioUrl.isNullOrBlank() && selectedTrackId.isNullOrBlank()) {
+            // ONLY fall back to persistent preferences if the caller did NOT pass any track ID, title, or audio URL
+            selectedTrackId = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext()).lastSelectedMusicTrackId
         }
 
         if (savedScrollPosition == -1) {
@@ -93,13 +101,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             savedScrollOffset = pref.lastMusicScrollOffset
         }
 
-        if (isTabMode) {
-            binding.btnBack.visibility = View.GONE
-            binding.tvTopTitle.text = getString(R.string.func_04_music)
-        } else {
-            binding.btnBack.visibility = View.VISIBLE
-            binding.tvTopTitle.text = getString(R.string.func_04_music)
-        }
+        binding.header.setBackButtonVisible(!isTabMode)
+        binding.header.setTitleRes(R.string.func_04_music)
 
         // Setup horizontal category chips
         categoryAdapter = MusicCategoryAdapter(
@@ -213,11 +216,12 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             loadCategoriesAndTracks()
         }
 
+
         b.llEmptyState.setOnClickListener {
             loadCategoriesAndTracks()
         }
 
-        b.btnBack.setOnClickListener {
+        b.header.setOnBackClickListener {
             stopAudio()
             findNavController().safePopBackStack()
         }
@@ -314,12 +318,73 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 // Dynamically discover extra categories from tracks
                 discoverExtraMusicCategories(tracks)
 
-                // Match initial title if selectedTrackId is still null
-                val initialTitle = arguments?.getString("selected_music_title")
-                if (selectedTrackId.isNullOrBlank() && !initialTitle.isNullOrBlank()) {
-                    val found = tracks.find { it.title.equals(initialTitle, ignoreCase = true) }
-                    if (found != null) {
-                        selectedTrackId = found.id
+                // Match currently selected track with high precision
+                val navState = findNavController().currentBackStackEntry?.savedStateHandle
+                val explicitTrackId = arguments?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+                    ?: navState?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
+                    ?: selectedTrackId?.takeIf { it.isNotBlank() }
+                val explicitTitle = arguments?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
+                    ?: navState?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
+                val explicitAudioUrl = arguments?.getString("selected_music_audio_url")?.takeIf { it.isNotBlank() }
+                    ?: navState?.get<String>("selected_music_audio_url")?.takeIf { it.isNotBlank() }
+
+                var matchedTrack: TemplateModel? = null
+
+                // 1. Match by Track ID
+                if (!explicitTrackId.isNullOrBlank()) {
+                    matchedTrack = tracks.find { it.id == explicitTrackId }
+                }
+
+                // 2. Match by exact Title
+                if (matchedTrack == null && !explicitTitle.isNullOrBlank()) {
+                    matchedTrack = tracks.find { it.title.equals(explicitTitle, ignoreCase = true) }
+                }
+
+                // 3. Match by Audio URL
+                if (matchedTrack == null && !explicitAudioUrl.isNullOrBlank()) {
+                    val cleanAudioUrl = explicitAudioUrl.substringBefore("?")
+                    matchedTrack = tracks.find {
+                        val trackCleanUrl = it.safeAudioUrl?.substringBefore("?")
+                        trackCleanUrl?.equals(cleanAudioUrl, ignoreCase = true) == true ||
+                                it.safeAudioUrl?.equals(explicitAudioUrl, ignoreCase = true) == true
+                    }
+                }
+
+                // 4. Match by fuzzy Title (contains)
+                if (matchedTrack == null && !explicitTitle.isNullOrBlank()) {
+                    matchedTrack = tracks.find {
+                        it.title.contains(explicitTitle, ignoreCase = true) ||
+                                explicitTitle.contains(it.title, ignoreCase = true)
+                    }
+                }
+
+                // 5. Fallback to Preferences if caller did not provide any track info
+                if (matchedTrack == null && explicitTrackId.isNullOrBlank() && explicitTitle.isNullOrBlank() && explicitAudioUrl.isNullOrBlank()) {
+                    val lastPrefId = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext()).lastSelectedMusicTrackId
+                    if (!lastPrefId.isNullOrBlank()) {
+                        matchedTrack = tracks.find { it.id == lastPrefId }
+                    }
+                }
+
+                // 6. Final fallback to first track
+                if (matchedTrack == null) {
+                    matchedTrack = tracks.firstOrNull()
+                }
+
+                if (matchedTrack != null) {
+                    selectedTrackId = matchedTrack.id
+                    musicAdapter.setSelectedTrackId(matchedTrack.id)
+                    context?.let { ctx ->
+                        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx).lastSelectedMusicTrackId = matchedTrack.id
+                    }
+
+                    // If user was filtering another category, reset to ALL so the selected track is guaranteed visible
+                    val hasExplicitTrack = !explicitTrackId.isNullOrBlank() || !explicitTitle.isNullOrBlank() || !explicitAudioUrl.isNullOrBlank()
+                    if (hasExplicitTrack && selectedCategoryCode != "ALL" && !matchedTrack.category.equals(selectedCategoryCode, ignoreCase = true)) {
+                        selectedCategoryCode = "ALL"
+                        if (::categoryAdapter.isInitialized) {
+                            categoryAdapter.setSelected("ALL")
+                        }
                     }
                 }
 
@@ -327,16 +392,11 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                 applyFilter()
 
                 // Display initial selected track in mini player if available
-                val initialTrack = allMusicTracks.find { it.id == selectedTrackId }
-                    ?: allMusicTracks.firstOrNull()
-                if (initialTrack != null) {
-                    if (selectedTrackId.isNullOrBlank()) {
-                        selectedTrackId = initialTrack.id
-                        musicAdapter.setSelectedTrackId(initialTrack.id)
-                    }
+                val targetTrackToDisplay = matchedTrack ?: allMusicTracks.firstOrNull()
+                if (targetTrackToDisplay != null) {
                     val isPlayingNow = mediaPlayer?.isPlaying == true
                     if (!isPlayingNow) {
-                        selectAndPlayTrack(initialTrack, autoPlay = false)
+                        selectAndPlayTrack(targetTrackToDisplay, autoPlay = false)
                     }
                 }
             } catch (e: Exception) {
@@ -426,15 +486,21 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         }
 
         val selectedIndex = filtered.indexOfFirst { it.id == selectedTrackId }
-        val targetPos = if (savedScrollPosition in 0 until filtered.size) savedScrollPosition else -1
-        val targetOffset = savedScrollOffset
+        val navState = findNavController().currentBackStackEntry?.savedStateHandle
+        val hasExplicitPassed = !arguments?.getString("selected_track_id").isNullOrBlank() ||
+                !arguments?.getString("selected_music_title").isNullOrBlank() ||
+                !arguments?.getString("selected_music_audio_url").isNullOrBlank() ||
+                !navState?.get<String>("selected_track_id").isNullOrBlank() ||
+                !navState?.get<String>("selected_music_title").isNullOrBlank()
 
         b.rvMusicTracks.post {
             if (isAdded && view != null && bindingOrNull != null) {
                 bindingOrNull?.rvMusicTracks?.stopScroll()
                 val lm = bindingOrNull?.rvMusicTracks?.layoutManager as? LinearLayoutManager
-                if (targetPos >= 0) {
-                    lm?.scrollToPositionWithOffset(targetPos, targetOffset)
+                if (hasExplicitPassed && selectedIndex >= 0) {
+                    lm?.scrollToPositionWithOffset(selectedIndex, 40)
+                } else if (savedScrollPosition in 0 until filtered.size) {
+                    lm?.scrollToPositionWithOffset(savedScrollPosition, savedScrollOffset)
                 } else if (selectedIndex >= 0) {
                     lm?.scrollToPositionWithOffset(selectedIndex, 40)
                 } else {

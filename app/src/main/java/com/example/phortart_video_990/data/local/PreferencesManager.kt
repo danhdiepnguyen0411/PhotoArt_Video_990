@@ -33,13 +33,14 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean(KEY_HAS_COMPLETED_INTRO, false)
         set(value) = prefs.edit().putBoolean(KEY_HAS_COMPLETED_INTRO, value).apply()
 
-    var shouldSkipSplashOnce: Boolean
-        get() = prefs.getBoolean("skip_splash_once", false)
-        set(value) = prefs.edit().putBoolean("skip_splash_once", value).apply()
-
-    var isUninstallActive: Boolean
-        get() = prefs.getBoolean("is_uninstall_active", false)
-        set(value) = prefs.edit().putBoolean("is_uninstall_active", value).apply()
+    fun clearLegacyUninstallFlags() {
+        if (prefs.contains("is_uninstall_active") || prefs.contains("skip_splash_once")) {
+            prefs.edit()
+                .remove("is_uninstall_active")
+                .remove("skip_splash_once")
+                .apply()
+        }
+    }
 
     var languageCode: String
         get() {

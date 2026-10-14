@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CommonTabHeaderView">
+        <attr name="headerTitle" format="string" />
+        <attr name="showSparkle" format="boolean" />
+        <attr name="showProButton" format="boolean" />
+        <attr name="showBrandLogo" format="boolean" />
+        <attr name="showBackButton" format="boolean" />
+    </declare-styleable>
+</resources>

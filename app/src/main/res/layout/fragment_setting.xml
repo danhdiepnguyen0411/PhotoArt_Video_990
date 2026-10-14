@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true"
-    android:overScrollMode="never">
+    android:background="@color/white">
 
-    <LinearLayout
-        android:id="@+id/llSettingContent"
+    <!-- Top Header -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/headerSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="24dp">
+        app:headerTitle="@string/settings_title"
+        app:showSparkle="true"
+        app:showProButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Top Title -->
-        <TextView
-            android:id="@+id/tvSettingHeader"
-            android:layout_width="wrap_content"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerSetting">
+
+        <LinearLayout
+            android:id="@+id/llSettingContent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginBottom="14dp"
-            android:fontFamily="@font/inter_bold"
-            android:text="@string/settings_title"
-            android:textColor="#2563EB"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
         <!-- IAP Banner Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -491,6 +496,8 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+        </LinearLayout>
 
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

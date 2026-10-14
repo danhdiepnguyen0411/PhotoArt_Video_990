@@ -23,12 +23,12 @@ class BeforeAfterSliderView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val ivAfter = ImageView(context).apply {
-        scaleType = ImageView.ScaleType.CENTER_CROP
+        scaleType = ImageView.ScaleType.FIT_CENTER
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
     private val ivBefore = ImageView(context).apply {
-        scaleType = ImageView.ScaleType.CENTER_CROP
+        scaleType = ImageView.ScaleType.FIT_CENTER
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
@@ -175,10 +175,28 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         return super.onTouchEvent(event)
     }
 
-    fun setBeforeImage(source: Any?, isFallback: Boolean = false) {
+    fun setScaleType(scaleType: ImageView.ScaleType) {
+        ivBefore.scaleType = scaleType
+        ivAfter.scaleType = scaleType
+    }
+
+    fun setBeforeImage(
+        source: Any?,
+        isFallback: Boolean = false,
+        onSizeReady: ((width: Int, height: Int) -> Unit)? = null
+    ) {
         if (source != null) {
             ivBefore.load(source) {
                 crossfade(true)
+                listener(
+                    onSuccess = { _, result ->
+                        val w = result.drawable.intrinsicWidth
+                        val h = result.drawable.intrinsicHeight
+                        if (w > 0 && h > 0) {
+                            onSizeReady?.invoke(w, h)
+                        }
+                    }
+                )
             }
             if (isFallback) {
                 val matrix = android.graphics.ColorMatrix()
@@ -190,10 +208,22 @@ class BeforeAfterSliderView @JvmOverloads constructor(
         }
     }
 
-    fun setAfterImage(source: Any?) {
+    fun setAfterImage(
+        source: Any?,
+        onSizeReady: ((width: Int, height: Int) -> Unit)? = null
+    ) {
         if (source != null) {
             ivAfter.load(source) {
                 crossfade(true)
+                listener(
+                    onSuccess = { _, result ->
+                        val w = result.drawable.intrinsicWidth
+                        val h = result.drawable.intrinsicHeight
+                        if (w > 0 && h > 0) {
+                            onSizeReady?.invoke(w, h)
+                        }
+                    }
+                )
             }
         }
     }
