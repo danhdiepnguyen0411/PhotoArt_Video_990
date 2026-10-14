@@ -337,6 +337,10 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
             findNavController().popBackStack()
         }
 
+        binding.cardMusicInfo.setOnClickListener {
+            findNavController().navigateSafe(R.id.action_templateVideoResultFragment_to_musicFragment)
+        }
+
         binding.cardVideoStage.setOnClickListener {
             togglePlayback()
         }
