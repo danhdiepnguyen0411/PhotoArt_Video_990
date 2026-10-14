@@ -27,7 +27,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         // Initialize launcher shortcut for Uninstall
         com.example.phortart_video_990.core.utils.ShortcutHelper.initUninstallShortcut(this)
 
-        handleUninstallIntent(intent)
+        setupNavigationGraph(intent)
+        checkAndResumeUninstallIfActive(intent)
 
         NotificationPermissionManager.resetSessionState()
     }
@@ -35,18 +36,91 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleUninstallIntent(intent)
+        setupNavigationGraph(intent)
+        checkAndResumeUninstallIfActive(intent)
     }
 
-    private fun handleUninstallIntent(intent: Intent?) {
-        if (intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
-            intent?.getStringExtra("target_screen") == "uninstall") {
-            intent.action = null
-            intent.removeExtra("target_screen")
+    private fun checkAndResumeUninstallIfActive(intent: Intent?): Boolean {
+        if (intent?.getStringExtra("target_screen") == "home") {
+            // User explicitly navigated to Home from UninstallActivity
+            com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallClosed(this)
+            return false
+        }
+
+        val isNewUninstallShortcut = intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
+                intent?.getStringExtra("target_screen") == "uninstall"
+
+        // If it's a new uninstall action from shortcut, let SplashFragment run first
+        if (isNewUninstallShortcut) {
+            return false
+        }
+
+        // If user was already in UninstallActivity and reopened app from launcher icon, resume it
+        if (com.example.phortart_video_990.core.utils.UninstallSessionState.isUninstallActive(this)) {
             val uninstallIntent = Intent(this, UninstallActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(uninstallIntent)
+            return true
+        }
+        return false
+    }
+
+    private fun shouldSkipSplash(intent: Intent?): Boolean {
+        val isNewUninstallShortcut = intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
+                intent?.getStringExtra("target_screen") == "uninstall"
+
+        // User requested: entering uninstall MUST show splash screen
+        if (isNewUninstallShortcut) {
+            return false
+        }
+
+        val prefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this)
+        return intent?.getStringExtra("target_screen") == "home" ||
+                intent?.getBooleanExtra("skip_splash", false) == true ||
+                com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash ||
+                prefs.shouldSkipSplashOnce
+    }
+
+    private fun consumeSkipSplashFlags() {
+        com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = false
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this).shouldSkipSplashOnce = false
+    }
+
+    private fun setupNavigationGraph(intent: Intent?) {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                as? androidx.navigation.fragment.NavHostFragment ?: return
+        val navController = navHostFragment.navController
+        val isGraphSet = try {
+            navController.graph
+            true
+        } catch (e: Exception) {
+            false
+        }
+
+        val skip = shouldSkipSplash(intent)
+
+        if (!isGraphSet) {
+            val graph = navController.navInflater.inflate(R.navigation.nav_graph)
+            if (skip) {
+                graph.setStartDestination(R.id.mainFragment)
+                consumeSkipSplashFlags()
+            } else {
+                graph.setStartDestination(R.id.splashFragment)
+            }
+            navController.graph = graph
+        } else if (skip) {
+            consumeSkipSplashFlags()
+            if (navController.currentDestination?.id != R.id.mainFragment) {
+                try {
+                    val navOptions = androidx.navigation.NavOptions.Builder()
+                        .setPopUpTo(navController.graph.id, true)
+                        .build()
+                    navController.navigate(R.id.mainFragment, null, navOptions)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 
