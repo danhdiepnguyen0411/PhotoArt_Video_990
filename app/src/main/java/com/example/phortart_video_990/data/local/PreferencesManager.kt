@@ -33,6 +33,15 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean(KEY_HAS_COMPLETED_INTRO, false)
         set(value) = prefs.edit().putBoolean(KEY_HAS_COMPLETED_INTRO, value).apply()
 
+    fun clearLegacyUninstallFlags() {
+        if (prefs.contains("is_uninstall_active") || prefs.contains("skip_splash_once")) {
+            prefs.edit()
+                .remove("is_uninstall_active")
+                .remove("skip_splash_once")
+                .apply()
+        }
+    }
+
     var languageCode: String
         get() {
             val code = prefs.getString(KEY_LANGUAGE_CODE, null)

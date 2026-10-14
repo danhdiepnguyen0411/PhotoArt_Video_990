@@ -27,6 +27,9 @@ class TemplateViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isError = MutableStateFlow(false)
+    val isError: StateFlow<Boolean> = _isError.asStateFlow()
+
     // All music tracks from API
     private var allMusicList: List<TemplateModel> = emptyList()
 
@@ -35,6 +38,7 @@ class TemplateViewModel(
     }
 
     fun loadData() {
+        if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -76,7 +80,9 @@ class TemplateViewModel(
                 val currentCode = _selectedCategoryCode.value
                 val selectedCat = categoriesList.find { it.code.equals(currentCode, ignoreCase = true) }
                 _templates.value = filterMusic(realMusicTracks, currentCode, selectedCat?.name)
+                _isError.value = false
             } catch (e: Exception) {
+                _isError.value = true
                 allMusicList = emptyList()
                 _templates.value = emptyList()
                 _categories.value = listOf(CategoryModel.ALL)

@@ -30,6 +30,9 @@ class PhotoArtApp : Application(), ImageLoaderFactory {
         // Initialize ArtMagicClient SDK
         ArtSdkManager.init(this)
 
+        // Clean up any legacy uninstall flags stored in SharedPreferences
+        prefs.clearLegacyUninstallFlags()
+
         // Initialize Uninstall shortcut for app launcher menu
         ShortcutHelper.initUninstallShortcut(this)
     }

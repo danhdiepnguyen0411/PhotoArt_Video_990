@@ -7,6 +7,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.example.phortart_video_990.MainActivity
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ object ShortcutHelper {
                 val shortcutIntent = Intent(context, MainActivity::class.java).apply {
                     action = "com.example.phortart_video_990.ACTION_UNINSTALL"
                     putExtra("target_screen", "uninstall")
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
 
                 val shortLabel = context.getString(R.string.shortcut_uninstall)
@@ -47,7 +48,7 @@ object ShortcutHelper {
                     val shortcutIntent = Intent(context, MainActivity::class.java).apply {
                         action = "com.example.phortart_video_990.ACTION_UNINSTALL"
                         putExtra("target_screen", "uninstall")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
 
                     val shortLabel = context.getString(R.string.shortcut_uninstall)
