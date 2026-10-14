@@ -20,6 +20,7 @@ class TemplateRepository(
 
     private val gson = Gson()
     private val TAG = "TemplateRepository"
+    private val TAG_VIDEOGEN = "PhotoArt_VideoGen"
 
     fun getDefaultCategories(): List<CategoryModel> = listOf(CategoryModel.ALL)
 
@@ -240,13 +241,17 @@ class TemplateRepository(
                 return@suspendCancellableCoroutine
             }
 
+            Log.i(TAG_VIDEOGEN, "[API Request] Calling processImageEditing: code='$code', file='${file.name}' (${file.length() / 1024} KB)")
             client.processImageEditing(file, code, options, attachmentFiles, prompt) { result, error ->
                 if (!continuation.isActive) return@processImageEditing
                 if (error != null) {
+                    Log.e(TAG_VIDEOGEN, "[API Response] processImageEditing FAILED: ${error.message}")
                     continuation.resume(Result.failure(error))
                 } else if (result != null) {
+                    Log.i(TAG_VIDEOGEN, "[API Response] processImageEditing SUCCEEDED: $result")
                     continuation.resume(Result.success(result))
                 } else {
+                    Log.e(TAG_VIDEOGEN, "[API Response] processImageEditing returned null result and error")
                     continuation.resume(Result.failure(Exception("Unknown error processing image")))
                 }
             }
@@ -291,6 +296,8 @@ class TemplateRepository(
         val maxInterval = 8_000L
         var attempt = 0
 
+        Log.i(TAG_VIDEOGEN, "[Polling] Starting polling for requestId='$requestId', timeout=${timeoutMillis / 1000}s...")
+
         // Initial delay before 1st poll
         kotlinx.coroutines.delay(4_000L)
 
@@ -301,9 +308,10 @@ class TemplateRepository(
                 if (res.isSuccess) {
                     val data = res.getOrNull()
                     if (data != null && isImageEditingResultReady(data)) {
-                        Log.d(TAG, "Polling requestId=$requestId succeeded on attempt $attempt")
+                        Log.i(TAG_VIDEOGEN, "[Polling] SUCCESS! Result ready on attempt #$attempt (elapsed ${(System.currentTimeMillis() - startTime) / 1000}s): $data")
                         return@withTimeoutOrNull res
                     }
+                    Log.d(TAG_VIDEOGEN, "[Polling] Attempt #$attempt: Result not ready yet, waiting ${currentInterval}ms (elapsed ${(System.currentTimeMillis() - startTime) / 1000}s)...")
                     currentInterval = (currentInterval * 1.2f).toLong().coerceAtMost(maxInterval)
                 } else {
                     val err = res.exceptionOrNull()
@@ -318,8 +326,10 @@ class TemplateRepository(
                             msg.contains("not ready", ignoreCase = true) ||
                             msg.contains("timeout", ignoreCase = true)
 
+                    Log.w(TAG_VIDEOGEN, "[Polling] Attempt #$attempt: Server response: $msg (isRetriable=$isRetriable)")
+
                     if (!isRetriable) {
-                        Log.e(TAG, "Fatal error polling requestId=$requestId: $msg")
+                        Log.e(TAG_VIDEOGEN, "[Polling] Fatal non-retriable error for requestId=$requestId: $msg")
                         return@withTimeoutOrNull res
                     }
                 }
@@ -335,6 +345,9 @@ class TemplateRepository(
             null
         }
 
+        if (pollResult == null) {
+            Log.e(TAG_VIDEOGEN, "[Polling] TIMEOUT after ${timeoutMillis / 1000}s for requestId=$requestId!")
+        }
         pollResult ?: Result.failure(Exception("Polling timeout after ${timeoutMillis}ms for requestId=$requestId"))
     }
 
