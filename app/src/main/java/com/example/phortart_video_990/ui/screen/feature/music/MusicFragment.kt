@@ -196,11 +196,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         // Tap mini player card to locate selected song in list
         b.cardMiniPlayer.setOnClickListener {
             val curId = selectedTrackId ?: return@setOnClickListener
-            val targetIndex = (b.rvMusicTracks.adapter as? MusicAdapter)?.let { adapter ->
-                (0 until adapter.itemCount).indexOfFirst { pos ->
-                    allMusicTracks.getOrNull(pos)?.id == curId
-                }
-            } ?: -1
+            val targetIndex = (b.rvMusicTracks.adapter as? MusicAdapter)?.getTrackPosition(curId) ?: -1
             if (targetIndex >= 0) {
                 (b.rvMusicTracks.layoutManager as? LinearLayoutManager)
                     ?.scrollToPositionWithOffset(targetIndex, 40)
@@ -304,7 +300,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
                         selectedTrackId = initialTrack.id
                         musicAdapter.setSelectedTrackId(initialTrack.id)
                     }
-                    selectAndPlayTrack(initialTrack, autoPlay = false)
+                    val isPlayingNow = mediaPlayer?.isPlaying == true
+                    if (!isPlayingNow) {
+                        selectAndPlayTrack(initialTrack, autoPlay = false)
+                    }
                 }
             } catch (e: Exception) {
                 if (e is CancellationException) {
@@ -322,7 +321,6 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         val b = bindingOrNull ?: return
         if (!isAdded || view == null) return
 
-        stopAudio()
         var filtered = allMusicTracks
 
         // Category filter
@@ -372,6 +370,25 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             } else {
                 b.ivMiniCover.setImageResource(R.drawable.ic_func_music)
             }
+        }
+
+        // Keep mini-player play/pause state in sync with audio playback
+        val isCurrentlyPlaying = mediaPlayer?.isPlaying == true
+        val isLoadingAudio = audioActionJob?.isActive == true
+        if (isCurrentlyPlaying) {
+            b.waveView.setPlaying(true)
+            b.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_pause_small)
+            b.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            b.pbMiniLoading.visibility = View.GONE
+        } else if (isLoadingAudio) {
+            b.waveView.setPlaying(false)
+            b.ivMiniPlayPauseIcon.visibility = View.GONE
+            b.pbMiniLoading.visibility = View.VISIBLE
+        } else {
+            b.waveView.setPlaying(false)
+            b.ivMiniPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
+            b.ivMiniPlayPauseIcon.visibility = View.VISIBLE
+            b.pbMiniLoading.visibility = View.GONE
         }
 
         val selectedIndex = filtered.indexOfFirst { it.id == selectedTrackId }
@@ -583,8 +600,8 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
 
     private fun onContinueClicked() {
         captureScrollPosition()
-        if (!::musicAdapter.isInitialized) return
-        val selectedTrack = musicAdapter.getSelectedTrack()
+        val selectedTrack = allMusicTracks.find { it.id == selectedTrackId }
+            ?: (if (::musicAdapter.isInitialized) musicAdapter.getSelectedTrack() else null)
         if (selectedTrack == null) {
             context?.let {
                 Toast.makeText(it, getString(R.string.toast_please_select_music), Toast.LENGTH_SHORT).show()

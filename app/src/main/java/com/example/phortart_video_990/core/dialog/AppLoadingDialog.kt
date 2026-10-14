@@ -13,7 +13,8 @@ class AppLoadingDialog(
     context: Context,
     private var titleText: String? = null,
     private var subtitleText: String? = null,
-    private val isCancelableByUser: Boolean = false
+    private var isCancelableByUser: Boolean = false,
+    private var onCancelAction: (() -> Unit)? = null
 ) : Dialog(context) {
 
     private lateinit var binding: DialogAppLoadingBinding
@@ -29,10 +30,30 @@ class AppLoadingDialog(
             setDimAmount(0.6f)
         }
 
-        setCancelable(isCancelableByUser)
-        setCanceledOnTouchOutside(isCancelableByUser)
-
+        applyCancelableState()
         updateTexts()
+    }
+
+    private fun applyCancelableState() {
+        // Tuyệt đối không cho phép bấm ra bên ngoài dialog để thoát
+        setCanceledOnTouchOutside(false)
+        setCancelable(false)
+
+        if (::binding.isInitialized) {
+            binding.btnCancelLoading.visibility = if (isCancelableByUser) View.VISIBLE else View.GONE
+            binding.btnCancelLoading.setOnClickListener {
+                dismiss()
+                onCancelAction?.invoke()
+            }
+        }
+    }
+
+    fun setCancelAction(cancelable: Boolean, action: (() -> Unit)? = null) {
+        isCancelableByUser = cancelable
+        if (action != null) {
+            onCancelAction = action
+        }
+        applyCancelableState()
     }
 
     fun updateMessage(title: String, subtitle: String? = null) {
@@ -59,9 +80,10 @@ class AppLoadingDialog(
             context: Context,
             title: String? = null,
             subtitle: String? = null,
-            cancelable: Boolean = false
+            cancelable: Boolean = false,
+            onCancel: (() -> Unit)? = null
         ): AppLoadingDialog {
-            val dialog = AppLoadingDialog(context, title, subtitle, cancelable)
+            val dialog = AppLoadingDialog(context, title, subtitle, cancelable, onCancel)
             try {
                 dialog.show()
             } catch (_: Exception) {}

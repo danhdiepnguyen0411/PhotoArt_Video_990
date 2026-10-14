@@ -15,8 +15,8 @@ class TemplateAdapter(
     private val onPlayClick: ((TemplateModel, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<TemplateAdapter.TemplateViewHolder>() {
 
-    private var playingPosition: Int = -1
-    private var loadingPosition: Int = -1
+    private var playingTrackId: String? = null
+    private var loadingTrackId: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TemplateViewHolder {
         val binding = ItemTemplateCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,19 +34,41 @@ class TemplateAdapter(
         notifyDataSetChanged()
     }
 
+    fun setPlayingTrack(trackId: String?, isPlaying: Boolean) {
+        val oldId = playingTrackId
+        playingTrackId = if (isPlaying) trackId else null
+        loadingTrackId = null
+        if (!oldId.isNullOrEmpty()) {
+            val oldPos = items.indexOfFirst { it.id == oldId }
+            if (oldPos != -1) notifyItemChanged(oldPos)
+        }
+        if (!trackId.isNullOrEmpty()) {
+            val newPos = items.indexOfFirst { it.id == trackId }
+            if (newPos != -1) notifyItemChanged(newPos)
+        }
+    }
+
+    fun setLoadingTrack(trackId: String?) {
+        val oldId = loadingTrackId
+        loadingTrackId = trackId
+        if (!oldId.isNullOrEmpty()) {
+            val oldPos = items.indexOfFirst { it.id == oldId }
+            if (oldPos != -1) notifyItemChanged(oldPos)
+        }
+        if (!trackId.isNullOrEmpty()) {
+            val newPos = items.indexOfFirst { it.id == trackId }
+            if (newPos != -1) notifyItemChanged(newPos)
+        }
+    }
+
     fun setPlayingState(position: Int, isPlaying: Boolean) {
-        val old = playingPosition
-        playingPosition = if (isPlaying) position else -1
-        loadingPosition = -1
-        if (old != -1 && old < items.size) notifyItemChanged(old)
-        if (position != -1 && position < items.size) notifyItemChanged(position)
+        val trackId = if (position in items.indices) items[position].id else null
+        setPlayingTrack(trackId, isPlaying)
     }
 
     fun setLoadingState(position: Int) {
-        val old = loadingPosition
-        loadingPosition = position
-        if (old != -1 && old < items.size) notifyItemChanged(old)
-        if (position != -1 && position < items.size) notifyItemChanged(position)
+        val trackId = if (position in items.indices) items[position].id else null
+        setLoadingTrack(trackId)
     }
 
     inner class TemplateViewHolder(private val binding: ItemTemplateCardBinding) :
@@ -58,8 +80,8 @@ class TemplateAdapter(
             binding.tvPhotoCount.text = item.displayPhotoCount
             binding.tvViews.text = item.displayViews
 
-            val isPlaying = position == playingPosition
-            val isLoading = position == loadingPosition
+            val isPlaying = item.id == playingTrackId
+            val isLoading = item.id == loadingTrackId
 
             binding.ivPlayIcon.setImageResource(
                 if (isPlaying) R.drawable.ic_pause_small else R.drawable.ic_play_small

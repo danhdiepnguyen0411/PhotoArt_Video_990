@@ -237,6 +237,7 @@ a premium experience.</string>
     <string name="toast_select_at_least_1_photo">Please select at least 1 photo to create video</string>
     <string name="toast_max_photos_limit">You can only select up to %1$d photos for this video</string>
     <string name="toast_cannot_create_video_file">Cannot create video file. Please try again!</string>
+    <string name="toast_video_cancelled">Video creation cancelled</string>
     <string name="toast_video_file_not_found">Video file not found!</string>
     <string name="toast_cannot_save_video">Cannot save video!</string>
     <string name="toast_music_preview_unavailable">Music preview is unavailable</string>
@@ -332,4 +333,5 @@ a premium experience.</string>
     <string name="btn_picker_confirm">Confirm (%1$d/%2$d)</string>
     <string name="toast_permission_needed_for_photos">Permission required to access device photos</string>
     <string name="picker_empty_photos">No photos found in device gallery</string>
+    <string name="toast_cannot_open_gallery">Cannot open photo gallery</string>
 </resources>

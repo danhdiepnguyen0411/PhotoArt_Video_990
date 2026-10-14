@@ -1,7 +1,5 @@
 package com.example.phortart_video_990.ui.screen.feature.memories
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -10,7 +8,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
@@ -21,8 +18,12 @@ import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
+import android.content.Context
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileOutputStream
 
 class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesBinding::inflate) {
 
@@ -37,33 +38,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private var maxPhotoLimit: Int = 10
     private var templateDurationSec: Float? = null
 
-    // Permission launcher for accessing device gallery
-    private val requestGalleryPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions[Manifest.permission.READ_MEDIA_IMAGES] == true ||
-                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-                    permissions[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true)
-        } else {
-            permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
-        }
-
-        if (granted) {
-            showImagePickerBottomSheet()
-        } else {
-            // Fallback to system photo picker if permission is denied
-            try {
-                pickVisualMediaLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-            } catch (e: Exception) {
-                fallbackGetMultipleContentsLauncher.launch("image/*")
-            }
-        }
-    }
-
-    // Native Photo Picker bottom sheet launcher (fallback)
+    // Native Photo Picker launcher (Media Picker)
     private val pickVisualMediaLauncher = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia()
     ) { uris: List<Uri> ->
@@ -84,8 +59,24 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private var selectedMusicImageUrl: String? = null
 
     private var isGeneratingVideo = false
+    private var generateVideoJob: kotlinx.coroutines.Job? = null
     private var pendingVideoResultBundle: Bundle? = null
     private var pendingVideoErrorMsg: String? = null
+
+    private fun cancelVideoGeneration() {
+        if (isGeneratingVideo) {
+            isGeneratingVideo = false
+            generateVideoJob?.cancel()
+            generateVideoJob = null
+            pendingVideoResultBundle = null
+            pendingVideoErrorMsg = null
+            hideLoading()
+            bindingOrNull?.btnCreateVideo?.isEnabled = true
+            context?.let { ctx ->
+                Toast.makeText(ctx, getString(R.string.toast_video_cancelled), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,13 +131,43 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         findNavController().currentBackStackEntry?.savedStateHandle?.set(SAVED_PHOTOS_KEY, uriStrings)
     }
 
+    private fun copyUriToAppCache(context: Context, sourceUri: Uri): Uri {
+        return try {
+            val scheme = sourceUri.scheme
+            if (scheme == "file") {
+                val f = File(sourceUri.path ?: "")
+                if (f.exists() && f.length() > 0) return sourceUri
+            }
+            val cacheDir = File(context.cacheDir, "memories_photos").apply { mkdirs() }
+            val fileName = "photo_${System.currentTimeMillis()}_${(1000..9999).random()}.jpg"
+            val targetFile = File(cacheDir, fileName)
+
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                FileOutputStream(targetFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            if (targetFile.exists() && targetFile.length() > 0) {
+                Uri.fromFile(targetFile)
+            } else {
+                sourceUri
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            sourceUri
+        }
+    }
+
     private fun handleSelectedPhotos(uris: List<Uri>) {
         if (uris.isNotEmpty()) {
-            val newUris = uris.filter { it !in selectedPhotos }
+            val context = requireContext()
+            // Sao chép ngay ảnh về bộ nhớ cache cục bộ để giữ quyền truy cập vĩnh viễn
+            val copiedUris = uris.map { copyUriToAppCache(context, it) }
+            val newUris = copiedUris.filter { it !in selectedPhotos }
             val remainingSlots = maxPhotoLimit - selectedPhotos.size
             if (remainingSlots <= 0) {
                 Toast.makeText(
-                    requireContext(),
+                    context,
                     getString(R.string.toast_max_photos_limit, maxPhotoLimit),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -160,7 +181,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             }
             if (newUris.size > remainingSlots) {
                 Toast.makeText(
-                    requireContext(),
+                    context,
                     getString(R.string.toast_max_photos_limit, maxPhotoLimit),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -479,41 +500,17 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             return
         }
 
-        val context = requireContext()
-        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED)
-        } else {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (hasPermission) {
-            showImagePickerBottomSheet()
-        } else {
-            val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
-            } else {
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        try {
+            pickVisualMediaLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        } catch (e: Exception) {
+            try {
+                fallbackGetMultipleContentsLauncher.launch("image/*")
+            } catch (ex: Exception) {
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_gallery), Toast.LENGTH_SHORT).show()
             }
-            requestGalleryPermissionLauncher.launch(permissionsToRequest)
         }
-    }
-
-    private fun showImagePickerBottomSheet() {
-        ImagePickerBottomSheetDialog(
-            context = requireContext(),
-            initialSelectedPhotos = selectedPhotos,
-            maxLimit = maxPhotoLimit,
-            onPhotosSelected = { newlySelected ->
-                selectedPhotos.clear()
-                selectedPhotos.addAll(newlySelected)
-                savePhotosState()
-                updatePhotosUi()
-            }
-        ).show()
     }
 
     override fun initListener() {
@@ -580,6 +577,17 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isGeneratingVideo) {
+                    cancelVideoGeneration()
+                } else {
+                    isEnabled = false
+                    findNavController().safePopBackStack()
+                }
+            }
+        })
+
         binding.btnCreateVideo.setOnClickListener {
             if (selectedPhotos.isEmpty()) {
                 Toast.makeText(requireContext(), getString(R.string.toast_select_at_least_1_photo), Toast.LENGTH_SHORT).show()
@@ -596,10 +604,13 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             binding.btnCreateVideo.isEnabled = false
             showLoading(
                 title = getString(R.string.loading_creating_video),
-                subtitle = getString(R.string.loading_preparing_images)
+                subtitle = getString(R.string.loading_preparing_images),
+                cancelable = true,
+                onCancel = { cancelVideoGeneration() }
             )
 
-            lifecycleScope.launch {
+            generateVideoJob?.cancel()
+            generateVideoJob = lifecycleScope.launch {
                 try {
                     // 1. Tải nhạc nền nếu cần
                     var resolvedAudioPath = finalAudioPath
@@ -621,6 +632,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         }
                     }
 
+                    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+
                     // 2. Tính toán thời lượng và sinh hiệu ứng chuyển cảnh
                     val photoCount = selectedPhotos.size
                     val videoDurationSec = templateDurationSec ?: VideoGenerator.calculateVideoDuration(photoCount)
@@ -639,7 +652,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         transitions = transitions,
                         aspectRatio = selectedAspectRatio,
                         onProgress = { progress, _ ->
-                            if (isAdded) {
+                            if (isAdded && isGeneratingVideo) {
                                 showLoading(
                                     title = getString(R.string.loading_creating_video),
                                     subtitle = getString(R.string.loading_processing_progress, progress)
@@ -647,6 +660,9 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             }
                         }
                     )
+
+                    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+                    if (!isGeneratingVideo) return@launch
 
                     isGeneratingVideo = false
 
@@ -677,7 +693,13 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             pendingVideoErrorMsg = getString(R.string.toast_cannot_create_video_file)
                         }
                     }
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    // Người dùng đã nhấn hủy/thoát: không hiển thị lỗi và không chuyển màn hình
+                    isGeneratingVideo = false
+                    hideLoading()
+                    bindingOrNull?.btnCreateVideo?.isEnabled = true
                 } catch (e: Exception) {
+                    if (!isGeneratingVideo) return@launch
                     isGeneratingVideo = false
                     if (isResumed && isAdded) {
                         hideLoading()
@@ -686,6 +708,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     } else {
                         pendingVideoErrorMsg = e.message ?: ""
                     }
+                } finally {
+                    generateVideoJob = null
                 }
             }
         }
@@ -713,5 +737,15 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         } else {
             pendingVideoResultBundle = bundle
         }
+    }
+
+    override fun onDestroyView() {
+        if (isGeneratingVideo) {
+            generateVideoJob?.cancel()
+            generateVideoJob = null
+            isGeneratingVideo = false
+        }
+        hideLoading()
+        super.onDestroyView()
     }
 }
