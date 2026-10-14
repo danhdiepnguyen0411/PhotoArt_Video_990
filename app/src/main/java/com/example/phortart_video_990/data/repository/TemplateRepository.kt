@@ -30,6 +30,16 @@ class TemplateRepository(
 
     fun getDefaultMusicTracks(): List<TemplateModel> = emptyList()
 
+    fun getDefaultDancingCategories(): List<CategoryModel> = listOf(
+        CategoryModel.ALL,
+        CategoryModel(code = "HOT_DANCE", name = "Hot Trend", groupCode = "DANCING"),
+        CategoryModel(code = "TIKTOK_DANCE", name = "TikTok Dance", groupCode = "DANCING"),
+        CategoryModel(code = "KPOP_DANCE", name = "K-Pop", groupCode = "DANCING"),
+        CategoryModel(code = "HIPHOP_DANCE", name = "Hip Hop", groupCode = "DANCING"),
+        CategoryModel(code = "SHUFFLE_DANCE", name = "Shuffle", groupCode = "DANCING"),
+        CategoryModel(code = "STREET_DANCE", name = "Street Dance", groupCode = "DANCING")
+    )
+
     /**
      * Fetch all categories from API.
      */
@@ -61,6 +71,126 @@ class TemplateRepository(
                     } catch (e: Exception) {
                         Log.e(TAG, "Error parsing categories: ${e.message}", e)
                         continuation.resume(getDefaultCategories())
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun getCategoriesByGroup(groupCode: String): List<CategoryModel> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val client = getClient()
+            if (client == null) {
+                if (continuation.isActive) continuation.resume(emptyList())
+                return@suspendCancellableCoroutine
+            }
+            client.getImageEditingCategories(page = 0, size = 50, groupCode = groupCode) { jsonElement, throwable ->
+                if (!continuation.isActive) return@getImageEditingCategories
+                if (throwable != null || jsonElement == null) {
+                    continuation.resume(emptyList())
+                } else {
+                    try {
+                        val categories = parseCategories(jsonElement)
+                        val activeCategories = categories.filter { it.active && it.name.isNotBlank() && !it.isAiTool }
+                            .sortedBy { it.orderPosition }
+                        continuation.resume(activeCategories)
+                    } catch (e: Exception) {
+                        continuation.resume(emptyList())
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch dancing categories from API.
+     */
+    suspend fun getDancingCategories(): List<CategoryModel> = withContext(Dispatchers.IO) {
+        val client = getClient()
+        if (client == null) {
+            return@withContext getDefaultDancingCategories()
+        }
+
+        // 1. Try groupCode = "DANCING"
+        var dancingCats = getCategoriesByGroup("DANCING")
+        if (dancingCats.isEmpty()) {
+            // 2. Try groupCode = "DANCE"
+            dancingCats = getCategoriesByGroup("DANCE")
+        }
+        if (dancingCats.isEmpty()) {
+            // 3. Fallback: filter general categories from API
+            val allApi = getCategories().filter { it.code != "ALL" }
+            val byDance = allApi.filter { it.isDanceCategory }
+            dancingCats = if (byDance.isNotEmpty()) byDance else allApi.filter { !it.isMusicCategory && !it.isAiTool }
+        }
+
+        val resultList = mutableListOf(CategoryModel.ALL)
+        if (dancingCats.isNotEmpty()) {
+            val existingCodes = mutableSetOf("all")
+            dancingCats.forEach { cat ->
+                if (existingCodes.add(cat.code.lowercase())) {
+                    resultList.add(cat)
+                }
+            }
+        } else {
+            resultList.addAll(getDefaultDancingCategories().filter { it.code != "ALL" })
+        }
+        resultList
+    }
+
+    /**
+     * Fetch dancing templates from API. Excludes pure music items.
+     */
+    suspend fun getDancingTemplates(
+        categoryCode: String? = null,
+        categoryName: String? = null
+    ): List<TemplateModel> = withContext(Dispatchers.IO) {
+        val client = getClient()
+        if (client == null) {
+            return@withContext emptyList()
+        }
+
+        val isAll = categoryCode.isNullOrBlank() ||
+                categoryCode.equals("ALL", ignoreCase = true) ||
+                categoryCode.equals("Tất cả", ignoreCase = true)
+
+        suspendCancellableCoroutine { continuation ->
+            val filterParam = if (isAll) "" else categoryCode ?: ""
+            client.getTemplateApps(page = 0, size = 100, category = "") { jsonElement, throwable ->
+                if (!continuation.isActive) return@getTemplateApps
+
+                if (throwable != null || jsonElement == null) {
+                    Log.e(TAG, "Failed to fetch dancing templates: ${throwable?.message}")
+                    continuation.resume(emptyList())
+                } else {
+                    try {
+                        val allTemplates = parseTemplates(jsonElement)
+                        val visualTemplates = allTemplates.filter { !it.isMusic }
+                        val pool = if (visualTemplates.isNotEmpty()) visualTemplates else allTemplates.filter { it.isDancingTemplate }
+
+                        if (pool.isEmpty()) {
+                            continuation.resume(emptyList())
+                            return@getTemplateApps
+                        }
+
+                        if (!isAll && filterParam.isNotBlank()) {
+                            val targetCode = filterParam.trim().lowercase()
+                            val targetName = categoryName?.trim()?.lowercase()
+                            val filtered = pool.filter { item ->
+                                val itemCat = item.category.trim().lowercase()
+                                itemCat == targetCode ||
+                                        (!targetName.isNullOrBlank() && itemCat == targetName) ||
+                                        itemCat.contains(targetCode) ||
+                                        (!targetName.isNullOrBlank() && itemCat.contains(targetName))
+                            }
+                            continuation.resume(if (filtered.isNotEmpty()) filtered else pool)
+                            return@getTemplateApps
+                        }
+
+                        continuation.resume(pool)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error parsing dancing templates: ${e.message}", e)
+                        continuation.resume(emptyList())
                     }
                 }
             }

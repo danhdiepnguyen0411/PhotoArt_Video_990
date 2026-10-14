@@ -35,9 +35,17 @@ data class TemplateModel(
         get() = category.startsWith("MUSIC_", ignoreCase = true) ||
                 templateType.equals("MUSIC", ignoreCase = true) ||
                 templateType.equals("AUDIO", ignoreCase = true) ||
-                !audioUrl.isNullOrBlank() ||
-                videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true ||
-                imageUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true
+                (videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true && safeImageUrl == null) ||
+                (videoUrl.isNullOrBlank() && safeImageUrl.isNullOrBlank() && !audioUrl.isNullOrBlank())
+
+    val isDancingTemplate: Boolean
+        get() = category.contains("DANCE", ignoreCase = true) ||
+                category.contains("NHẢY", ignoreCase = true) ||
+                title.contains("DANCE", ignoreCase = true) ||
+                title.contains("VŨ ĐIỆU", ignoreCase = true) ||
+                templateType.equals("DANCE", ignoreCase = true) ||
+                templateType.equals("DANCING", ignoreCase = true) ||
+                !isMusic
 
     val categoryDisplayName: String
         get() {

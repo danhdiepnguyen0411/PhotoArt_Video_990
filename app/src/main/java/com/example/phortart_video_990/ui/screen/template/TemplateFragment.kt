@@ -47,30 +47,34 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvTemplateCategories.adapter = categoryAdapter
 
-        // Setup Music Tracks Grid (2 Columns)
+        // Setup Dancing Templates Grid (2 Columns)
         templateAdapter = TemplateAdapter(
             items = emptyList(),
-            onItemClick = { selectedMusic ->
+            onItemClick = { selectedTemplate ->
                 stopAudio()
                 com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
-                    .recordSelectedCategory(selectedMusic.category)
+                    .recordSelectedCategory(selectedTemplate.category)
                 val bundle = Bundle().apply {
-                    putString("selected_track_id", selectedMusic.id)
-                    putString("template_code", selectedMusic.id)
-                    putString("template_title", selectedMusic.title)
-                    putString("template_category", selectedMusic.category)
-                    putString("template_thumb", selectedMusic.safeImageUrl)
-                    putString("template_audio_url", selectedMusic.safeAudioUrl)
-                    putString("selected_music_title", selectedMusic.title)
-                    putString("selected_music_audio_url", selectedMusic.safeAudioUrl)
-                    putString("selected_music_image_url", selectedMusic.safeImageUrl)
-                    putFloat("selected_template_duration_sec", selectedMusic.durationSeconds.toFloat())
-                    putInt("selected_template_photo_count", selectedMusic.targetPhotoCount)
+                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, selectedTemplate.id)
+                    putString("template_code", selectedTemplate.id)
+                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, selectedTemplate.title)
+                    putString("template_title", selectedTemplate.title)
+                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, selectedTemplate.category)
+                    putString("template_category", selectedTemplate.category)
+                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, selectedTemplate.safeImageUrl)
+                    putString("template_thumb", selectedTemplate.safeImageUrl)
+                    putString("template_audio_url", selectedTemplate.safeAudioUrl)
+                    putString("selected_track_id", selectedTemplate.id)
+                    putString("selected_music_title", selectedTemplate.title)
+                    putString("selected_music_audio_url", selectedTemplate.safeAudioUrl)
+                    putString("selected_music_image_url", selectedTemplate.safeImageUrl)
+                    putFloat("selected_template_duration_sec", selectedTemplate.durationSeconds.toFloat())
+                    putInt("selected_template_photo_count", selectedTemplate.targetPhotoCount)
                 }
                 val navController = parentFragment?.parentFragment?.findNavController()
                     ?: parentFragment?.findNavController()
                     ?: findNavController()
-                navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment, bundle)
+                navController.navigateSafe(R.id.action_mainFragment_to_createTemplateVideoFragment, bundle)
             },
             onPlayClick = { track, position ->
                 toggleAudioPreview(track, position)
