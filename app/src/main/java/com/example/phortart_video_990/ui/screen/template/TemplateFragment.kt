@@ -152,6 +152,8 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
         super.onResume()
         if (::templateAdapter.isInitialized && templateAdapter.itemCount > 0) {
             templateAdapter.notifyDataSetChanged()
+        } else if (isAdded && context != null && com.example.phortart_video_990.core.utils.NetworkMonitor.isOnline(requireContext())) {
+            viewModel.loadData()
         }
     }
 
@@ -178,6 +180,11 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
             viewModel.loadData()
         }
 
+        binding.llEmptyState.setOnClickListener {
+            stopAudio()
+            viewModel.loadData()
+        }
+
         binding.headerTemplate.setOnProClickListener {
             (parentFragment as? MainFragment)?.selectTab(3)
         }
@@ -186,6 +193,21 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Auto-reload data when network reconnects
+                launch {
+                    var wasOffline = false
+                    com.example.phortart_video_990.core.utils.NetworkMonitor.observeNetwork(requireContext()).collect { isOnline ->
+                        if (isOnline) {
+                            val isEmptyOrError = viewModel.templates.value.isEmpty() || viewModel.isError.value
+                            if (wasOffline || isEmptyOrError) {
+                                viewModel.loadData()
+                            }
+                            wasOffline = false
+                        } else {
+                            wasOffline = true
+                        }
+                    }
+                }
                 launch {
                     viewModel.categories.collect { categories ->
                         categoryAdapter.submitList(categories)
