@@ -57,6 +57,16 @@ class UninstallActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_uninstall)
 
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentStep == 2) {
+                    showStep(1)
+                } else {
+                    navigateToMain()
+                }
+            }
+        })
+
         hideSystemUI()
         initView()
     }
@@ -369,14 +379,19 @@ class UninstallActivity : AppCompatActivity() {
     }
 
     private fun navigateToMain() {
+        com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = true
+
         NotificationPermissionManager.hasShownNotificationDialogThisSession = true
         NotificationPermissionManager.suppressNotificationDialog = true
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("skip_splash", true)
+            putExtra("target_screen", "home")
         }
         startActivity(intent)
         finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun openSystemUninstall() {
