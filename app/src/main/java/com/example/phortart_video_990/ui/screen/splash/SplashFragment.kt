@@ -45,6 +45,33 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
     override fun initView() {
         activity?.window?.let { SystemBarInsetsHelper.hideSystemBars(it) }
+
+        val ctx = context
+        if (ctx != null) {
+            val prefs = PreferencesManager.getInstance(ctx)
+            val isNewUninstallShortcut = activity?.intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
+                    activity?.intent?.getStringExtra("target_screen") == "uninstall"
+
+            val isSkip = !isNewUninstallShortcut && (
+                    activity?.intent?.getStringExtra("target_screen") == "home" ||
+                    activity?.intent?.getBooleanExtra("skip_splash", false) == true ||
+                    com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash ||
+                    prefs.shouldSkipSplashOnce
+            )
+
+            if (isSkip) {
+                if (activity?.intent?.getStringExtra("target_screen") == "home") {
+                    com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallClosed(ctx)
+                } else {
+                    com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = false
+                    prefs.shouldSkipSplashOnce = false
+                }
+                hasNavigated = true
+                findNavController().navigateSafe(R.id.action_splashFragment_to_mainFragment)
+                return
+            }
+        }
+
         binding.progressBar.progress = 0
 
         // Reset nếu user đã chọn ngôn ngữ nhưng chưa hoàn thành intro
@@ -96,6 +123,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
     }
 
     override fun initData() {
+        if (hasNavigated) return
         startProgressSimulation()
     }
 
@@ -167,6 +195,24 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
         val ctx = context ?: return
         hasNavigated = true
+
+        val act = activity
+        val intent = act?.intent
+        val isUninstallTarget = intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
+                intent?.getStringExtra("target_screen") == "uninstall"
+
+        if (isUninstallTarget) {
+            intent?.action = null
+            intent?.removeExtra("target_screen")
+
+            com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallActive(ctx)
+            val uninstallIntent = android.content.Intent(ctx, com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity::class.java).apply {
+                flags = android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(uninstallIntent)
+            act?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            return
+        }
 
         try {
             val prefs = PreferencesManager.getInstance(ctx)

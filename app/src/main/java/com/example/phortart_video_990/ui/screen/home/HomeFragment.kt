@@ -7,7 +7,9 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -89,6 +91,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setupForYouTemplates()
         setupHotTemplates()
         loadHomeData()
+        setupNetworkObserver()
+    }
+
+    private fun setupNetworkObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                var wasOffline = false
+                com.example.phortart_video_990.core.utils.NetworkMonitor.observeNetwork(requireContext()).collect { isOnline ->
+                    if (isOnline) {
+                        val needReload = cachedMusicTracks.isEmpty() ||
+                                forYouAdapter.itemCount == 0 ||
+                                hotTemplateAdapter.itemCount == 0
+                        if (wasOffline || needReload) {
+                            loadHomeData(forceRefresh = true)
+                        }
+                        wasOffline = false
+                    } else {
+                        wasOffline = true
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -97,6 +121,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         loadRecentHistory()
         checkCustomNotificationPermission()
         restoreScrollPosition()
+
+        if ((cachedMusicTracks.isEmpty() || forYouAdapter.itemCount == 0) &&
+            com.example.phortart_video_990.core.utils.NetworkMonitor.isOnline(requireContext())) {
+            loadHomeData(forceRefresh = true)
+        }
     }
 
     override fun onPause() {

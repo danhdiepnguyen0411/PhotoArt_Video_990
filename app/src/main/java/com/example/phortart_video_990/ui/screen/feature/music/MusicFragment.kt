@@ -8,7 +8,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
@@ -160,6 +162,34 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         })
 
         loadCategoriesAndTracks()
+        setupNetworkObserver()
+    }
+
+    private fun setupNetworkObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                var wasOffline = false
+                com.example.phortart_video_990.core.utils.NetworkMonitor.observeNetwork(requireContext()).collect { isOnline ->
+                    if (isOnline) {
+                        val needReload = allMusicTracks.isEmpty()
+                        if (wasOffline || needReload) {
+                            loadCategoriesAndTracks()
+                        }
+                        wasOffline = false
+                    } else {
+                        wasOffline = true
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (allMusicTracks.isEmpty() && isAdded && context != null &&
+            com.example.phortart_video_990.core.utils.NetworkMonitor.isOnline(requireContext())) {
+            loadCategoriesAndTracks()
+        }
     }
 
     override fun initListener() {
@@ -180,6 +210,10 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             bindingOrNull?.rvMusicTracks?.canScrollVertically(-1) ?: false
         }
         b.swipeRefreshLayout.setOnRefreshListener {
+            loadCategoriesAndTracks()
+        }
+
+        b.llEmptyState.setOnClickListener {
             loadCategoriesAndTracks()
         }
 
