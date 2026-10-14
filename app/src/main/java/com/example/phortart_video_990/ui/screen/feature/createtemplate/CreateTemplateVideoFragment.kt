@@ -48,6 +48,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private var selectedPhotoUri: Uri? = null
 
     // Optional music
+    private var selectedMusicTrackId: String? = null
     private var selectedMusicTitle: String? = null
     private var selectedMusicAudioUrl: String? = null
     private var selectedMusicAudioFilePath: String? = null
@@ -198,16 +199,54 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
         // Read music selection returned or preloaded
         val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        stateHandle?.get<String>("selected_music_title")?.let { title ->
-            if (title.isNotBlank()) {
-                selectedMusicTitle = title
-                binding.tvSelectedMusicTitle.text = title
-                binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
-                binding.tvMusicAction.text = getString(R.string.music_change_action)
+
+        val initialTrackId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+            ?: args?.getString(ARG_TEMPLATE_CODE)?.takeIf { it.isNotBlank() }
+            ?: stateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
+        if (!initialTrackId.isNullOrBlank()) {
+            selectedMusicTrackId = initialTrackId
+        }
+
+        val initialMusicTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
+            ?: args?.getString(ARG_TEMPLATE_TITLE)?.takeIf { it.isNotBlank() }
+            ?: stateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
+        if (!initialMusicTitle.isNullOrBlank()) {
+            selectedMusicTitle = initialMusicTitle
+            binding.tvSelectedMusicTitle.text = initialMusicTitle
+            binding.tvSelectedMusicSubtitle.text = getString(R.string.music_chosen_as_bg)
+            binding.tvMusicAction.text = getString(R.string.music_change_action)
+        }
+
+        val initialAudioUrl = args?.getString("selected_music_audio_url")
+            ?: args?.getString("template_audio_url")
+            ?: stateHandle?.get<String?>("selected_music_audio_url")
+        if (!initialAudioUrl.isNullOrBlank()) {
+            selectedMusicAudioUrl = initialAudioUrl
+        }
+
+        val initialFilePath = args?.getString("selected_music_file_path")
+            ?: stateHandle?.get<String?>("selected_music_file_path")
+        if (!initialFilePath.isNullOrBlank()) {
+            selectedMusicAudioFilePath = initialFilePath
+        }
+
+        val initialImageUrl = args?.getString("selected_music_image_url")
+            ?: args?.getString(ARG_TEMPLATE_THUMB)
+            ?: stateHandle?.get<String?>("selected_music_image_url")
+        if (!initialImageUrl.isNullOrBlank()) {
+            selectedMusicImageUrl = initialImageUrl
+            binding.ivMusicIcon.load(initialImageUrl) {
+                crossfade(true)
+                placeholder(R.drawable.ic_func_music)
+                error(R.drawable.ic_func_music)
             }
         }
-        stateHandle?.get<String?>("selected_music_audio_url")?.let { selectedMusicAudioUrl = it }
-        stateHandle?.get<String?>("selected_music_file_path")?.let { selectedMusicAudioFilePath = it }
+
+        stateHandle?.getLiveData<String>("selected_track_id")?.observe(viewLifecycleOwner) { trackId ->
+            if (!trackId.isNullOrBlank()) {
+                selectedMusicTrackId = trackId
+            }
+        }
         stateHandle?.get<String?>("selected_music_image_url")?.let { imgUrl ->
             selectedMusicImageUrl = imgUrl
             if (!imgUrl.isNullOrBlank()) {
@@ -271,7 +310,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             }
         })
 
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().safePopBackStack()
         }
 
@@ -284,7 +323,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         }
 
         binding.cardSelectMusic.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_createTemplateVideoFragment_to_musicFragment)
+            val bundle = Bundle().apply {
+                putString("selected_track_id", selectedMusicTrackId)
+                putString("selected_music_title", selectedMusicTitle)
+                putString("selected_music_audio_url", selectedMusicAudioUrl)
+            }
+            findNavController().navigateSafe(R.id.action_createTemplateVideoFragment_to_musicFragment, bundle)
         }
 
         binding.btnCreateVideo.setOnClickListener {
@@ -526,6 +570,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private fun navigateToResult(videoUrl: String?, inputPhotoUri: String, audioPath: String?) {
         val bundle = Bundle().apply {
             putString(TemplateVideoResultFragment.ARG_VIDEO_URL, videoUrl)
+            putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, selectedMusicTrackId)
             putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, selectedMusicTitle.orEmpty())
             putString(TemplateVideoResultFragment.ARG_MUSIC_AUDIO_URL, selectedMusicAudioUrl)
             putString(TemplateVideoResultFragment.ARG_MUSIC_FILE_PATH, audioPath)

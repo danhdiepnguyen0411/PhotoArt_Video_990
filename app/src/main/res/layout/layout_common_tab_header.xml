@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <!-- Circular Back Button -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_circle_back"
+        android:clickable="true"
+        android:contentDescription="@string/btn_back"
+        android:elevation="1dp"
+        android:focusable="true"
+        android:padding="8dp"
+        android:src="@drawable/ic_arrow_back"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#4A7BFE"
+        tools:visibility="visible" />
+
+    <!-- Left / Center Group: Brand Container OR Title + Sparkle -->
+    <LinearLayout
+        android:id="@+id/llHeaderLeftGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/flHeaderRightAction"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Brand Mode Container: Logo + "Photo AI" -->
+        <LinearLayout
+            android:id="@+id/llHeaderBrand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ivHeaderBrandLogo"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitCenter"
+                android:src="@drawable/photo_ai_logo" />
+
+            <TextView
+                android:id="@+id/tvHeaderBrandPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/inter_black"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.04"
+                android:text="Photo"
+                android:textColor="#1B2A78"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHeaderBrandAi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/inter_black"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.04"
+                android:text="AI"
+                android:textColor="#3D86F4"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Standard Mode Container: Title Text + Sparkle Icon -->
+        <LinearLayout
+            android:id="@+id/llHeaderTitleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/inter_bold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="#4A7BFE"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                tools:text="AI Create" />
+
+            <ImageView
+                android:id="@+id/ivHeaderSparkle"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="6dp"
+                android:contentDescription="Sparkle"
+                android:src="@drawable/ic_template_sparkle"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Right Container: PRO Button or Custom Actions -->
+    <FrameLayout
+        android:id="@+id/flHeaderRightAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- PRO Capsule Button -->
+        <LinearLayout
+            android:id="@+id/btnHeaderPro"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_btn_pro"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/ivHeaderProCrown"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="PRO"
+                android:src="@drawable/ic_crown" />
+
+            <TextView
+                android:id="@+id/tvHeaderProText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="PRO"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</merge>

@@ -192,7 +192,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     override fun initView() {
-        binding.tvTopTitle.text = getString(R.string.memories_title)
+        binding.header.setTitleRes(R.string.memories_title)
 
         // Restore uploaded photos if previously saved
         val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
@@ -516,7 +516,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().safePopBackStack()
         }
 
@@ -567,6 +567,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val bundle = android.os.Bundle().apply {
                 putString("selected_track_id", selectedMusicTrackId)
                 putString("selected_music_title", selectedMusicTitle)
+                putString("selected_music_audio_url", selectedMusicAudioUrl)
             }
             findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
         }
@@ -575,6 +576,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             val bundle = android.os.Bundle().apply {
                 putString("selected_track_id", selectedMusicTrackId)
                 putString("selected_music_title", selectedMusicTitle)
+                putString("selected_music_audio_url", selectedMusicAudioUrl)
             }
             findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
         }
@@ -688,7 +690,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             track = finalTrack,
                             audioUrl = finalAudioUrl,
                             audioPath = resolvedAudioPath,
-                            imageUrl = finalImageUrl
+                            imageUrl = finalImageUrl,
+                            trackId = selectedMusicTrackId
                         )
 
                         if (isResumed && isAdded) {

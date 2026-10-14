@@ -19,6 +19,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
         val adapter = MainPagerAdapter(this)
         binding.vpMainTabs.adapter = adapter
         binding.vpMainTabs.isUserInputEnabled = false
+        binding.vpMainTabs.offscreenPageLimit = 3
 
         binding.bottomNavigationView.post {
             updateIndicator(binding.vpMainTabs.currentItem, animate = false)

@@ -36,6 +36,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
 
     private var videoPath: String? = null
     private var photoUris: List<String> = emptyList()
+    private var musicTrackId: String? = null
     private var musicTitle: String? = null
     private var musicAudioUrl: String? = null
     private var musicAudioFilePath: String? = null
@@ -60,6 +61,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         val args = arguments
         videoPath = args?.getString(ARG_VIDEO_PATH)
         photoUris = args?.getStringArrayList(ARG_PHOTOS) ?: emptyList()
+        musicTrackId = args?.getString(ARG_TRACK_ID) ?: args?.getString("selected_track_id")
         musicTitle = args?.getString(ARG_TRACK)
         musicAudioUrl = args?.getString(ARG_AUDIO_URL)
         musicAudioFilePath = args?.getString(ARG_AUDIO_PATH)
@@ -73,17 +75,21 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         // Lắng nghe đổi bài hát mới từ MusicFragment
         val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         stateHandle?.getLiveData<String>("selected_music_title")?.observe(viewLifecycleOwner) { title ->
-            if (!title.isNullOrBlank()) {
+                val newTrackId = stateHandle.get<String?>("selected_track_id")
                 val newAudioUrl = stateHandle.get<String?>("selected_music_audio_url")
                 val newFilePath = stateHandle.get<String?>("selected_music_file_path")
                 val newImgUrl = stateHandle.get<String?>("selected_music_image_url")
 
                 // Clear keys ngay lập tức tránh trigger lặp lại
                 stateHandle.remove<String>("selected_music_title")
+                stateHandle.remove<String?>("selected_track_id")
                 stateHandle.remove<String?>("selected_music_audio_url")
                 stateHandle.remove<String?>("selected_music_file_path")
                 stateHandle.remove<String?>("selected_music_image_url")
 
+                if (!newTrackId.isNullOrBlank()) {
+                    musicTrackId = newTrackId
+                }
                 musicTitle = title
                 musicAudioUrl = newAudioUrl
                 musicAudioFilePath = newFilePath
@@ -98,7 +104,6 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                 handleMusicChanged(newAudioUrl, newFilePath)
             }
         }
-    }
 
     private var hasAutoSavedHistory = false
 
@@ -512,16 +517,26 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().popBackStack()
         }
 
         binding.cardVideoInfo.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment)
+            val bundle = Bundle().apply {
+                putString("selected_track_id", musicTrackId)
+                putString("selected_music_title", musicTitle)
+                putString("selected_music_audio_url", musicAudioUrl)
+            }
+            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment, bundle)
         }
 
         binding.flVideoNote.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment)
+            val bundle = Bundle().apply {
+                putString("selected_track_id", musicTrackId)
+                putString("selected_music_title", musicTitle)
+                putString("selected_music_audio_url", musicAudioUrl)
+            }
+            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment, bundle)
         }
 
         binding.cardVideoStage.setOnClickListener {
@@ -578,6 +593,7 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     companion object {
         const val ARG_VIDEO_PATH = "arg_video_path"
         const val ARG_PHOTOS = "arg_photos"
+        const val ARG_TRACK_ID = "arg_track_id"
         const val ARG_TRACK = "arg_track"
         const val ARG_AUDIO_URL = "arg_audio_url"
         const val ARG_AUDIO_PATH = "arg_audio_path"
@@ -589,11 +605,13 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
             track: String?,
             audioUrl: String? = null,
             audioPath: String? = null,
-            imageUrl: String? = null
+            imageUrl: String? = null,
+            trackId: String? = null
         ): Bundle {
             return Bundle().apply {
                 putString(ARG_VIDEO_PATH, videoPath)
                 putStringArrayList(ARG_PHOTOS, ArrayList(photos))
+                putString(ARG_TRACK_ID, trackId)
                 putString(ARG_TRACK, track)
                 putString(ARG_AUDIO_URL, audioUrl)
                 putString(ARG_AUDIO_PATH, audioPath)

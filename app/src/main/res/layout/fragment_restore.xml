@@ -6,24 +6,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_restore_screen">
 
-    <!-- Circular Back Button -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_circle_back"
-        android:clickable="true"
-        android:contentDescription="@string/btn_back"
-        android:elevation="4dp"
-        android:outlineAmbientShadowColor="#5A6EC8"
-        android:outlineSpotShadowColor="#5A6EC8"
-        android:focusable="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_arrow_back"
-        app:tint="#2D7DF6"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Top Bar: Common Header with Back Button and Title -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:headerTitle="@string/restore_title"
+        app:showBackButton="true"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
@@ -33,7 +22,7 @@
         android:overScrollMode="never"
         android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/btnStartRestore"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack">
+        app:layout_constraintTop_toBottomOf="@+id/header">
 
         <LinearLayout
             android:layout_width="match_parent"
