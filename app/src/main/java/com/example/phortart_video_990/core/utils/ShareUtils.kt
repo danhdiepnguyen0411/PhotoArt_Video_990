@@ -64,13 +64,14 @@ object ShareUtils {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "video/mp4"
                 putExtra(Intent.EXTRA_STREAM, contentUri)
-                clipData = ClipData.newUri(context.contentResolver, "Video", contentUri)
+                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
+                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                clipData = sendIntent.clipData
+                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 if (context !is Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
