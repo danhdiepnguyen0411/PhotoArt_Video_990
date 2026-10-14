@@ -40,6 +40,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var rawVideoPathOrUrl: String = ""
     private var currentPlayingVideoFile: File? = null
 
+    private var musicTrackId: String? = null
     private var musicTitle: String? = null
     private var musicAudioUrl: String? = null
     private var musicAudioFilePath: String? = null
@@ -60,6 +61,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     override fun initView() {
         val args = arguments
         rawVideoPathOrUrl = args?.getString(ARG_VIDEO_URL).orEmpty()
+        musicTrackId = args?.getString(ARG_MUSIC_TRACK_ID) ?: args?.getString("selected_track_id")
         musicTitle = args?.getString(ARG_MUSIC_TITLE)
         musicAudioUrl = args?.getString(ARG_MUSIC_AUDIO_URL)
         musicAudioFilePath = args?.getString(ARG_MUSIC_FILE_PATH)
@@ -79,16 +81,21 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
 
         stateHandle.getLiveData<String>("selected_music_title").observe(viewLifecycleOwner) { title ->
             if (!title.isNullOrBlank()) {
+                val newTrackId = stateHandle.get<String?>("selected_track_id")
                 val newAudioUrl = stateHandle.get<String?>("selected_music_audio_url")
                 val newFilePath = stateHandle.get<String?>("selected_music_file_path")
                 val newImgUrl = stateHandle.get<String?>("selected_music_image_url")
 
                 // Clear saved state handle keys ngay lập tức để không bị trigger lại thừa
                 stateHandle.remove<String>("selected_music_title")
+                stateHandle.remove<String?>("selected_track_id")
                 stateHandle.remove<String?>("selected_music_audio_url")
                 stateHandle.remove<String?>("selected_music_file_path")
                 stateHandle.remove<String?>("selected_music_image_url")
 
+                if (!newTrackId.isNullOrBlank()) {
+                    musicTrackId = newTrackId
+                }
                 musicTitle = title
                 musicAudioUrl = newAudioUrl
                 musicAudioFilePath = newFilePath
@@ -333,12 +340,17 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().popBackStack()
         }
 
         binding.cardMusicInfo.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_templateVideoResultFragment_to_musicFragment)
+            val bundle = Bundle().apply {
+                putString("selected_track_id", musicTrackId)
+                putString("selected_music_title", musicTitle)
+                putString("selected_music_audio_url", musicAudioUrl)
+            }
+            findNavController().navigateSafe(R.id.action_templateVideoResultFragment_to_musicFragment, bundle)
         }
 
         binding.cardVideoStage.setOnClickListener {
@@ -506,6 +518,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
 
     companion object {
         const val ARG_VIDEO_URL = "arg_video_url"
+        const val ARG_MUSIC_TRACK_ID = "arg_music_track_id"
         const val ARG_MUSIC_TITLE = "arg_music_title"
         const val ARG_MUSIC_AUDIO_URL = "arg_music_audio_url"
         const val ARG_MUSIC_FILE_PATH = "arg_music_file_path"

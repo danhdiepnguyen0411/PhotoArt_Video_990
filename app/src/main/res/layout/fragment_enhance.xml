@@ -6,62 +6,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_ai_create_screen">
 
-    <!-- Top Bar: Back, Title "AI Create ✦", Heart Action -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/topBar"
+    <!-- Top Bar: Common Header with Back, Title "AI Create", and Sparkle -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:background="@drawable/bg_circle_back"
-            android:clickable="true"
-            android:contentDescription="@string/btn_back"
-            android:elevation="1dp"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="#4A7BFE"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/layoutTopTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@+id/btnBack"
-            app:layout_constraintStart_toEndOf="@+id/btnBack"
-            app:layout_constraintTop_toTopOf="@+id/btnBack">
-
-            <TextView
-                android:id="@+id/tvTopTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_bold"
-                android:text="@string/ai_create_title"
-                android:textColor="#3A8BF5"
-                android:textSize="26sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/ivTopTitleSparkle"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginStart="6dp"
-                android:contentDescription="Sparkle"
-                android:src="@drawable/ic_sparkle_chip"
-                app:tint="#6F86F4" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:headerTitle="@string/ai_create_title"
+        app:showBackButton="true"
+        app:showSparkle="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Scrollable Body Content -->
     <ScrollView
@@ -71,7 +24,7 @@
         android:overScrollMode="never"
         android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/btnGeneratePrompt"
-        app:layout_constraintTop_toBottomOf="@+id/topBar">
+        app:layout_constraintTop_toBottomOf="@+id/header">
 
         <LinearLayout
             android:layout_width="match_parent"

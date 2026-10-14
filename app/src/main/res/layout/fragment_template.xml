@@ -7,75 +7,14 @@
     android:background="@color/white">
 
     <!-- Top Header -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clTemplateHeader"
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/headerTemplate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="48dp"
-        android:paddingBottom="12dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Title "Template" with sparkle icon -->
-        <LinearLayout
-            android:id="@+id/llTitleGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tvTemplateHeaderTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:text="@string/nav_template"
-                android:textColor="#4A7BFE"
-                android:textSize="32sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/ivTemplateSparkle"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="6dp"
-                android:contentDescription="Sparkle"
-                android:src="@drawable/ic_template_sparkle" />
-        </LinearLayout>
-
-        <!-- PRO Capsule Button -->
-        <LinearLayout
-            android:id="@+id/btnTemplatePro"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:background="@drawable/bg_btn_pro"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="14dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:contentDescription="PRO"
-                android:src="@drawable/ic_crown" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="PRO"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:headerTitle="@string/nav_template"
+        app:showSparkle="true"
+        app:showProButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Horizontal Category Filter Chips -->
     <androidx.recyclerview.widget.RecyclerView
@@ -86,7 +25,7 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingBottom="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/clTemplateHeader"
+        app:layout_constraintTop_toBottomOf="@+id/headerTemplate"
         tools:listitem="@layout/item_template_category_chip" />
 
     <!-- Swipe Refresh Layout containing Template Grid & Empty State -->

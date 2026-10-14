@@ -7,35 +7,14 @@
     android:background="@color/white">
 
     <!-- Top Header -->
-    <LinearLayout
-        android:id="@+id/llHistoryHeader"
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/headerHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="44dp"
-        android:paddingBottom="12dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/tvHistoryTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_black"
-            android:text="@string/history_title"
-            android:textColor="#3879F6"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvHistorySubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/history_subtitle"
-            android:textColor="#7E8EA8"
-            android:textSize="13sp" />
-    </LinearLayout>
+        app:headerTitle="@string/history_title"
+        app:showSparkle="true"
+        app:showProButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Filter Chips RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -44,9 +23,9 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        android:paddingBottom="12dp"
-        app:layout_constraintTop_toBottomOf="@+id/llHistoryHeader"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/headerHistory"
         tools:listitem="@layout/item_history_filter_chip" />
 
     <!-- Swipe Refresh Layout containing History List & Empty State -->

@@ -9,11 +9,10 @@ class UpscaleFragment : BaseFragment<FragmentUpscaleBinding>(FragmentUpscaleBind
 
     override fun initView() {
         binding.tvFunctionName.text = getString(R.string.func_05_upscale)
-        binding.tvTopTitle.text = getString(R.string.func_05_upscale)
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().popBackStack()
         }
     }
