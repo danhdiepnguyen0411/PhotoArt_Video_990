@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/screen_bg">
+
+    <!-- Top Header: Brand Logo + PRO Button -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/headerHome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/screen_bg"
+        app:showBrandLogo="true"
+        app:showProButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerHome">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -17,100 +34,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingTop="4dp"
         android:paddingBottom="16dp">
 
-        <!-- Header: Logo Brand + PRO Button -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clTopHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="44dp"
-            android:paddingBottom="14dp">
-
-            <!-- Brand Logo & App Name -->
-            <LinearLayout
-                android:id="@+id/llBrandContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/ivBrandLogo"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/photo_ai_logo" />
-
-                <TextView
-                    android:id="@+id/tvBrandPhoto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="@font/inter_black"
-                    app:fontFamily="@font/inter_black"
-                    android:textStyle="bold"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="-0.04"
-                    android:text="Photo"
-                    android:textColor="#1B2A78"
-                    android:textSize="26sp" />
-
-                <TextView
-                    android:id="@+id/tvBrandAi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:fontFamily="@font/inter_black"
-                    app:fontFamily="@font/inter_black"
-                    android:textStyle="bold"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="-0.04"
-                    android:text="AI"
-                    android:textColor="#3D86F4"
-                    android:textSize="26sp" />
-            </LinearLayout>
-
-            <!-- PRO Button -->
-            <LinearLayout
-                android:id="@+id/btnPro"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:background="@drawable/bg_btn_pro"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingStart="18dp"
-                android:paddingEnd="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription="PRO"
-                    android:src="@drawable/ic_crown" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:fontFamily="@font/inter_medium"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="0.02"
-                    android:text="PRO"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Banner Carousel Container (Rounded Card + Bottom Dots inside) -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -671,3 +597,5 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -64,14 +64,13 @@ object ShareUtils {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "video/mp4"
                 putExtra(Intent.EXTRA_STREAM, contentUri)
-                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
+                clipData = ClipData.newUri(context.contentResolver, "Video", contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             val chooserIntent = Intent.createChooser(sendIntent, effectiveTitle).apply {
                 putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
+                clipData = sendIntent.clipData
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 if (context !is Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -96,13 +95,12 @@ object ShareUtils {
     }
 
     /**
-     * Chia sẻ Ảnh (ảnh kết quả tạo prompt, phục hồi ảnh...) hiển thị ảnh preview trực tiếp trên Bottom Sheet
+     * Chia sẻ duy nhất file Ảnh (không kèm đường dẫn URL hay text caption)
      */
     suspend fun shareImage(
         context: Context,
         imageSource: Any?,
-        chooserTitle: String? = null,
-        caption: String? = null
+        chooserTitle: String? = null
     ): Boolean = withContext(Dispatchers.IO) {
         if (!checkAndMarkLaunch()) return@withContext false
         if (imageSource == null) return@withContext false
@@ -113,15 +111,17 @@ object ShareUtils {
             val contentUri = FileProvider.getUriForFile(context, authority, localFile)
 
             val effectiveTitle = chooserTitle ?: context.getString(R.string.share_artwork_title)
+            val mimeType = when (localFile.extension.lowercase()) {
+                "png" -> "image/png"
+                "webp" -> "image/webp"
+                else -> "image/jpeg"
+            }
 
+            // Chỉ gửi duy nhất tệp ảnh (EXTRA_STREAM), không kèm EXTRA_TEXT hay đường dẫn link
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/jpeg"
+                type = mimeType
                 putExtra(Intent.EXTRA_STREAM, contentUri)
-                putExtra(Intent.EXTRA_TITLE, effectiveTitle)
-                if (!caption.isNullOrBlank()) {
-                    putExtra(Intent.EXTRA_TEXT, caption)
-                }
-                clipData = ClipData.newUri(context.contentResolver, effectiveTitle, contentUri)
+                clipData = ClipData.newUri(context.contentResolver, "Image", contentUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
@@ -135,6 +135,14 @@ object ShareUtils {
             }
 
             try {
+                val resInfoList = context.packageManager.queryIntentActivities(
+                    chooserIntent,
+                    android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
+                )
+                for (resolveInfo in resInfoList) {
+                    val packageName = resolveInfo.activityInfo.packageName
+                    context.grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
                 context.grantUriPermission("android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } catch (_: Exception) {}
 
@@ -166,7 +174,8 @@ object ShareUtils {
             }
 
             if (imageSource is File && imageSource.exists() && imageSource.length() > 0) {
-                val targetFile = File(sharedDir, "share_${imageSource.nameWithoutExtension}.jpg")
+                val ext = imageSource.extension.ifBlank { "jpg" }
+                val targetFile = File(sharedDir, "share_${imageSource.nameWithoutExtension}.$ext")
                 if (!targetFile.exists() || targetFile.length() != imageSource.length()) {
                     imageSource.copyTo(targetFile, overwrite = true)
                 }
@@ -177,7 +186,8 @@ object ShareUtils {
                 val cleanPath = imageSource.removePrefix("file://")
                 val existing = File(cleanPath)
                 if (existing.exists() && existing.length() > 0) {
-                    val targetFile = File(sharedDir, "share_${existing.nameWithoutExtension}.jpg")
+                    val ext = existing.extension.ifBlank { "jpg" }
+                    val targetFile = File(sharedDir, "share_${existing.nameWithoutExtension}.$ext")
                     if (!targetFile.exists() || targetFile.length() != existing.length()) {
                         existing.copyTo(targetFile, overwrite = true)
                     }

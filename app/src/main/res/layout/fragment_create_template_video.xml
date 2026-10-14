@@ -6,49 +6,21 @@
     android:layout_height="match_parent"
     android:background="@color/screen_bg">
 
-    <!-- Top Bar -->
-    <LinearLayout
-        android:id="@+id/llTopBar"
+    <!-- Top Bar: Common Header with Back Button and Title -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:background="@drawable/bg_circle_back"
-            android:contentDescription="@string/btn_back"
-            android:elevation="1dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="#2D7DF6" />
-
-        <TextView
-            android:id="@+id/tvTopTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/template_create_title"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        app:headerTitle="@string/template_create_title"
+        app:showBackButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@+id/btnCreateVideo"
-        app:layout_constraintTop_toBottomOf="@+id/llTopBar">
+        app:layout_constraintTop_toBottomOf="@+id/header">
 
         <LinearLayout
             android:layout_width="match_parent"

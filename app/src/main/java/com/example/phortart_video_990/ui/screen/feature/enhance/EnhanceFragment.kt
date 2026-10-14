@@ -41,12 +41,8 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
     override fun initView() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
 
-            binding.topBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset 
-            }
             binding.btnGeneratePrompt.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = navBarInset + (24 * resources.displayMetrics.density).toInt()
             }
@@ -66,13 +62,12 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             updateGenerateButtonState()
         }
 
-        setupTopTitleGradient()
         updateSelectedStyle(selectedStyleIndex)
         updateGenerateButtonState()
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             if (isAdded) findNavController().safePopBackStack()
         }
 
@@ -150,26 +145,6 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         binding.btnGeneratePrompt.alpha = if (hasPrompt) 1.0f else 0.4f
     }
 
-    private fun setupTopTitleGradient() {
-        val textView = binding.tvTopTitle
-        textView.post {
-            val width = textView.paint.measureText(textView.text.toString())
-            if (width > 0f) {
-                val shader = android.graphics.LinearGradient(
-                    0f, 0f, width, 0f,
-                    intArrayOf(
-                        Color.parseColor("#3A8BF5"),
-                        Color.parseColor("#7A63EE"),
-                        Color.parseColor("#D45BD8")
-                    ),
-                    floatArrayOf(0f, 0.55f, 1f),
-                    android.graphics.Shader.TileMode.CLAMP
-                )
-                textView.paint.shader = shader
-                textView.invalidate()
-            }
-        }
-    }
 
     private fun updateSelectedStyle(index: Int) {
         selectedStyleIndex = index

@@ -11,6 +11,7 @@ import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentHistoryBinding
+import com.example.phortart_video_990.ui.screen.main.MainFragment
 import com.google.gson.Gson
 
 class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBinding::inflate) {
@@ -69,6 +70,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(FragmentHistoryBind
             binding.swipeRefreshLayout.postDelayed({
                 if (isAdded) binding.swipeRefreshLayout.isRefreshing = false
             }, 500L)
+        }
+    }
+
+    override fun initListener() {
+        binding.headerHistory.setOnProClickListener {
+            (parentFragment as? MainFragment)?.selectTab(3)
         }
     }
 

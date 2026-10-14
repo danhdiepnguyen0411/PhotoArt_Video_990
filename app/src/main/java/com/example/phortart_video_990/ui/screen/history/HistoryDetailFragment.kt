@@ -59,20 +59,24 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         }
     }
 
+    private var btnShareTop: View? = null
+    private var btnDeleteTop: View? = null
+
     override fun initView() {
         // Window Insets for edge-to-edge
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
 
-            binding.layoutTopBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset
-            }
             binding.layoutBottomBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = navBarInset
             }
             insets
         }
+
+        val actionView = layoutInflater.inflate(R.layout.layout_header_action_history_detail, binding.header.flRightAction, false)
+        binding.header.setRightCustomView(actionView)
+        btnShareTop = actionView.findViewById(R.id.btnShareTop)
+        btnDeleteTop = actionView.findViewById(R.id.btnDeleteTop)
 
         val item = historyItem ?: return
         bindItemData(item)
@@ -87,7 +91,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         when {
             // 1. KHÔI PHỤC ẢNH CŨ
             type.contains("khôi phục") || type.contains("restore") -> {
-                binding.tvHeaderTitle.text = getString(R.string.detail_header_restore)
+                binding.header.setTitle(getString(R.string.detail_header_restore))
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_restore)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_after)
 
@@ -100,13 +104,24 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 val mediaSource: Any? = item.imageUri ?: item.imageUrl ?: if (item.imageRes != 0) item.imageRes else null
                 val beforeSource: Any? = item.beforeUri
 
+                val onSizeReady: (Int, Int) -> Unit = { w, h ->
+                    if (w > 0 && h > 0 && isAdded && bindingOrNull != null) {
+                        val density = resources.displayMetrics.density
+                        val screenWidth = resources.displayMetrics.widthPixels
+                        val padding = (32 * density).toInt()
+                        val availWidth = (screenWidth - padding).coerceAtLeast(1)
+                        val targetHeight = (availWidth * (h.toFloat() / w.toFloat())).toInt().coerceIn((180 * density).toInt(), (520 * density).toInt())
+                        binding.cardMediaContainer.updateLayoutParams { height = targetHeight }
+                    }
+                }
+
                 if (beforeSource != null) {
-                    binding.sliderView.setBeforeImage(beforeSource, isFallback = false)
-                    binding.sliderView.setAfterImage(mediaSource ?: beforeSource)
+                    binding.sliderView.setBeforeImage(beforeSource, isFallback = false, onSizeReady = onSizeReady)
+                    binding.sliderView.setAfterImage(mediaSource ?: beforeSource, onSizeReady = onSizeReady)
                 } else if (mediaSource != null) {
                     // Fallback when beforeUri was not saved: use same image with vintage/B&W effect on Trước
-                    binding.sliderView.setBeforeImage(mediaSource, isFallback = true)
-                    binding.sliderView.setAfterImage(mediaSource)
+                    binding.sliderView.setBeforeImage(mediaSource, isFallback = true, onSizeReady = onSizeReady)
+                    binding.sliderView.setAfterImage(mediaSource, onSizeReady = onSizeReady)
                 } else {
                     binding.sliderView.setBeforeImage(R.drawable.bg_card_white, isFallback = false)
                     binding.sliderView.setAfterImage(R.drawable.bg_card_white)
@@ -125,7 +140,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 2. PROMPT AI
             type.contains("prompt") -> {
-                binding.tvHeaderTitle.text = getString(R.string.detail_header_prompt)
+                binding.header.setTitle(getString(R.string.detail_header_prompt))
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_prompt)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge_capsule)
 
@@ -160,7 +175,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 3. GOM ẢNH / VIDEO GHÉP NHẠC
             type.contains("gom") || type.contains("music") || type.contains("video") -> {
-                binding.tvHeaderTitle.text = getString(R.string.detail_header_memories)
+                binding.header.setTitle(getString(R.string.detail_header_memories))
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_memories)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge)
 
@@ -200,7 +215,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             // 4. TEMPLATE / WAACKING
             else -> {
-                binding.tvHeaderTitle.text = getString(R.string.detail_header_template)
+                binding.header.setTitle(getString(R.string.detail_header_template))
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_template)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_hot)
 
@@ -254,12 +269,12 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
     override fun initListener() {
         // Back
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             findNavController().popBackStack()
         }
 
         // Delete confirmation (600Y Tree Scan custom dialog)
-        binding.btnDeleteTop.setOnClickListener {
+        btnDeleteTop?.setOnClickListener {
             val item = historyItem ?: return@setOnClickListener
             AppDialogHelper.showDeleteHistoryDialog(requireActivity()) {
                 historyRepository.deleteHistoryItem(item)
@@ -269,7 +284,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         }
 
         // Share
-        binding.btnShareTop.setOnClickListener {
+        btnShareTop?.setOnClickListener {
             if (SystemClock.elapsedRealtime() - lastShareClickTime < 1000L) return@setOnClickListener
             lastShareClickTime = SystemClock.elapsedRealtime()
             shareCurrentItem()
@@ -432,19 +447,17 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
             if (imageSource != null) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    ShareUtils.shareImage(
+                    val success = ShareUtils.shareImage(
                         context = requireContext(),
                         imageSource = imageSource,
-                        chooserTitle = getString(R.string.share_artwork_title),
-                        caption = getString(R.string.share_artwork_message, item.title)
+                        chooserTitle = getString(R.string.share_artwork_title)
                     )
+                    if (!success && isAdded) {
+                        Toast.makeText(requireContext(), getString(R.string.toast_cannot_open_share), Toast.LENGTH_SHORT).show()
+                    }
                 }
             } else {
-                val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, getString(R.string.share_artwork_message, item.title))
-                }
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.share_artwork_title)))
+                Toast.makeText(requireContext(), getString(R.string.toast_cannot_read_image), Toast.LENGTH_SHORT).show()
             }
         }
     }

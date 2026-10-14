@@ -1,40 +1,49 @@
 package com.example.phortart_video_990.ui.screen.feature.enhance
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.os.Bundle
-import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.dialog.AppDialogHelper
+import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.AIPromptRepository
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.databinding.FragmentEnhanceLoadingBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-import com.example.phortart_video_990.core.utils.navigateSafe
-import com.example.phortart_video_990.core.utils.safePopBackStack
-
 class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(FragmentEnhanceLoadingBinding::inflate) {
 
-    private val promptRepository by lazy { AIPromptRepository(requireContext()) }
-    private val historyRepository by lazy { HistoryRepository(requireContext()) }
+    private val promptRepository by lazy { AIPromptRepository(requireContext().applicationContext) }
+    private val historyRepository by lazy { HistoryRepository(requireContext().applicationContext) }
+
     private var progressAnimator: ValueAnimator? = null
     private var finalAnimator: ValueAnimator? = null
+    private var crawlJob: Job? = null
+    private var sdkJob: Job? = null
 
     private var userPrompt: String = ""
     private var fullPrompt: String = ""
     private var styleName: String = ""
+
+    private var currentProgress: Float = 0f
+    private var isProcessFinished: Boolean = false
+    private var isGenerating: Boolean = false
+
+    private var pendingNavigateBundle: Bundle? = null
+    private var pendingErrorAction: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,77 +53,115 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
     }
 
     override fun initView() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            binding.btnBack.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset + (14 * resources.displayMetrics.density).toInt()
-            }
-            insets
+        updateProgressUi(currentProgress)
+
+        if (!isGenerating && !isProcessFinished) {
+            startProgressSimulation()
+            startSdkGeneration()
         }
-
-        binding.progressCircle.setProgress(0f)
-        binding.tvProgressPercent.text = "0%"
-
-        startProgressSimulation()
-        startSdkGeneration()
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
-            progressAnimator?.cancel()
-            finalAnimator?.cancel()
+        binding.header.setOnBackClickListener {
+            cancelProcess()
             if (isAdded) {
                 findNavController().safePopBackStack()
             }
         }
     }
 
-    private fun startProgressSimulation() {
-        progressAnimator?.cancel()
-        progressAnimator = ValueAnimator.ofFloat(0f, 92f).apply {
-            duration = 4500
-            interpolator = DecelerateInterpolator()
-            addUpdateListener { animator ->
-                if (isAdded && bindingOrNull != null) {
-                    val value = animator.animatedValue as Float
-                    bindingOrNull?.progressCircle?.setProgress(value)
-                    bindingOrNull?.tvProgressPercent?.text = "${value.toInt()}%"
+    override fun onResume() {
+        super.onResume()
+
+        // 1. Nếu kết quả đã xử lý xong khi app đang ở background, lập tức chuyển màn hình an toàn
+        pendingNavigateBundle?.let { bundle ->
+            pendingNavigateBundle = null
+            navigateToResult(bundle)
+            return
+        }
+
+        // 2. Nếu có lỗi xảy ra khi app đang ở background, hiển thị dialog lỗi an toàn
+        pendingErrorAction?.let { errorAction ->
+            pendingErrorAction = null
+            errorAction.invoke()
+            return
+        }
+
+        // 3. Nếu đang trong tiến trình xử lý, đảm bảo UI tiếp tục chạy và không bao giờ bị đứng
+        if (!isProcessFinished) {
+            updateProgressUi(currentProgress)
+            if (progressAnimator?.isRunning != true && crawlJob?.isActive != true) {
+                if (currentProgress < 80f) {
+                    startProgressSimulation()
+                } else {
+                    startSlowProgressCrawl()
                 }
             }
+        }
+    }
+
+    private fun startProgressSimulation() {
+        progressAnimator?.cancel()
+        crawlJob?.cancel()
+
+        val startP = currentProgress
+        val targetP1 = 80f
+        progressAnimator = ValueAnimator.ofFloat(startP, targetP1).apply {
+            duration = 3200
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { animator ->
+                val value = animator.animatedValue as Float
+                updateProgressUi(value)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (!isProcessFinished) {
+                        startSlowProgressCrawl()
+                    }
+                }
+            })
             start()
         }
     }
 
+    private fun startSlowProgressCrawl() {
+        crawlJob?.cancel()
+        crawlJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (!isProcessFinished && currentProgress < 96f) {
+                delay(650)
+                if (isProcessFinished) break
+                val nextP = (currentProgress + 1f).coerceAtMost(96f)
+                updateProgressUi(nextP)
+            }
+        }
+    }
+
+    private fun updateProgressUi(value: Float) {
+        currentProgress = value
+        if (isAdded && bindingOrNull != null) {
+            bindingOrNull?.progressCircle?.setProgress(value)
+            bindingOrNull?.tvProgressPercent?.text = "${value.toInt()}%"
+        }
+    }
+
     private fun startSdkGeneration() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        if (isGenerating) return
+        isGenerating = true
+
+        sdkJob?.cancel()
+        sdkJob = lifecycleScope.launch {
             val result = promptRepository.generateImageWithPrompt(fullPrompt)
-            if (!isAdded || view == null) return@launch
 
             if (result.isFailure) {
-                progressAnimator?.cancel()
-                finalAnimator?.cancel()
-                val act = activity ?: return@launch
-                com.example.phortart_video_990.core.dialog.AppDialogHelper.showAiErrorDialog(
-                    activity = act,
-                    onRetry = {
-                        if (isAdded) {
-                            startProgressSimulation()
-                            startSdkGeneration()
-                        }
-                    },
-                    onCancel = {
-                        if (isAdded) {
-                            findNavController().safePopBackStack()
-                        }
-                    }
-                )
+                handleError(result.exceptionOrNull())
                 return@launch
             }
+
             val outputUrl = result.getOrNull()?.outputUrl.orEmpty()
 
-            // Preload the AI generated image into Coil cache so it renders immediately upon opening result screen
+            // Preload Coil cache và lưu lịch sử
             if (outputUrl.isNotBlank()) {
-                val ctx = context
+                val ctx = context?.applicationContext
                 if (ctx != null) {
                     try {
                         val imageLoader = coil.Coil.imageLoader(ctx)
@@ -126,7 +173,6 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
                         e.printStackTrace()
                     }
 
-                    // Tự động lưu vào lịch sử ngay khi gen ra thành công
                     try {
                         val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
                         val currentDate = dateFormat.format(Date())
@@ -144,41 +190,112 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
                 }
             }
 
-            if (!isAdded || bindingOrNull == null) return@launch
+            finishProgressAndNavigate(outputUrl)
+        }
+    }
 
-            // Animate to 100%
-            progressAnimator?.cancel()
-            val currentProgress = bindingOrNull?.progressCircle?.getProgress() ?: 90f
-            finalAnimator = ValueAnimator.ofFloat(currentProgress, 100f).apply {
-                duration = 350
-                addUpdateListener { anim ->
-                    if (isAdded && bindingOrNull != null) {
-                        val v = anim.animatedValue as Float
-                        bindingOrNull?.progressCircle?.setProgress(v)
-                        bindingOrNull?.tvProgressPercent?.text = "${v.toInt()}%"
-                    }
+    private fun finishProgressAndNavigate(outputUrl: String) {
+        if (isProcessFinished) return
+        isProcessFinished = true
+
+        progressAnimator?.cancel()
+        crawlJob?.cancel()
+
+        val startVal = currentProgress
+        finalAnimator = ValueAnimator.ofFloat(startVal, 100f).apply {
+            duration = 350
+            addUpdateListener { anim ->
+                val v = anim.animatedValue as Float
+                updateProgressUi(v)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    updateProgressUi(100f)
+                }
+            })
+            start()
+        }
+
+        val bundle = bundleOf(
+            EnhanceResultFragment.KEY_USER_PROMPT to userPrompt,
+            EnhanceResultFragment.KEY_IMAGE_URL to outputUrl
+        )
+
+        lifecycleScope.launch {
+            delay(400)
+            if (isResumed && isAdded) {
+                navigateToResult(bundle)
+            } else {
+                pendingNavigateBundle = bundle
+            }
+        }
+    }
+
+    private fun navigateToResult(bundle: Bundle) {
+        if (!isAdded) return
+        findNavController().navigateSafe(
+            R.id.action_enhanceLoadingFragment_to_enhanceResultFragment,
+            bundle
+        )
+    }
+
+    private fun handleError(throwable: Throwable?) {
+        progressAnimator?.cancel()
+        crawlJob?.cancel()
+        finalAnimator?.cancel()
+        isGenerating = false
+
+        val errorAction = {
+            if (isAdded) {
+                val act = activity
+                if (act != null && !act.isFinishing && !act.isDestroyed) {
+                    AppDialogHelper.showAiErrorDialog(
+                        activity = act,
+                        onRetry = {
+                            if (isAdded) {
+                                isProcessFinished = false
+                                currentProgress = 0f
+                                updateProgressUi(0f)
+                                startProgressSimulation()
+                                startSdkGeneration()
+                            }
+                        },
+                        onCancel = {
+                            if (isAdded) {
+                                findNavController().safePopBackStack()
+                            }
+                        }
+                    )
                 }
             }
-            finalAnimator?.start()
-
-            delay(400)
-
-            if (!isAdded) return@launch
-
-            findNavController().navigateSafe(
-                R.id.action_enhanceLoadingFragment_to_enhanceResultFragment,
-                bundleOf(
-                    EnhanceResultFragment.KEY_USER_PROMPT to userPrompt,
-                    EnhanceResultFragment.KEY_IMAGE_URL to outputUrl
-                )
-            )
         }
+
+        if (isResumed && isAdded) {
+            errorAction.invoke()
+        } else {
+            pendingErrorAction = errorAction
+        }
+    }
+
+    private fun cancelProcess() {
+        isGenerating = false
+        isProcessFinished = true
+        sdkJob?.cancel()
+        progressAnimator?.cancel()
+        finalAnimator?.cancel()
+        crawlJob?.cancel()
     }
 
     override fun onDestroyView() {
         progressAnimator?.cancel()
         finalAnimator?.cancel()
+        crawlJob?.cancel()
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        sdkJob?.cancel()
+        super.onDestroy()
     }
 
     companion object {

@@ -6,36 +6,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_restore_screen">
 
-    <!-- Top Bar: Back Button & Header Title -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_circle_back"
-        android:clickable="true"
-        android:contentDescription="@string/btn_back"
-        android:elevation="1dp"
-        android:focusable="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_arrow_back"
-        app:tint="#2D7DF6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvHeaderTitle"
-        android:layout_width="wrap_content"
+    <!-- Top Bar: Common Header with Back Button and Title -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:text="@string/restore_result_title"
-        android:textColor="#17327C"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
-        app:layout_constraintStart_toEndOf="@+id/btnBack"
-        app:layout_constraintTop_toTopOf="@+id/btnBack" />
+        app:headerTitle="@string/restore_result_title"
+        app:showBackButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Interactive Before / After Comparison Card -->
     <com.google.android.material.card.MaterialCardView
@@ -48,11 +26,14 @@
         app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
+        app:cardBackgroundColor="@android:color/transparent"
         app:strokeWidth="0dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/layoutBottomDetails"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack">
+        app:layout_constraintTop_toBottomOf="@+id/header">
 
         <com.example.phortart_video_990.ui.screen.feature.restore.widget.BeforeAfterSliderView
             android:id="@+id/sliderView"

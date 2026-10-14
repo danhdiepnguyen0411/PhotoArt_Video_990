@@ -44,12 +44,8 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
 
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
 
-            binding.btnBack.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInset + (14 * resources.displayMetrics.density).toInt()
-            }
             binding.btnStartRestore.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = navBarInset + (24 * resources.displayMetrics.density).toInt()
             }
@@ -66,11 +62,6 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
             override fun getOutline(view: View, outline: Outline) {
                 outline.setOval(0, 0, view.width, view.height)
             }
-        }
-
-        binding.btnBack.apply {
-            outlineProvider = circularOutlineProvider
-            clipToOutline = true
         }
 
         binding.badgeCompare.apply {
@@ -137,7 +128,7 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
     }
 
     override fun initListener() {
-        binding.btnBack.setOnClickListener {
+        binding.header.setOnBackClickListener {
             if (isAdded) findNavController().safePopBackStack()
         }
 

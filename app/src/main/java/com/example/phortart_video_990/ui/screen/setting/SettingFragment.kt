@@ -15,15 +15,6 @@ import com.example.phortart_video_990.databinding.FragmentSettingBinding
 class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBinding::inflate) {
 
     override fun initView() {
-        // Apply window insets for status bar
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            binding.llSettingContent.updatePadding(
-                top = statusBarInset + (16 * resources.displayMetrics.density).toInt()
-            )
-            insets
-        }
-
         val prefs = PreferencesManager.getInstance(requireContext())
         binding.tvCurrentLanguage.text = prefs.languageName
         binding.switchNotification.isChecked = prefs.isNotificationEnabled
@@ -51,6 +42,11 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
         }
         binding.switchNotification.onCheckedChangeListener = { isChecked ->
             prefs.isNotificationEnabled = isChecked
+        }
+
+        // Header PRO Button
+        binding.headerSetting.setOnProClickListener {
+            binding.btnIapUpgrade.performClick()
         }
 
         // IAP Upgrade Button
