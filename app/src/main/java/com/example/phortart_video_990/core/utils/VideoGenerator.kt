@@ -19,6 +19,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -39,8 +42,8 @@ object VideoGenerator {
     private const val VIDEO_WIDTH = 720
     private const val VIDEO_HEIGHT = 1280
 
-    // Thời gian của mỗi hiệu ứng chuyển cảnh (15 frames = 0.5s ở 30fps)
-    private const val TRANSITION_FRAMES = 15
+    // Thời gian của mỗi hiệu ứng chuyển cảnh (12 frames = 0.4s ở 30fps)
+    private const val TRANSITION_FRAMES = 12
 
     enum class TransitionType {
         CROSS_FADE,
@@ -58,19 +61,27 @@ object VideoGenerator {
     }
 
     /**
-     * Tính toán tổng thời lượng video sao cho mỗi ảnh hiển thị ít nhất 3.0 giây:
-     * - Tối thiểu (min): 3.0 giây / ảnh
-     * - Chia đều toàn bộ thời lượng video cho số ảnh, không thừa không thiếu
+     * Tính toán tổng thời lượng video tối ưu theo số ảnh:
+     * - 1 ảnh: 4.0s
+     * - 2-3 ảnh: 2.5s / ảnh (5.0s - 7.5s)
+     * - 4-6 ảnh: 2.2s / ảnh (8.8s - 13.2s)
+     * - 7+ ảnh: 2.0s / ảnh (14.0s - 20.0s)
+     * Giúp video ngắn gọn, sinh nhanh và mượt mà cho story/reels.
      */
     fun calculateVideoDuration(photoCount: Int): Float {
         if (photoCount <= 0) return 15f
-        val calculated = photoCount * 3.0f
-        return calculated.coerceIn(9f, 60f)
+        val calculated = when {
+            photoCount == 1 -> 4.0f
+            photoCount in 2..3 -> photoCount * 2.5f
+            photoCount in 4..6 -> photoCount * 2.2f
+            else -> photoCount * 2.0f
+        }
+        return calculated.coerceIn(4f, 30f)
     }
 
     fun calculateSecondsPerPhoto(durationSec: Float, photoCount: Int): Float {
-        if (photoCount <= 0) return 3.0f
-        return (durationSec / photoCount).coerceAtLeast(3.0f)
+        if (photoCount <= 0) return 2.0f
+        return (durationSec / photoCount).coerceAtLeast(1.5f)
     }
 
     /**
@@ -98,10 +109,10 @@ object VideoGenerator {
             onProgress(5, "Đang xử lý hình ảnh...")
         }
 
-        // 1. Tải và giải mã hình ảnh
+        // 1. Tải và tiền xử lý hình ảnh (Scale chuẩn kích thước khung hình video để vẽ siêu nhanh & tránh tràn RAM)
         val loadedBitmaps = mutableListOf<Bitmap>()
         for (uriStr in photoUris) {
-            val bmp = decodeSampledBitmap(context, Uri.parse(uriStr), videoWidth, videoHeight)
+            val bmp = decodeAndPrepareBitmap(context, Uri.parse(uriStr), videoWidth, videoHeight)
             if (bmp != null) {
                 loadedBitmaps.add(bmp)
             }
@@ -135,12 +146,18 @@ object VideoGenerator {
 
         val muxer = MediaMuxer(rawVideoFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         var muxerStarted = false
+        var videoTrackIndex = -1
         val bufferInfo = MediaCodec.BufferInfo()
+        var writtenFrameCount = 0L
 
         try {
             val paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
+            var lastReportedPercent = -1
 
             for (frameIndex in 0 until totalFrames) {
+                // Hỗ trợ hủy tiến trình ngay khi người dùng nhấn thoát / hủy
+                kotlinx.coroutines.currentCoroutineContext().ensureActive()
+
                 val photoIndex = ((frameIndex / framesPerPhoto).toInt()).coerceIn(0, loadedBitmaps.lastIndex)
                 val currentBitmap = loadedBitmaps[photoIndex]
 
@@ -150,22 +167,17 @@ object VideoGenerator {
                 val nextPhotoIndex = (photoIndex + 1).coerceAtMost(loadedBitmaps.lastIndex)
                 val isTransitioning = remainingFramesInPhoto <= TRANSITION_FRAMES && photoIndex < loadedBitmaps.lastIndex
 
-                val canvas: Canvas = try {
-                    inputSurface.lockHardwareCanvas()
-                } catch (e: Exception) {
-                    inputSurface.lockCanvas(null)
-                }
+                // Vẽ an toàn qua lockCanvas(null) - trực tiếp trên bộ đệm bộ nhớ, không phụ thuộc EGL context
+                val canvas: Canvas = inputSurface.lockCanvas(null)
                 try {
-                    canvas.drawColor(Color.BLACK)
-
                     if (isTransitioning) {
                         val nextBitmap = loadedBitmaps[nextPhotoIndex]
                         val progress = 1f - (remainingFramesInPhoto.toFloat() / TRANSITION_FRAMES)
                         val transition = transitionList.getOrElse(photoIndex) { TransitionType.CROSS_FADE }
 
-                        drawTransitionFrame(canvas, currentBitmap, nextBitmap, transition, progress, paint)
+                        drawTransitionFrame(canvas, currentBitmap, nextBitmap, transition, progress, paint, videoWidth.toFloat(), videoHeight.toFloat())
                     } else {
-                        drawBitmapCenterCrop(canvas, currentBitmap, paint)
+                        canvas.drawBitmap(currentBitmap, 0f, 0f, paint)
                     }
                 } finally {
                     try {
@@ -173,20 +185,45 @@ object VideoGenerator {
                     } catch (_: Exception) {}
                 }
 
-                drainEncoder(encoder, muxer, bufferInfo, false) {
-                    muxerStarted = true
-                }
+                drainEncoder(
+                    encoder = encoder,
+                    muxer = muxer,
+                    bufferInfo = bufferInfo,
+                    endOfStream = false,
+                    timeoutUs = 0L,
+                    onMuxerStart = { track ->
+                        muxerStarted = true
+                        videoTrackIndex = track
+                    },
+                    isMuxerStarted = { muxerStarted },
+                    getVideoTrackIndex = { videoTrackIndex },
+                    getFramePtsUs = { (writtenFrameCount++ * 1_000_000L) / FRAME_RATE }
+                )
 
                 val percent = 15 + ((frameIndex.toFloat() / totalFrames) * 60).toInt()
-                withContext(Dispatchers.Main) {
-                    onProgress(percent, "Đang mã hóa khung hình video ($percent%)...")
+                if (percent != lastReportedPercent) {
+                    lastReportedPercent = percent
+                    withContext(Dispatchers.Main) {
+                        onProgress(percent, "Đang mã hóa khung hình video ($percent%)...")
+                    }
                 }
             }
 
             encoder.signalEndOfInputStream()
-            drainEncoder(encoder, muxer, bufferInfo, true) {
-                muxerStarted = true
-            }
+            drainEncoder(
+                encoder = encoder,
+                muxer = muxer,
+                bufferInfo = bufferInfo,
+                endOfStream = true,
+                timeoutUs = 10000L,
+                onMuxerStart = { track ->
+                    muxerStarted = true
+                    videoTrackIndex = track
+                },
+                isMuxerStarted = { muxerStarted },
+                getVideoTrackIndex = { videoTrackIndex },
+                getFramePtsUs = { (writtenFrameCount++ * 1_000_000L) / FRAME_RATE }
+            )
         } finally {
             try { encoder.stop() } catch (_: Exception) {}
             try { encoder.release() } catch (_: Exception) {}
@@ -199,7 +236,14 @@ object VideoGenerator {
             loadedBitmaps.forEach {
                 if (!it.isRecycled) it.recycle()
             }
+
+            // Nếu coroutine bị hủy bởi người dùng, dọn dẹp file tạm ngay
+            if (!kotlinx.coroutines.currentCoroutineContext().isActive) {
+                try { rawVideoFile.delete() } catch (_: Exception) {}
+            }
         }
+
+        kotlinx.coroutines.currentCoroutineContext().ensureActive()
 
         // 3. Nếu không có nhạc thì trả về video thô
         if (audioUrl.isNullOrBlank()) {
@@ -237,33 +281,45 @@ object VideoGenerator {
                 }
             }
 
+            kotlinx.coroutines.currentCoroutineContext().ensureActive()
+
             withContext(Dispatchers.Main) {
                 onProgress(90, "Đang trộn âm thanh vào video...")
             }
 
-            val muxSuccess = muxVideoAndAudio(
-                videoInput = rawVideoFile,
-                audioInput = audioSourceFile,
-                output = finalWithAudioFile,
-                maxDurationUs = (durationSec * 1_000_000L).toLong()
-            )
+            val muxSuccess = try {
+                muxVideoAndAudio(
+                    videoInput = rawVideoFile,
+                    audioInput = audioSourceFile,
+                    output = finalWithAudioFile,
+                    maxDurationUs = (durationSec * 1_000_000L).toLong()
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
 
-            // Dọn sạch file video raw và file temp (nếu có tạo mới ngoài cache)
-            rawVideoFile.delete()
             tempDownloadedAudioFile?.delete()
 
             withContext(Dispatchers.Main) {
                 onProgress(100, "Hoàn tất video!")
             }
 
+            // Chỉ xóa file thô khi file ghép nhạc đã được tạo thành công
             if (muxSuccess && finalWithAudioFile.exists() && finalWithAudioFile.length() > 0) {
+                try { rawVideoFile.delete() } catch (_: Exception) {}
                 finalWithAudioFile
             } else {
+                // Fallback an toàn: vẫn có video để xem và phát nhạc ngoài
                 rawVideoFile
             }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            try { tempDownloadedAudioFile?.delete() } catch (_: Exception) {}
+            try { finalWithAudioFile.delete() } catch (_: Exception) {}
+            try { rawVideoFile.delete() } catch (_: Exception) {}
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
-            // Fallback an toàn nếu ghép nhạc gặp lỗi
             try { tempDownloadedAudioFile?.delete() } catch (_: Exception) {}
             withContext(Dispatchers.Main) {
                 onProgress(100, "Hoàn tất video!")
@@ -382,68 +438,61 @@ object VideoGenerator {
         next: Bitmap,
         transition: TransitionType,
         progress: Float, // 0.0 -> 1.0
-        paint: Paint
+        paint: Paint,
+        w: Float,
+        h: Float
     ) {
         val p = progress.coerceIn(0f, 1f)
-        val w = canvas.width.toFloat()
-        val h = canvas.height.toFloat()
 
         when (transition) {
             TransitionType.CROSS_FADE -> {
                 // Ảnh cũ mờ dần
                 paint.alpha = ((1f - p) * 255).toInt()
-                drawBitmapCenterCrop(canvas, current, paint)
+                canvas.drawBitmap(current, 0f, 0f, paint)
                 // Ảnh mới hiện dần
                 paint.alpha = (p * 255).toInt()
-                drawBitmapCenterCrop(canvas, next, paint)
+                canvas.drawBitmap(next, 0f, 0f, paint)
                 paint.alpha = 255
             }
             TransitionType.SLIDE_LEFT -> {
                 // Trượt sang trái
-                canvas.save()
-                canvas.translate(-p * w, 0f)
-                drawBitmapCenterCrop(canvas, current, paint)
-                canvas.restore()
-
-                canvas.save()
-                canvas.translate((1f - p) * w, 0f)
-                drawBitmapCenterCrop(canvas, next, paint)
-                canvas.restore()
+                canvas.drawBitmap(current, -p * w, 0f, paint)
+                canvas.drawBitmap(next, (1f - p) * w, 0f, paint)
             }
             TransitionType.ZOOM_IN -> {
                 // Ảnh cũ zoom nhẹ và fade out
                 canvas.save()
-                val scale = 1f + (p * 0.25f)
+                val scale = 1f + (p * 0.2f)
                 canvas.scale(scale, scale, w / 2f, h / 2f)
                 paint.alpha = ((1f - p) * 255).toInt()
-                drawBitmapCenterCrop(canvas, current, paint)
+                canvas.drawBitmap(current, 0f, 0f, paint)
                 canvas.restore()
 
                 // Ảnh mới fade in
                 paint.alpha = (p * 255).toInt()
-                drawBitmapCenterCrop(canvas, next, paint)
+                canvas.drawBitmap(next, 0f, 0f, paint)
                 paint.alpha = 255
             }
             TransitionType.WIPE_DOWN -> {
                 // Vẽ ảnh cũ dưới
-                drawBitmapCenterCrop(canvas, current, paint)
+                canvas.drawBitmap(current, 0f, 0f, paint)
 
                 // Clip và vẽ ảnh mới từ trên quét xuống
                 canvas.save()
                 canvas.clipRect(0f, 0f, w, p * h)
-                drawBitmapCenterCrop(canvas, next, paint)
+                canvas.drawBitmap(next, 0f, 0f, paint)
                 canvas.restore()
             }
             TransitionType.FLASH_PULSE -> {
                 // Nửa đầu chớp sáng trắng, nửa sau hiện ảnh mới
                 if (p < 0.5f) {
-                    drawBitmapCenterCrop(canvas, current, paint)
-                    paint.alpha = ((p * 2f) * 200).toInt()
+                    canvas.drawBitmap(current, 0f, 0f, paint)
+                    paint.alpha = ((p * 2f) * 220).toInt()
                     canvas.drawColor(Color.WHITE)
                     paint.alpha = 255
                 } else {
-                    drawBitmapCenterCrop(canvas, next, paint)
-                    paint.alpha = (((1f - p) * 2f) * 200).toInt()
+                    canvas.drawBitmap(next, 0f, 0f, paint)
+                    paint.alpha = (((1f - p) * 2f) * 220).toInt()
                     canvas.drawColor(Color.WHITE)
                     paint.alpha = 255
                 }
@@ -507,22 +556,27 @@ object VideoGenerator {
             val audioMime = audioSourceFormat?.getString(MediaFormat.KEY_MIME) ?: ""
             val isAac = audioMime.equals("audio/mp4a-latm", ignoreCase = true) || audioMime.equals("audio/aac", ignoreCase = true)
 
-            muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            val videoTrackDestIndex = muxer.addTrack(videoFormat)
+            if (isAac && audioSourceFormat != null && audioTrackSourceIndex >= 0) {
+                // Định dạng AAC đã tương thích MediaMuxer: copy xen kẽ (interleaved) để không làm tràn bộ đệm
+                val createdMuxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+                muxer = createdMuxer
+                val videoTrackDestIndex = createdMuxer.addTrack(videoFormat)
+                val audioTrackDestIndex = createdMuxer.addTrack(audioSourceFormat)
+                createdMuxer.start()
 
-            // Nếu file audio đầu vào đã là AAC, MediaMuxer hỗ trợ addTrack trực tiếp
-            if (isAac && audioSourceFormat != null) {
-                val audioTrackDestIndex = muxer.addTrack(audioSourceFormat)
-                muxer.start()
-
-                // Sao chép video samples
-                copyVideoSamples(videoExtractor, videoTrackSourceIndex, muxer, videoTrackDestIndex)
-
-                // Sao chép audio samples
-                copyDirectAudioSamples(audioExtractor, audioTrackSourceIndex, muxer, audioTrackDestIndex, maxDurationUs)
+                copyInterleavedSamples(
+                    videoExtractor = videoExtractor,
+                    videoTrackSourceIndex = videoTrackSourceIndex,
+                    audioExtractor = audioExtractor,
+                    audioTrackSourceIndex = audioTrackSourceIndex,
+                    muxer = createdMuxer,
+                    videoTrackDestIndex = videoTrackDestIndex,
+                    audioTrackDestIndex = audioTrackDestIndex,
+                    maxDurationUs = maxDurationUs
+                )
                 true
             } else if (audioTrackSourceIndex >= 0 && audioSourceFormat != null) {
-                // Nhạc đầu vào là MP3 hoặc định dạng khác -> Cần decode ra PCM và encode thành AAC
+                // Nhạc là MP3 / định dạng khác: giải mã sang PCM và mã hóa sang AAC
                 val sampleRate = if (audioSourceFormat.containsKey(MediaFormat.KEY_SAMPLE_RATE)) {
                     audioSourceFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
                 } else 44100
@@ -546,45 +600,167 @@ object VideoGenerator {
                 dec.configure(audioSourceFormat, null, null, 0)
                 dec.start()
 
-                // Thu thập format đầu ra thực tế của AAC Encoder để addTrack vào Muxer
-                var audioTrackDestIndex = -1
-                val encBufferInfo = MediaCodec.BufferInfo()
-                var formatFound = false
+                audioExtractor.selectTrack(audioTrackSourceIndex)
+                videoExtractor.selectTrack(videoTrackSourceIndex)
 
-                // Chờ encoder nhả output format
-                for (attempt in 0 until 50) {
-                    val status = enc.dequeueOutputBuffer(encBufferInfo, 10000L)
-                    if (status == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                        audioTrackDestIndex = muxer.addTrack(enc.outputFormat)
-                        formatFound = true
-                        break
+                var videoTrackDestIndex = -1
+                var audioTrackDestIndex = -1
+                var muxerStarted = false
+
+                val decBufferInfo = MediaCodec.BufferInfo()
+                val encBufferInfo = MediaCodec.BufferInfo()
+                val videoBuffer = ByteBuffer.allocateDirect(1024 * 1024)
+                val videoBufferInfo = MediaCodec.BufferInfo()
+
+                var isExtractorEOS = false
+                var isDecoderEOS = false
+                var isEncoderEOS = false
+                var isVideoEOS = false
+                val timeoutUs = 5000L
+
+                var audioTimeOffsetUs = 0L
+                var lastSampleTimeInLoop = 0L
+                var loopCount = 0
+                val maxLoops = 50
+
+                while (!isEncoderEOS && loopCount < maxLoops) {
+                    // 1. Audio Extractor -> Decoder
+                    if (!isExtractorEOS) {
+                        val inIndex = dec.dequeueInputBuffer(timeoutUs)
+                        if (inIndex >= 0) {
+                            val inBuffer = dec.getInputBuffer(inIndex)
+                            if (inBuffer != null) {
+                                val sampleSize = audioExtractor.readSampleData(inBuffer, 0)
+                                if (sampleSize < 0) {
+                                    if (audioTimeOffsetUs + lastSampleTimeInLoop < maxDurationUs) {
+                                        audioTimeOffsetUs += (lastSampleTimeInLoop + 23219L)
+                                        audioExtractor.seekTo(0L, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+                                        loopCount++
+                                    } else {
+                                        isExtractorEOS = true
+                                        dec.queueInputBuffer(inIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                                    }
+                                } else {
+                                    val sampleTime = audioExtractor.sampleTime
+                                    if (sampleTime >= 0) lastSampleTimeInLoop = sampleTime
+                                    val pts = audioTimeOffsetUs + sampleTime
+                                    if (pts > maxDurationUs) {
+                                        isExtractorEOS = true
+                                        dec.queueInputBuffer(inIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                                    } else {
+                                        dec.queueInputBuffer(inIndex, 0, sampleSize, pts, 0)
+                                        audioExtractor.advance()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Decoder -> Encoder
+                    var decOutIndex = dec.dequeueOutputBuffer(decBufferInfo, timeoutUs)
+                    while (decOutIndex >= 0) {
+                        val pcmBuffer = dec.getOutputBuffer(decOutIndex)
+                        if (pcmBuffer != null && decBufferInfo.size > 0) {
+                            val encInIndex = enc.dequeueInputBuffer(timeoutUs)
+                            if (encInIndex >= 0) {
+                                val encInputBuffer = enc.getInputBuffer(encInIndex)
+                                if (encInputBuffer != null) {
+                                    encInputBuffer.clear()
+                                    val toCopy = minOf(decBufferInfo.size, encInputBuffer.remaining())
+                                    pcmBuffer.position(decBufferInfo.offset)
+                                    pcmBuffer.limit(decBufferInfo.offset + toCopy)
+                                    encInputBuffer.put(pcmBuffer)
+                                    enc.queueInputBuffer(encInIndex, 0, toCopy, decBufferInfo.presentationTimeUs, 0)
+                                }
+                            }
+                        }
+
+                        if ((decBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            isDecoderEOS = true
+                            val encInIndex = enc.dequeueInputBuffer(timeoutUs)
+                            if (encInIndex >= 0) {
+                                enc.queueInputBuffer(encInIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            }
+                        }
+
+                        dec.releaseOutputBuffer(decOutIndex, false)
+                        if (isDecoderEOS) break
+                        decOutIndex = dec.dequeueOutputBuffer(decBufferInfo, 0L)
+                    }
+
+                    // 3. Encoder -> Muxer
+                    var encOutIndex = enc.dequeueOutputBuffer(encBufferInfo, timeoutUs)
+                    while (encOutIndex != MediaCodec.INFO_TRY_AGAIN_LATER) {
+                        if (encOutIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                            if (!muxerStarted) {
+                                val createdMuxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+                                muxer = createdMuxer
+                                videoTrackDestIndex = createdMuxer.addTrack(videoFormat)
+                                audioTrackDestIndex = createdMuxer.addTrack(enc.outputFormat)
+                                createdMuxer.start()
+                                muxerStarted = true
+                            }
+                        } else if (encOutIndex >= 0) {
+                            val aacBuffer = enc.getOutputBuffer(encOutIndex)
+                            if (aacBuffer != null && muxerStarted && audioTrackDestIndex >= 0) {
+                                if ((encBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                                    encBufferInfo.size = 0
+                                }
+                                if (encBufferInfo.size != 0) {
+                                    aacBuffer.position(encBufferInfo.offset)
+                                    aacBuffer.limit(encBufferInfo.offset + encBufferInfo.size)
+
+                                    // Interleave: Đồng bộ ghi các mẫu video trước hoặc cùng mốc thời gian với âm thanh
+                                    while (!isVideoEOS && videoExtractor.sampleTime <= encBufferInfo.presentationTimeUs) {
+                                        videoBufferInfo.size = videoExtractor.readSampleData(videoBuffer, 0)
+                                        if (videoBufferInfo.size < 0) {
+                                            isVideoEOS = true
+                                            break
+                                        }
+                                        videoBufferInfo.presentationTimeUs = videoExtractor.sampleTime
+                                        videoBufferInfo.flags = videoExtractor.sampleFlags
+                                        muxer?.writeSampleData(videoTrackDestIndex, videoBuffer, videoBufferInfo)
+                                        videoExtractor.advance()
+                                    }
+
+                                    muxer?.writeSampleData(audioTrackDestIndex, aacBuffer, encBufferInfo)
+                                }
+                            }
+
+                            if ((encBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                                isEncoderEOS = true
+                            }
+
+                            enc.releaseOutputBuffer(encOutIndex, false)
+                            if (isEncoderEOS) break
+                        }
+
+                        encOutIndex = enc.dequeueOutputBuffer(encBufferInfo, 0L)
                     }
                 }
 
-                if (!formatFound) {
-                    // Fallback thử cấu hình sẵn
-                    audioTrackDestIndex = muxer.addTrack(enc.outputFormat)
+                // Ghi nốt các mẫu video còn lại (nếu có)
+                if (muxerStarted && videoTrackDestIndex >= 0) {
+                    while (!isVideoEOS) {
+                        videoBufferInfo.size = videoExtractor.readSampleData(videoBuffer, 0)
+                        if (videoBufferInfo.size < 0) {
+                            isVideoEOS = true
+                            break
+                        }
+                        videoBufferInfo.presentationTimeUs = videoExtractor.sampleTime
+                        videoBufferInfo.flags = videoExtractor.sampleFlags
+                        muxer?.writeSampleData(videoTrackDestIndex, videoBuffer, videoBufferInfo)
+                        videoExtractor.advance()
+                    }
                 }
 
-                muxer.start()
-
-                // 1. Sao chép video samples
-                copyVideoSamples(videoExtractor, videoTrackSourceIndex, muxer, videoTrackDestIndex)
-
-                // 2. Transcode MP3 sang AAC rồi ghi vào audioTrackDestIndex
-                audioExtractor.selectTrack(audioTrackSourceIndex)
-                transcodeAudioToMuxer(
-                    extractor = audioExtractor,
-                    decoder = dec,
-                    encoder = enc,
-                    muxer = muxer,
-                    audioTrackDestIndex = audioTrackDestIndex,
-                    maxDurationUs = maxDurationUs
-                )
-                true
+                muxerStarted && output.exists() && output.length() > 0
             } else {
-                muxer.start()
-                copyVideoSamples(videoExtractor, videoTrackSourceIndex, muxer, videoTrackDestIndex)
+                val createdMuxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+                muxer = createdMuxer
+                val videoTrackDestIndex = createdMuxer.addTrack(videoFormat)
+                createdMuxer.start()
+                copyVideoSamples(videoExtractor, videoTrackSourceIndex, createdMuxer, videoTrackDestIndex)
                 true
             }
         } catch (e: Exception) {
@@ -599,6 +775,73 @@ object VideoGenerator {
                 muxer?.stop()
                 muxer?.release()
             } catch (_: Exception) {}
+        }
+    }
+
+    private fun copyInterleavedSamples(
+        videoExtractor: MediaExtractor,
+        videoTrackSourceIndex: Int,
+        audioExtractor: MediaExtractor,
+        audioTrackSourceIndex: Int,
+        muxer: MediaMuxer,
+        videoTrackDestIndex: Int,
+        audioTrackDestIndex: Int,
+        maxDurationUs: Long
+    ) {
+        videoExtractor.selectTrack(videoTrackSourceIndex)
+        audioExtractor.selectTrack(audioTrackSourceIndex)
+
+        val videoBuffer = ByteBuffer.allocateDirect(1024 * 1024)
+        val audioBuffer = ByteBuffer.allocateDirect(256 * 1024)
+        val videoBufferInfo = MediaCodec.BufferInfo()
+        val audioBufferInfo = MediaCodec.BufferInfo()
+
+        var videoDone = false
+        var audioDone = false
+        var audioTimeOffsetUs = 0L
+        var lastAudioSampleTime = 0L
+        var audioLoopCount = 0
+        val maxAudioLoops = 50
+
+        while (!videoDone || !audioDone) {
+            val vPts = if (videoDone) Long.MAX_VALUE else videoExtractor.sampleTime
+            val rawAudioTime = if (audioDone) -1L else audioExtractor.sampleTime
+            val aPts = if (audioDone || rawAudioTime < 0) Long.MAX_VALUE else (audioTimeOffsetUs + rawAudioTime)
+
+            if (!videoDone && (vPts <= aPts || audioDone)) {
+                videoBufferInfo.size = videoExtractor.readSampleData(videoBuffer, 0)
+                if (videoBufferInfo.size < 0) {
+                    videoDone = true
+                } else {
+                    videoBufferInfo.presentationTimeUs = videoExtractor.sampleTime
+                    videoBufferInfo.flags = videoExtractor.sampleFlags
+                    muxer.writeSampleData(videoTrackDestIndex, videoBuffer, videoBufferInfo)
+                    videoExtractor.advance()
+                }
+            } else if (!audioDone) {
+                audioBufferInfo.size = audioExtractor.readSampleData(audioBuffer, 0)
+                if (audioBufferInfo.size < 0) {
+                    if (audioTimeOffsetUs + lastAudioSampleTime < maxDurationUs && audioLoopCount < maxAudioLoops) {
+                        audioTimeOffsetUs += (lastAudioSampleTime + 23219L)
+                        audioExtractor.seekTo(0L, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+                        audioLoopCount++
+                    } else {
+                        audioDone = true
+                    }
+                } else {
+                    val sTime = audioExtractor.sampleTime
+                    if (sTime >= 0) lastAudioSampleTime = sTime
+                    val pts = audioTimeOffsetUs + sTime
+                    if (pts > maxDurationUs) {
+                        audioDone = true
+                    } else {
+                        audioBufferInfo.presentationTimeUs = pts
+                        audioBufferInfo.flags = audioExtractor.sampleFlags
+                        muxer.writeSampleData(audioTrackDestIndex, audioBuffer, audioBufferInfo)
+                        audioExtractor.advance()
+                    }
+                }
+            }
         }
     }
 
@@ -622,188 +865,45 @@ object VideoGenerator {
         }
     }
 
-    private fun copyDirectAudioSamples(
-        audioExtractor: MediaExtractor,
-        audioTrackSourceIndex: Int,
-        muxer: MediaMuxer,
-        audioTrackDestIndex: Int,
-        maxDurationUs: Long
-    ) {
-        audioExtractor.selectTrack(audioTrackSourceIndex)
-        val buffer = ByteBuffer.allocateDirect(256 * 1024)
-        val bufferInfo = MediaCodec.BufferInfo()
-        var audioTimeOffsetUs = 0L
-        var lastSampleTimeInLoop = 0L
-        val maxLoopCount = 100
-        var loopIndex = 0
-
-        while (audioTimeOffsetUs + lastSampleTimeInLoop < maxDurationUs && loopIndex < maxLoopCount) {
-            var readAnySampleInLoop = false
-            while (true) {
-                bufferInfo.size = audioExtractor.readSampleData(buffer, 0)
-                if (bufferInfo.size < 0) break
-                readAnySampleInLoop = true
-                val sampleTime = audioExtractor.sampleTime
-                if (sampleTime >= 0) {
-                    lastSampleTimeInLoop = sampleTime
-                }
-                val presentationTimeUs = audioTimeOffsetUs + sampleTime
-                if (presentationTimeUs > maxDurationUs) break
-
-                bufferInfo.presentationTimeUs = presentationTimeUs
-                bufferInfo.flags = audioExtractor.sampleFlags
-                muxer.writeSampleData(audioTrackDestIndex, buffer, bufferInfo)
-                audioExtractor.advance()
-            }
-
-            if (audioTimeOffsetUs + lastSampleTimeInLoop >= maxDurationUs || !readAnySampleInLoop) break
-
-            audioTimeOffsetUs += (lastSampleTimeInLoop + 23219L)
-            audioExtractor.seekTo(0L, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
-            loopIndex++
-        }
-    }
-
-    private fun transcodeAudioToMuxer(
-        extractor: MediaExtractor,
-        decoder: MediaCodec,
-        encoder: MediaCodec,
-        muxer: MediaMuxer,
-        audioTrackDestIndex: Int,
-        maxDurationUs: Long
-    ) {
-        val decBufferInfo = MediaCodec.BufferInfo()
-        val encBufferInfo = MediaCodec.BufferInfo()
-        var isExtractorEOS = false
-        var isDecoderEOS = false
-        var isEncoderEOS = false
-        val timeoutUs = 5000L
-
-        var audioTimeOffsetUs = 0L
-        var lastSampleTimeInLoop = 0L
-        var loopCount = 0
-
-        while (!isEncoderEOS && loopCount < 50) {
-            // 1. Đưa compressed input data từ MediaExtractor vào Decoder
-            if (!isExtractorEOS) {
-                val inputIndex = decoder.dequeueInputBuffer(timeoutUs)
-                if (inputIndex >= 0) {
-                    val inputBuffer = decoder.getInputBuffer(inputIndex)
-                    if (inputBuffer != null) {
-                        val sampleSize = extractor.readSampleData(inputBuffer, 0)
-                        if (sampleSize < 0) {
-                            if (audioTimeOffsetUs + lastSampleTimeInLoop < maxDurationUs) {
-                                // Lặp lại bài hát nếu video chưa hết
-                                audioTimeOffsetUs += (lastSampleTimeInLoop + 23219L)
-                                extractor.seekTo(0L, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
-                                loopCount++
-                            } else {
-                                isExtractorEOS = true
-                                decoder.queueInputBuffer(inputIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                            }
-                        } else {
-                            val sampleTime = extractor.sampleTime
-                            if (sampleTime >= 0) lastSampleTimeInLoop = sampleTime
-                            val pts = audioTimeOffsetUs + sampleTime
-                            if (pts > maxDurationUs) {
-                                isExtractorEOS = true
-                                decoder.queueInputBuffer(inputIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                            } else {
-                                decoder.queueInputBuffer(inputIndex, 0, sampleSize, pts, 0)
-                                extractor.advance()
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 2. Lấy decoded PCM data từ Decoder và nạp sang Encoder
-            var decOutIndex = decoder.dequeueOutputBuffer(decBufferInfo, timeoutUs)
-            while (decOutIndex >= 0) {
-                val pcmBuffer = decoder.getOutputBuffer(decOutIndex)
-                if (pcmBuffer != null && decBufferInfo.size > 0) {
-                    // Đẩy PCM vào encoder
-                    val encInIndex = encoder.dequeueInputBuffer(timeoutUs)
-                    if (encInIndex >= 0) {
-                        val encInputBuffer = encoder.getInputBuffer(encInIndex)
-                        if (encInputBuffer != null) {
-                            encInputBuffer.clear()
-                            val toCopy = Math.min(decBufferInfo.size, encInputBuffer.remaining())
-                            pcmBuffer.position(decBufferInfo.offset)
-                            pcmBuffer.limit(decBufferInfo.offset + toCopy)
-                            encInputBuffer.put(pcmBuffer)
-                            encoder.queueInputBuffer(encInIndex, 0, toCopy, decBufferInfo.presentationTimeUs, 0)
-                        }
-                    }
-                }
-
-                if ((decBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    isDecoderEOS = true
-                    val encInIndex = encoder.dequeueInputBuffer(timeoutUs)
-                    if (encInIndex >= 0) {
-                        encoder.queueInputBuffer(encInIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                    }
-                }
-
-                decoder.releaseOutputBuffer(decOutIndex, false)
-                if (isDecoderEOS) break
-                decOutIndex = decoder.dequeueOutputBuffer(decBufferInfo, 0L)
-            }
-
-            // 3. Lấy encoded AAC data từ Encoder và ghi vào Muxer
-            var encOutIndex = encoder.dequeueOutputBuffer(encBufferInfo, timeoutUs)
-            while (encOutIndex >= 0) {
-                val aacBuffer = encoder.getOutputBuffer(encOutIndex)
-                if (aacBuffer != null) {
-                    if ((encBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                        encBufferInfo.size = 0
-                    }
-                    if (encBufferInfo.size != 0 && audioTrackDestIndex >= 0) {
-                        aacBuffer.position(encBufferInfo.offset)
-                        aacBuffer.limit(encBufferInfo.offset + encBufferInfo.size)
-                        muxer.writeSampleData(audioTrackDestIndex, aacBuffer, encBufferInfo)
-                    }
-                }
-
-                if ((encBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    isEncoderEOS = true
-                }
-
-                encoder.releaseOutputBuffer(encOutIndex, false)
-                if (isEncoderEOS) break
-                encOutIndex = encoder.dequeueOutputBuffer(encBufferInfo, 0L)
-            }
-        }
-    }
-
     private fun drainEncoder(
         encoder: MediaCodec,
         muxer: MediaMuxer,
         bufferInfo: MediaCodec.BufferInfo,
         endOfStream: Boolean,
-        onMuxerStart: () -> Unit
+        timeoutUs: Long = 0L,
+        onMuxerStart: (Int) -> Unit,
+        isMuxerStarted: () -> Boolean,
+        getVideoTrackIndex: () -> Int,
+        getFramePtsUs: () -> Long
     ) {
-        val timeoutUs = 10000L
+        var noOutputCount = 0
         while (true) {
             val outputBufferIndex = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
             if (outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 if (!endOfStream) break
+                noOutputCount++
+                if (noOutputCount >= 10) break
             } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                val newFormat = encoder.outputFormat
-                muxer.addTrack(newFormat)
-                muxer.start()
-                onMuxerStart()
+                if (!isMuxerStarted()) {
+                    val newFormat = encoder.outputFormat
+                    val trackIndex = muxer.addTrack(newFormat)
+                    muxer.start()
+                    onMuxerStart(trackIndex)
+                }
             } else if (outputBufferIndex >= 0) {
+                noOutputCount = 0
                 val encodedData = encoder.getOutputBuffer(outputBufferIndex) ?: continue
 
                 if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                     bufferInfo.size = 0
                 }
 
-                if (bufferInfo.size != 0) {
+                if (bufferInfo.size != 0 && isMuxerStarted()) {
                     encodedData.position(bufferInfo.offset)
                     encodedData.limit(bufferInfo.offset + bufferInfo.size)
-                    muxer.writeSampleData(0, encodedData, bufferInfo)
+                    bufferInfo.presentationTimeUs = getFramePtsUs()
+                    val track = getVideoTrackIndex().coerceAtLeast(0)
+                    muxer.writeSampleData(track, encodedData, bufferInfo)
                 }
 
                 encoder.releaseOutputBuffer(outputBufferIndex, false)
@@ -814,41 +914,75 @@ object VideoGenerator {
         }
     }
 
-    private fun drawBitmapCenterCrop(canvas: Canvas, bitmap: Bitmap, paint: Paint) {
-        val canvasWidth = canvas.width
-        val canvasHeight = canvas.height
-        val bmpWidth = bitmap.width
-        val bmpHeight = bitmap.height
-
-        val scale = maxOf(canvasWidth.toFloat() / bmpWidth, canvasHeight.toFloat() / bmpHeight)
-        val scaledWidth = bmpWidth * scale
-        val scaledHeight = bmpHeight * scale
-
-        val left = (canvasWidth - scaledWidth) / 2f
-        val top = (canvasHeight - scaledHeight) / 2f
-
-        val destRect = Rect(left.toInt(), top.toInt(), (left + scaledWidth).toInt(), (top + scaledHeight).toInt())
-        canvas.drawBitmap(bitmap, null, destRect, paint)
+    private fun openInputStreamForUri(context: Context, uri: Uri): InputStream? {
+        return try {
+            val scheme = uri.scheme
+            if (scheme == null || scheme == "file") {
+                val path = uri.path ?: uri.toString()
+                val file = File(path)
+                if (file.exists()) FileInputStream(file) else null
+            } else {
+                context.contentResolver.openInputStream(uri)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("VideoGenerator", "Cannot open stream for: $uri", e)
+            null
+        }
     }
 
-    private fun decodeSampledBitmap(context: Context, uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
+    private fun decodeAndPrepareBitmap(context: Context, uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
+            // Đọc bytes một lần duy nhất để tránh việc stream bị đóng hoặc không thể mở lại lần 2
+            val bytes = openInputStreamForUri(context, uri)?.use { it.readBytes() }
+            if (bytes == null || bytes.isEmpty()) {
+                android.util.Log.e("VideoGenerator", "Empty or unreadable bytes for: $uri")
+                return null
+            }
+
             val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            var stream: InputStream? = context.contentResolver.openInputStream(uri)
-            BitmapFactory.decodeStream(stream, null, options)
-            stream?.close()
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+
+            if (options.outWidth <= 0 || options.outHeight <= 0) {
+                android.util.Log.e("VideoGenerator", "Invalid bounds for: $uri (${options.outWidth}x${options.outHeight})")
+                return null
+            }
 
             options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
             options.inJustDecodeBounds = false
             options.inPreferredConfig = Bitmap.Config.ARGB_8888
 
-            stream = context.contentResolver.openInputStream(uri)
-            val bitmap = BitmapFactory.decodeStream(stream, null, options)
-            stream?.close()
-            bitmap
-        } catch (e: Exception) {
+            val rawBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+            if (rawBitmap == null) {
+                android.util.Log.e("VideoGenerator", "BitmapFactory decode failed for: $uri")
+                return null
+            }
+
+            val preparedBitmap = createCenterCropBitmap(rawBitmap, reqWidth, reqHeight)
+            if (preparedBitmap != rawBitmap && !rawBitmap.isRecycled) {
+                rawBitmap.recycle()
+            }
+            preparedBitmap
+        } catch (t: Throwable) {
+            android.util.Log.e("VideoGenerator", "Error preparing bitmap for: $uri", t)
             null
         }
+    }
+
+    private fun createCenterCropBitmap(src: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
+        if (src.width == targetWidth && src.height == targetHeight) return src
+        val output = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
+
+        val scale = maxOf(targetWidth.toFloat() / src.width, targetHeight.toFloat() / src.height)
+        val scaledWidth = src.width * scale
+        val scaledHeight = src.height * scale
+        val left = (targetWidth - scaledWidth) / 2f
+        val top = (targetHeight - scaledHeight) / 2f
+
+        val destRect = Rect(left.toInt(), top.toInt(), (left + scaledWidth).toInt(), (top + scaledHeight).toInt())
+        canvas.drawBitmap(src, null, destRect, paint)
+        return output
     }
 
     private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
@@ -859,11 +993,11 @@ object VideoGenerator {
         if (height > reqHeight || width > reqWidth) {
             val halfHeight = height / 2
             val halfWidth = width / 2
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+            while ((halfHeight / inSampleSize) >= reqHeight || (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2
             }
         }
-        return inSampleSize
+        return inSampleSize.coerceAtLeast(1)
     }
 
     /**

@@ -47,6 +47,23 @@
             android:textSize="13sp"
             tools:text="Vui lòng chờ trong giây lát" />
 
+        <TextView
+            android:id="@+id/btnCancelLoading"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_btn_dialog_cancel"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:text="@string/btn_cancel"
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -88,4 +88,17 @@ data class HistoryItemModel(
                 if (date.contains("•")) date.split("•")[0].trim() else date
             }
         }
+
+    val gridDisplayDate: String
+        get() {
+            if (date.isBlank()) {
+                return try {
+                    val fmt = java.text.SimpleDateFormat("d 'thg' M, yyyy", java.util.Locale("vi"))
+                    fmt.format(java.util.Date())
+                } catch (_: Exception) {
+                    "25 thg 8, 2024"
+                }
+            }
+            return if (date.contains("•")) date.split("•")[0].trim() else date.trim()
+        }
 }
