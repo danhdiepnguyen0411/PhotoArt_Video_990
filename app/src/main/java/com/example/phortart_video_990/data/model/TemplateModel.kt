@@ -16,7 +16,7 @@ data class TemplateModel(
     @SerializedName(value = "videoUrl", alternate = ["video_url"]) val videoUrl: String? = null,
     @SerializedName(value = "audioUrl", alternate = ["audio_url", "musicUrl", "music_url", "soundUrl", "sound_url"]) val audioUrl: String? = null,
     @SerializedName("videoThumbnailUrl") val videoThumbnailUrl: String? = null,
-    @SerializedName("templateType") val templateType: String? = null,
+    @SerializedName(value = "templateType", alternate = ["template_type", "type"]) val templateType: String? = null,
     @SerializedName("premium") val premium: Boolean = false,
     @param:DrawableRes val localImageRes: Int? = null
 ) {
@@ -38,14 +38,12 @@ data class TemplateModel(
                 (videoUrl?.trim()?.endsWith(".mp3", ignoreCase = true) == true && safeImageUrl == null) ||
                 (videoUrl.isNullOrBlank() && safeImageUrl.isNullOrBlank() && !audioUrl.isNullOrBlank())
 
+    val isStaticVideo: Boolean
+        get() = templateType.equals("GENERATE_STATIC_VIDEO", ignoreCase = true) ||
+                templateType.equals("GEN_VIDEO_STATIC", ignoreCase = true)
+
     val isDancingTemplate: Boolean
-        get() = category.contains("DANCE", ignoreCase = true) ||
-                category.contains("NHẢY", ignoreCase = true) ||
-                title.contains("DANCE", ignoreCase = true) ||
-                title.contains("VŨ ĐIỆU", ignoreCase = true) ||
-                templateType.equals("DANCE", ignoreCase = true) ||
-                templateType.equals("DANCING", ignoreCase = true) ||
-                !isMusic
+        get() = !isMusic && !isStaticVideo
 
     val categoryDisplayName: String
         get() {

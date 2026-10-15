@@ -116,7 +116,7 @@ AI 即可描摹</string>
     <string name="tap_to_select_change_music">点击选择或更换 AI 配乐</string>
     <string name="btn_select_music">选择音乐</string>
     <string name="btn_create_video_now">立即制作视频</string>
-    <string name="template_video_result_title">AI 模板视频</string>
+    <string name="template_video_result_title">你的视频</string>
     <string name="original_audio">原声音频</string>
     <string name="tap_to_change_bg_music">点击更换背景配乐</string>
     <string name="btn_change_music">更换配乐</string>
@@ -133,7 +133,7 @@ AI 即可描摹</string>
     <string name="btn_view_photos">查看照片</string>
     <string name="choose_bg_song">选择背景音乐</string>
     <string name="browse_ai_music_catalog">点击浏览 AI 配乐库</string>
-    <string name="video_result_title">回忆录视频</string>
+    <string name="video_result_title">你的视频</string>
     <string name="no_music_selected">未选择音乐</string>
     <string name="btn_save">保存</string>
     <string name="exporting_video_merging_music">正在导出视频并合成配乐...</string>

@@ -99,7 +99,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="prompt_style_portrait">満開の花畑に佇む少女のシネマティックで超リアルなポートレート、柔らかな日差し、美しい被写界深度、8K</string>
     <string name="prompt_style_fantasy">雲の上に浮かぶ幻想的な魔法の城、輝くクリスタル、夜空に舞うオーロラ、壮大なファンタジーアート</string>
     <string name="prompt_style_selfie">トレンドの服を着た若者の明るくおしゃれなセルフィー、自然な柔らかな光、明るい背景、SNS映えする高精細</string>
-    <string name="template_video_result_title">AIテンプレート動画</string>
+    <string name="template_video_result_title">あなたの動画</string>
     <string name="original_audio">元の音声</string>
     <string name="tap_to_change_bg_music">タップしてBGMを変更</string>
     <string name="btn_change_music">音楽を変更</string>
@@ -115,7 +115,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="btn_view_photos">写真を見る</string>
     <string name="choose_bg_song">BGMを選択</string>
     <string name="browse_ai_music_catalog">タップしてAI音楽カタログを閲覧</string>
-    <string name="video_result_title">思い出動画</string>
+    <string name="video_result_title">あなたの動画</string>
     <string name="no_music_selected">音楽が未選択</string>
     <string name="btn_save">保存</string>
     <string name="exporting_video_merging_music">動画を書き出し、音楽を合成中...</string>

@@ -85,7 +85,7 @@ und frisch</string>
     <string name="tap_to_select_change_music">Tippen, um KI-Musik zu wählen oder zu ändern</string>
     <string name="btn_select_music">Musik wählen</string>
     <string name="btn_create_video_now">Jetzt Video erstellen</string>
-    <string name="template_video_result_title">KI-Vorlagenvideo</string>
+    <string name="template_video_result_title">Dein Video</string>
     <string name="original_audio">Original-Audio</string>
     <string name="tap_to_change_bg_music">Tippen, um Hintergrundmusik zu ändern</string>
     <string name="btn_change_music">Musik ändern</string>
@@ -101,7 +101,7 @@ und frisch</string>
     <string name="btn_view_photos">Fotos ansehen</string>
     <string name="choose_bg_song">Hintergrundmusik wählen</string>
     <string name="browse_ai_music_catalog">Tippen zum Durchsuchen des KI-Musikkatalogs</string>
-    <string name="video_result_title">Erinnerungsvideo</string>
+    <string name="video_result_title">Dein Video</string>
     <string name="no_music_selected">Keine Musik ausgewählt</string>
     <string name="btn_save">Speichern</string>
     <string name="exporting_video_merging_music">Video wird exportiert und Musik gemischt...</string>

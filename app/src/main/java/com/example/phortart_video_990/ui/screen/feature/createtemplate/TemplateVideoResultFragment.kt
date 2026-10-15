@@ -45,6 +45,8 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var musicAudioUrl: String? = null
     private var musicAudioFilePath: String? = null
     private var musicImageUrl: String? = null
+    private var templateTitle: String? = null
+    private var templateThumbUrl: String? = null
 
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
@@ -57,8 +59,11 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var progressPollingJob: Job? = null
     private var externalAudioPlayer: MediaPlayer? = null
     private var videoMediaPlayer: MediaPlayer? = null
+    private var noteIconAnimator: android.animation.ValueAnimator? = null
 
     override fun initView() {
+        binding.header.applyTitleGradient()
+
         val args = arguments
         rawVideoPathOrUrl = args?.getString(ARG_VIDEO_URL).orEmpty()
         musicTrackId = args?.getString(ARG_MUSIC_TRACK_ID) ?: args?.getString("selected_track_id")
@@ -66,61 +71,39 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         musicAudioUrl = args?.getString(ARG_MUSIC_AUDIO_URL)
         musicAudioFilePath = args?.getString(ARG_MUSIC_FILE_PATH)
         musicImageUrl = args?.getString(ARG_MUSIC_IMAGE_URL)
+        templateTitle = args?.getString(ARG_TEMPLATE_TITLE)
+        templateThumbUrl = args?.getString(ARG_TEMPLATE_THUMB)
+
+        binding.cardMusicInfo.isClickable = false
+        binding.cardMusicInfo.isFocusable = false
 
         updateMusicInfoUi()
 
         // Khởi tạo và phát video
         initializeVideo()
-
-        // Lắng nghe khi người dùng đổi nhạc từ MusicFragment
-        setupMusicSelectionObserver()
-    }
-
-    private fun setupMusicSelectionObserver() {
-        val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle ?: return
-
-        stateHandle.getLiveData<String>("selected_music_title").observe(viewLifecycleOwner) { title ->
-            if (!title.isNullOrBlank()) {
-                val newTrackId = stateHandle.get<String?>("selected_track_id")
-                val newAudioUrl = stateHandle.get<String?>("selected_music_audio_url")
-                val newFilePath = stateHandle.get<String?>("selected_music_file_path")
-                val newImgUrl = stateHandle.get<String?>("selected_music_image_url")
-
-                // Clear saved state handle keys ngay lập tức để không bị trigger lại thừa
-                stateHandle.remove<String>("selected_music_title")
-                stateHandle.remove<String?>("selected_track_id")
-                stateHandle.remove<String?>("selected_music_audio_url")
-                stateHandle.remove<String?>("selected_music_file_path")
-                stateHandle.remove<String?>("selected_music_image_url")
-
-                if (!newTrackId.isNullOrBlank()) {
-                    musicTrackId = newTrackId
-                }
-                musicTitle = title
-                musicAudioUrl = newAudioUrl
-                musicAudioFilePath = newFilePath
-                musicImageUrl = newImgUrl
-
-                // Invalidate bản video đã xuất trước đó vì đã đổi nhạc mới
-                appDocumentVideoFile = null
-                tempShareCacheFile?.delete()
-                tempShareCacheFile = null
-
-                updateMusicInfoUi()
-                handleMusicChanged(newAudioUrl, newFilePath)
-            }
-        }
     }
 
     private fun updateMusicInfoUi() {
-        val title = musicTitle?.takeIf { it.isNotBlank() } ?: getString(R.string.music_original_sound)
-        binding.tvMusicTitle.text = title
-        binding.tvMusicSubtitle.text = if (musicTitle.isNullOrBlank()) getString(R.string.music_tap_to_choose) else getString(R.string.music_currently_playing)
+        val displayTitle = musicTitle?.takeIf { it.isNotBlank() }
+            ?: templateTitle?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.original_audio)
+        binding.tvMusicTitle.text = displayTitle
 
-        if (!musicImageUrl.isNullOrBlank()) {
+        val formattedDuration = formatTime(videoDurationSec)
+        val subtitle = if (!musicTitle.isNullOrBlank() && !templateTitle.isNullOrBlank()) {
+            getString(R.string.video_subtitle_format, formattedDuration, templateTitle)
+        } else {
+            getString(R.string.video_subtitle_no_music_format, formattedDuration)
+        }
+        binding.tvMusicSubtitle.text = subtitle
+
+        val thumbToLoad = musicImageUrl?.takeIf { it.isNotBlank() }
+            ?: templateThumbUrl?.takeIf { it.isNotBlank() }
+
+        if (!thumbToLoad.isNullOrBlank()) {
             binding.ivMusicCover.visibility = View.VISIBLE
             binding.ivDefaultThumbIcon.visibility = View.GONE
-            binding.ivMusicCover.load(musicImageUrl) { crossfade(true) }
+            binding.ivMusicCover.load(thumbToLoad) { crossfade(true) }
         } else {
             binding.ivMusicCover.visibility = View.GONE
             binding.ivDefaultThumbIcon.visibility = View.VISIBLE
@@ -175,7 +158,10 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
             }
 
             val dur = mp.duration / 1000f
-            if (dur > 0) videoDurationSec = dur
+            if (dur > 0) {
+                videoDurationSec = dur
+                updateMusicInfoUi()
+            }
 
             binding.videoView.start()
             isPlaying = true
@@ -324,6 +310,30 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
             binding.btnPlayPause.isClickable = true
             binding.ivPlayPauseIcon.setImageResource(R.drawable.ic_play_small)
         }
+        updateNoteMusicAnimation(playing)
+    }
+
+    private fun updateNoteMusicAnimation(playing: Boolean) {
+        if (playing) {
+            if (noteIconAnimator == null) {
+                noteIconAnimator = android.animation.ValueAnimator.ofFloat(-12f, 12f).apply {
+                    duration = 800L
+                    addUpdateListener { animator ->
+                        bindingOrNull?.ivNoteMusic?.rotation = animator.animatedValue as Float
+                    }
+                    repeatMode = android.animation.ValueAnimator.REVERSE
+                    repeatCount = android.animation.ValueAnimator.INFINITE
+                }
+            }
+            if (noteIconAnimator?.isStarted != true) {
+                noteIconAnimator?.start()
+            }
+            binding.ivNoteMusic.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start()
+        } else {
+            noteIconAnimator?.cancel()
+            noteIconAnimator = null
+            bindingOrNull?.ivNoteMusic?.animate()?.rotation(0f)?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
+        }
     }
 
     private fun updateTimeUi(timeSec: Float) {
@@ -342,15 +352,6 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     override fun initListener() {
         binding.header.setOnBackClickListener {
             findNavController().popBackStack()
-        }
-
-        binding.cardMusicInfo.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("selected_track_id", musicTrackId)
-                putString("selected_music_title", musicTitle)
-                putString("selected_music_audio_url", musicAudioUrl)
-            }
-            findNavController().navigateSafe(R.id.action_templateVideoResultFragment_to_musicFragment, bundle)
         }
 
         binding.cardVideoStage.setOnClickListener {
@@ -513,6 +514,8 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         videoMediaPlayer = null
         tempShareCacheFile?.delete()
         tempShareCacheFile = null
+        noteIconAnimator?.cancel()
+        noteIconAnimator = null
         super.onDestroyView()
     }
 
@@ -523,5 +526,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         const val ARG_MUSIC_AUDIO_URL = "arg_music_audio_url"
         const val ARG_MUSIC_FILE_PATH = "arg_music_file_path"
         const val ARG_MUSIC_IMAGE_URL = "arg_music_image_url"
+        const val ARG_TEMPLATE_TITLE = "template_title"
+        const val ARG_TEMPLATE_THUMB = "template_thumb"
     }
 }

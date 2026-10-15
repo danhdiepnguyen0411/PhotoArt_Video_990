@@ -177,16 +177,24 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_category_chip_unselected"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:text="@string/btn_change_music"
-                android:textColor="@color/primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+            <!-- Note Icon (.fl-video-note) with Animation -->
+            <FrameLayout
+                android:id="@+id/flVideoNote"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="0dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:background="@drawable/bg_note_circle">
+
+                <ImageView
+                    android:id="@+id/ivNoteMusic"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_video_note_double" />
+            </FrameLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

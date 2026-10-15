@@ -105,7 +105,7 @@ seperti baru</string>
     <string name="tap_to_select_change_music">Ketuk untuk memilih atau mengganti musik AI</string>
     <string name="btn_select_music">Pilih Musik</string>
     <string name="btn_create_video_now">Buat Video Sekarang</string>
-    <string name="template_video_result_title">Video Templat AI</string>
+    <string name="template_video_result_title">Video Anda</string>
     <string name="original_audio">Audio Asli</string>
     <string name="tap_to_change_bg_music">Sentuh untuk mengganti musik latar</string>
     <string name="btn_change_music">Ganti Musik</string>
@@ -121,7 +121,7 @@ seperti baru</string>
     <string name="btn_view_photos">Lihat foto</string>
     <string name="choose_bg_song">Pilih musik latar</string>
     <string name="browse_ai_music_catalog">Ketuk untuk melihat katalog musik AI</string>
-    <string name="video_result_title">Video Kenangan</string>
+    <string name="video_result_title">Video Anda</string>
     <string name="no_music_selected">Musik belum dipilih</string>
     <string name="btn_save">Simpan</string>
     <string name="exporting_video_merging_music">Mengekspor video &amp; menggabungkan musik...</string>

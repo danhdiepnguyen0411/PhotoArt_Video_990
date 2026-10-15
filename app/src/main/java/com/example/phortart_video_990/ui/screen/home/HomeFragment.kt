@@ -435,6 +435,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             putString("template_category", template.category)
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, template.safeImageUrl)
             putString("template_thumb", template.safeImageUrl)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TYPE, template.templateType)
+            putString("template_type", template.templateType)
             putString("template_audio_url", template.safeAudioUrl)
             putFloat("selected_template_duration_sec", template.durationSeconds.toFloat())
             putInt("selected_template_photo_count", template.targetPhotoCount)
