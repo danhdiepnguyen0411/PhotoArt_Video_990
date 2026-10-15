@@ -83,7 +83,8 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
     }
 
     private fun bindItemData(item: HistoryItemModel) {
-        binding.tvDetailTitle.text = item.title.ifBlank { getString(R.string.detail_default_title) }
+        val localizedTitle = item.getLocalizedTitle(requireContext())
+        binding.tvDetailTitle.text = localizedTitle.ifBlank { getString(R.string.detail_default_title) }
         binding.tvDetailDate.text = item.date.ifBlank { getString(R.string.detail_recently_created) }
 
         val type = item.type.lowercase()
@@ -157,7 +158,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.cardRestoreSection.visibility = View.GONE
                 binding.cardMusicSection.visibility = View.GONE
 
-                val promptText = item.title.ifBlank { getString(R.string.prompt_fantasy_full) }
+                val promptText = if (item.title.isNotBlank()) item.getLocalizedTitle(requireContext()) else getString(R.string.prompt_fantasy_full)
                 binding.tvPromptContent.text = promptText
 
                 binding.btnCopyPrompt.setOnClickListener {

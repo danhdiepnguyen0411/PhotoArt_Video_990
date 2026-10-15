@@ -427,7 +427,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
     private fun updateEmptyPhotoDescription() {
         val b = bindingOrNull ?: return
-        b.tvEmptyPhotoDescription.text = "Chọn 1 hoặc nhiều ảnh (JPG, PNG)"
+        b.tvEmptyPhotoDescription.text = getString(R.string.dance_upload_card_desc)
     }
 
     private fun updatePhotosUi() {

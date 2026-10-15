@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_ai_create_screen">
 
-    <!-- Top Bar: Common Header with Back, Title "Tạo ảnh bằng text", and Sparkle -->
+    <!-- Top Bar: Common Header with Back and Centered Title -->
     <com.example.phortart_video_990.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:headerTitle="@string/ai_create_title"
         app:showBackButton="true"
-        app:showSparkle="true"
+        app:showSparkle="false"
         app:centerTitle="true"
         app:layout_constraintTop_toTopOf="parent" />
 

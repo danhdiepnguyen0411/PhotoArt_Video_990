@@ -428,45 +428,45 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <!-- Secondary Action (Dùng lại / Tạo mới) -->
-            <com.google.android.material.card.MaterialCardView
+            <FrameLayout
                 android:id="@+id/cardRecreate"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="5dp"
-                app:cardMaxElevation="8dp"
-                app:strokeColor="#CAD8FE"
-                app:strokeWidth="1.5dp"
-                android:outlineSpotShadowColor="#4D2563EB"
-                android:outlineAmbientShadowColor="#26000000">
+                android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnRecreate"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
+                    android:background="@drawable/bg_btn_secondary_outline"
                     android:stateListAnimator="@null"
                     android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="6dp"
                     android:text="@string/btn_create_similar"
                     android:textAllCaps="false"
                     android:textColor="#2563EB"
-                    android:textSize="13.5sp"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="10sp"
+                    app:autoSizeMaxTextSize="13.5sp"
+                    app:autoSizeStepGranularity="0.5sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+            </FrameLayout>
 
             <!-- Primary Action: Save to Device -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardSaveMedia"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1.2"
+                android:layout_height="50dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
                 app:cardBackgroundColor="#7663F2"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
-                app:cardMaxElevation="12dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="6dp"
+                app:cardMaxElevation="10dp"
                 app:strokeWidth="0dp"
                 android:outlineSpotShadowColor="#B37663F2"
                 android:outlineAmbientShadowColor="#6637A8F8">
@@ -479,10 +479,16 @@
                     android:stateListAnimator="@null"
                     android:fontFamily="@font/inter_bold"
                     android:gravity="center"
+                    android:paddingHorizontal="6dp"
                     android:text="@string/btn_save_to_device"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="14sp"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="10sp"
+                    app:autoSizeMaxTextSize="13.5sp"
+                    app:autoSizeStepGranularity="0.5sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:textStyle="bold" />
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

@@ -46,22 +46,19 @@
     <string name="banner_1_chip">AI Photo &amp; Video</string>
     <string name="banner_1_title">Превратите ваши фото
 в потрясающие</string>
-    <string name="banner_1_highlight">яркие
-мгновения</string>
+    <string name="banner_1_highlight">яркие воспоминания</string>
     <string name="banner_1_desc">Создавайте динамичные видеоролики и арт-фото с помощью AI за пару секунд.</string>
     <string name="banner_1_btn">Попробовать</string>
     <string name="banner_2_chip">AI Prompt</string>
     <string name="banner_2_title">Просто опишите,
 а AI нарисует</string>
-    <string name="banner_2_highlight">образ вашей
-мечты</string>
+    <string name="banner_2_highlight">образ вашей мечты</string>
     <string name="banner_2_desc">Опишите идею и мгновенно получите уникальное произведение искусства.</string>
     <string name="banner_2_btn">Создать</string>
     <string name="banner_3_chip">Реставрация фото</string>
     <string name="banner_3_title">Подарите старым
 снимкам</string>
-    <string name="banner_3_highlight">идеальную
-четкость</string>
+    <string name="banner_3_highlight">идеальное качество</string>
     <string name="banner_3_desc">Устраняйте размытие, царапины и восстанавливайте цвета в одно касание.</string>
     <string name="banner_3_btn">Восстановить</string>
     <string name="template_title">Шаблоны ✨</string>
@@ -72,6 +69,38 @@
     <string name="template_cat_effect">Эффекты</string>
     <string name="template_cat_portrait">Портрет</string>
     <string name="template_cat_fantasy">Фэнтези</string>
+    <string name="dance_cat_transition">Тренды танцев</string>
+    <string name="dance_cat_latin">Латинские танцы</string>
+    <string name="dance_cat_tiktok">Танцы TikTok</string>
+    <string name="dance_cat_kpop">К-поп</string>
+    <string name="dance_cat_hiphop">Хип-хоп</string>
+    <string name="dance_cat_shuffle">Шаффл</string>
+    <string name="dance_cat_street">Уличные танцы</string>
+    <string name="dance_cat_waacking">Вакинг</string>
+    <string name="dance_cat_jazz">Джазовый танец</string>
+    <string name="dance_cat_hot">Популярно</string>
+    <string name="style_cyber_move">Кибер-танец</string>
+    <string name="style_street_vibes">Уличный стиль</string>
+    <string name="style_urban_renaissance">Городской\nренессанс</string>
+    <string name="style_dreamy">Мечтательность</string>
+    <string name="style_vintage">Винтаж</string>
+    <string name="style_cyberpunk">Киберпанк</string>
+    <string name="style_nature">Природа</string>
+    <string name="style_portrait">Портрет</string>
+    <string name="style_anime">Аниме</string>
+    <string name="style_neon_glow">Неоновое сияние</string>
+    <string name="style_fantasy">Фэнтези</string>
+    <string name="style_selfie">Селфи</string>
+    <string name="prompt_style_cyber_move">Динамичный танцор в кибер-стиле, застывший в движении, неоновые контуры, световые шлейфы, футуристический город, ультра-детализация</string>
+    <string name="prompt_style_street_vibes">Уличный портрет молодого человека в стильном streetwear, стены с граффити, свет золотого часа, эстетика пленки 35 мм</string>
+    <string name="prompt_style_urban_renaissance">Городской пейзаж эпохи возрождения на закате, классическая архитектура в сочетании с современными небоскребами, живописный стиль</string>
+    <string name="prompt_style_dreamy">Сказочный пастельный пейзаж с мягкими облаками, парящими лепестками и сияющим светом, эфирная атмосфера, волшебная иллюстрация</string>
+    <string name="prompt_style_vintage">Винтажное пленочное фото 1970-х годов о путешествии к морю, теплые выцветшие цвета, легкие блики, зернистость пленки, ностальгия</string>
+    <string name="prompt_style_cyberpunk">Неоновый мегаполис в стиле киберпанк ночью с летающими машинами, голограммами и мокрыми улицами после дождя, кинематографичный 8k</string>
+    <string name="prompt_style_nature">Волшебный водопад в залитом солнцем сосновом лесу, плывущий туман, лучи света, гиперреалистичная фотография природы</string>
+    <string name="prompt_style_portrait">Кинематографичный гиперреалистичный портрет девушки в цветочном поле, мягкий солнечный свет, глубина резкости, 8k</string>
+    <string name="prompt_style_fantasy">Парящий сказочный замок над облаками со светящимися кристаллами и северным сиянием в небе, концепт-арт в стиле эпического фэнтези</string>
+    <string name="prompt_style_selfie">Яркое стильное селфи в модном образе, мягкий естественный свет, светлый фон, современная эстетика соцсетей, четкие детали</string>
     <string name="template_empty_category">В этой категории пока нет шаблонов</string>
     <string name="template_create_title">Создать видео по шаблону</string>
     <string name="upload_portrait_face">Загрузить фото лица / портрет</string>
@@ -330,11 +359,11 @@
     <string name="search_music_hint">Поиск песен, исполнителей...</string>
     <string name="btn_next_step">Далее</string>
     <string name="banner_1_title_line1">Объединяйте фото,</string>
-    <string name="banner_1_title_line2">сохраняйте </string>
+    <string name="banner_1_title_line2" />
     <string name="banner_2_title_line1">Создавайте из текста,</string>
-    <string name="banner_2_title_line2">воплощайте </string>
+    <string name="banner_2_title_line2" />
     <string name="banner_3_title_line1">Оживите старые фото,</string>
-    <string name="banner_3_title_line2">четкие как </string>
+    <string name="banner_3_title_line2" />
     <string name="memories_title">Сбор воспоминаний</string>
     <string name="your_photos">Ваши фото</string>
     <string name="selected_x_photos">Выбрано %1$d фото</string>

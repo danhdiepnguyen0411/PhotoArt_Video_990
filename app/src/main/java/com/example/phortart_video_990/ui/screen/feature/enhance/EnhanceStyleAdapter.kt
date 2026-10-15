@@ -13,7 +13,41 @@ data class EnhanceStyleModel(
     val imageResId: Int,
     val prompt: String,
     val isHot: Boolean = false
-)
+) {
+    fun getLocalizedTitle(context: android.content.Context): String {
+        return when (id) {
+            "cyber_move" -> context.getString(com.example.phortart_video_990.R.string.style_cyber_move)
+            "street_vibes" -> context.getString(com.example.phortart_video_990.R.string.style_street_vibes)
+            "urban_renaissance" -> context.getString(com.example.phortart_video_990.R.string.style_urban_renaissance)
+            "dreamy" -> context.getString(com.example.phortart_video_990.R.string.style_dreamy)
+            "vintage" -> context.getString(com.example.phortart_video_990.R.string.style_vintage)
+            "cyberpunk" -> context.getString(com.example.phortart_video_990.R.string.style_cyberpunk)
+            "nature" -> context.getString(com.example.phortart_video_990.R.string.style_nature)
+            "portrait" -> context.getString(com.example.phortart_video_990.R.string.style_portrait)
+            "fantasy" -> context.getString(com.example.phortart_video_990.R.string.style_fantasy)
+            "selfie" -> context.getString(com.example.phortart_video_990.R.string.style_selfie)
+            "anime" -> context.getString(com.example.phortart_video_990.R.string.style_anime)
+            "neon_glow" -> context.getString(com.example.phortart_video_990.R.string.style_neon_glow)
+            else -> title
+        }
+    }
+
+    fun getLocalizedPrompt(context: android.content.Context): String {
+        return when (id) {
+            "cyber_move" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_cyber_move)
+            "street_vibes" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_street_vibes)
+            "urban_renaissance" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_urban_renaissance)
+            "dreamy" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_dreamy)
+            "vintage" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_vintage)
+            "cyberpunk" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_cyberpunk)
+            "nature" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_nature)
+            "portrait" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_portrait)
+            "fantasy" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_fantasy)
+            "selfie" -> context.getString(com.example.phortart_video_990.R.string.prompt_style_selfie)
+            else -> prompt
+        }
+    }
+}
 
 class EnhanceStyleAdapter(
     private val items: List<EnhanceStyleModel>,
@@ -38,7 +72,7 @@ class EnhanceStyleAdapter(
 
         fun bind(item: EnhanceStyleModel, isSelected: Boolean) {
             binding.ivStyleThumb.setImageResource(item.imageResId)
-            binding.tvStyleTitle.text = item.title
+            binding.tvStyleTitle.text = item.getLocalizedTitle(binding.root.context)
             binding.layoutHotBadge.visibility = if (item.isHot) View.VISIBLE else View.GONE
 
             val density = binding.root.context.resources.displayMetrics.density
