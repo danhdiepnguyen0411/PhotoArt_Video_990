@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="6dp"
+            android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/waveView"
@@ -50,6 +51,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
                 android:fontFamily="@font/inter_bold"
+                android:gravity="center_vertical"
                 android:singleLine="true"
                 android:textColor="#1B2A78"
                 android:textSize="14.5sp"
@@ -64,6 +66,7 @@
                 android:fontFamily="@font/inter_regular"
                 android:textColor="#8296BC"
                 android:textSize="12sp"
+                android:visibility="gone"
                 tools:text="00:17" />
 
         </LinearLayout>

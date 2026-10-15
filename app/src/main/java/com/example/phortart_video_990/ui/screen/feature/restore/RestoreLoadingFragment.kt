@@ -19,9 +19,13 @@ import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
 import com.example.phortart_video_990.data.repository.RestoreRepository
 import com.example.phortart_video_990.databinding.FragmentRestoreLoadingBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.example.phortart_video_990.core.utils.ErrorFormatter
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -157,8 +161,11 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
         isRestoring = true
 
         sdkJob?.cancel()
-        sdkJob = lifecycleScope.launch {
-            val file = restoreRepository.createTempFileFromUri(uri)
+        sdkJob = viewLifecycleOwner.lifecycleScope.launch {
+            // 1. Chuẩn bị và nén ảnh hoàn toàn trên Dispatchers.IO để không bao giờ làm đơ UI
+            val file = withContext(Dispatchers.IO) {
+                restoreRepository.createTempFileFromUri(uri)
+            }
             if (file == null) {
                 isRestoring = false
                 if (isAdded && context != null) {
@@ -168,7 +175,7 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
                 return@launch
             }
 
-            // Call SDK processImageEditing
+            // 2. Gọi backend SDK phục hồi ảnh
             val result = restoreRepository.restoreImage(file)
 
             if (result.isFailure) {
@@ -178,75 +185,92 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
 
             val restoreData = result.getOrNull()
             val finalInputUrl = restoreData?.inputUrl?.takeIf { it.isNotBlank() } ?: file.absolutePath
-            var finalOutputUrl = restoreData?.outputUrl?.takeIf { it.isNotBlank() } ?: file.absolutePath
+            val finalOutputUrl = restoreData?.outputUrl?.takeIf { it.isNotBlank() } ?: file.absolutePath
 
-            // Preload và xoay chuẩn orientation nếu cần
-            val ctx = context?.applicationContext
-            if (ctx != null) {
-                try {
-                    val imageLoader = coil.Coil.imageLoader(ctx)
-                    val outRequest = coil.request.ImageRequest.Builder(ctx)
-                        .data(finalOutputUrl)
-                        .allowHardware(false)
-                        .build()
-                    val outResult = imageLoader.execute(outRequest)
+            // 3. Preload, căn chỉnh góc xoay và lưu lịch sử hoàn toàn trên Dispatchers.IO
+            val processedPair = withContext(Dispatchers.IO) {
+                processPostRestore(file, finalInputUrl, finalOutputUrl)
+            }
 
-                    if (outResult is coil.request.SuccessResult) {
+            finishProgressAndNavigate(processedPair.first, processedPair.second)
+        }
+    }
+
+    private suspend fun processPostRestore(
+        inputFile: File,
+        inputUrl: String,
+        outputUrl: String
+    ): Pair<String, String> = withContext(Dispatchers.IO) {
+        val ctx = context?.applicationContext ?: return@withContext Pair(inputUrl, outputUrl)
+        var fixedOutputUrl = outputUrl
+
+        try {
+            val imageLoader = coil.Coil.imageLoader(ctx)
+            val outRequest = coil.request.ImageRequest.Builder(ctx)
+                .data(outputUrl)
+                .allowHardware(false)
+                .build()
+            val outResult = imageLoader.execute(outRequest)
+
+            if (outResult is coil.request.SuccessResult) {
+                val outW = outResult.drawable.intrinsicWidth
+                val outH = outResult.drawable.intrinsicHeight
+
+                if (outW > 0 && outH > 0) {
+                    val inputBounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    android.graphics.BitmapFactory.decodeFile(inputFile.absolutePath, inputBounds)
+                    val inRot = com.example.phortart_video_990.core.utils.ImageCompressor.getExifRotation(inputFile)
+                    val actualInW = if (inRot == 90 || inRot == 270) inputBounds.outHeight else inputBounds.outWidth
+                    val actualInH = if (inRot == 90 || inRot == 270) inputBounds.outWidth else inputBounds.outHeight
+
+                    val isInputPortrait = actualInH > actualInW
+                    val isOutputPortrait = outH > outW
+
+                    if (isInputPortrait != isOutputPortrait && inputBounds.outWidth > 0 && inputBounds.outHeight > 0) {
                         val outBitmap = com.example.phortart_video_990.core.utils.MediaSaveUtils.drawableToBitmap(outResult.drawable)
-
-                        val inputBounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                        android.graphics.BitmapFactory.decodeFile(file.absolutePath, inputBounds)
-                        val inRot = com.example.phortart_video_990.core.utils.ImageCompressor.getExifRotation(file)
-                        val actualInW = if (inRot == 90 || inRot == 270) inputBounds.outHeight else inputBounds.outWidth
-                        val actualInH = if (inRot == 90 || inRot == 270) inputBounds.outWidth else inputBounds.outHeight
-                        val isInputPortrait = actualInH > actualInW
-                        val isOutputPortrait = outBitmap.height > outBitmap.width
-
-                        if (isInputPortrait != isOutputPortrait && inputBounds.outWidth > 0 && inputBounds.outHeight > 0) {
-                            android.util.Log.w("RestoreProcess", "Phát hiện ảnh kết quả lệch hướng xoay so với ảnh gốc! Tự động xoay chuẩn lại.")
-                            val matrix = android.graphics.Matrix().apply { postRotate(90f) }
-                            val rotatedBmp = android.graphics.Bitmap.createBitmap(outBitmap, 0, 0, outBitmap.width, outBitmap.height, matrix, true)
-                            val fixedFile = java.io.File(ctx.cacheDir, "restore_aligned_${System.currentTimeMillis()}.jpg")
-                            java.io.FileOutputStream(fixedFile).use { fos ->
-                                rotatedBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, fos)
-                            }
-                            finalOutputUrl = fixedFile.absolutePath
-                            if (rotatedBmp != outBitmap) {
-                                rotatedBmp.recycle()
-                            }
+                        val matrix = android.graphics.Matrix().apply { postRotate(90f) }
+                        val rotatedBmp = android.graphics.Bitmap.createBitmap(outBitmap, 0, 0, outBitmap.width, outBitmap.height, matrix, true)
+                        val fixedFile = File(ctx.cacheDir, "restore_aligned_${System.currentTimeMillis()}.jpg")
+                        java.io.FileOutputStream(fixedFile).use { fos ->
+                            rotatedBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, fos)
                         }
+                        fixedOutputUrl = fixedFile.absolutePath
+                        if (rotatedBmp != outBitmap) {
+                            rotatedBmp.recycle()
+                        }
+                        outBitmap.recycle()
                     }
-
-                    if (finalInputUrl.startsWith("http://") || finalInputUrl.startsWith("https://")) {
-                        val inRequest = coil.request.ImageRequest.Builder(ctx)
-                            .data(finalInputUrl)
-                            .build()
-                        imageLoader.execute(inRequest)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-
-                // Tự động lưu vào lịch sử
-                try {
-                    val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-                    val currentDate = dateFormat.format(Date())
-                    val historyItem = HistoryItemModel(
-                        type = "Khôi phục",
-                        title = getString(R.string.func_02_restore),
-                        date = currentDate,
-                        imageUri = finalOutputUrl,
-                        imageUrl = finalOutputUrl,
-                        beforeUri = finalInputUrl
-                    )
-                    historyRepository.addHistoryItem(historyItem)
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
             }
 
-            finishProgressAndNavigate(finalInputUrl, finalOutputUrl)
+            if (inputUrl.startsWith("http://") || inputUrl.startsWith("https://")) {
+                val inRequest = coil.request.ImageRequest.Builder(ctx)
+                    .data(inputUrl)
+                    .build()
+                imageLoader.execute(inRequest)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
+        // Tự động lưu vào lịch sử
+        try {
+            val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
+            val currentDate = dateFormat.format(Date())
+            val historyItem = HistoryItemModel(
+                type = "Khôi phục",
+                title = getString(R.string.func_02_restore),
+                date = currentDate,
+                imageUri = fixedOutputUrl,
+                imageUrl = fixedOutputUrl,
+                beforeUri = inputUrl
+            )
+            historyRepository.addHistoryItem(historyItem)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        Pair(inputUrl, fixedOutputUrl)
     }
 
     private fun finishProgressAndNavigate(finalInputUrl: String, finalOutputUrl: String) {
@@ -304,8 +328,10 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
             if (isAdded) {
                 val act = activity
                 if (act != null && !act.isFinishing && !act.isDestroyed) {
+                    val formattedMsg = context?.let { ErrorFormatter.formatVideoErrorMessage(it, throwable) }
                     AppDialogHelper.showRestoreErrorDialog(
                         activity = act,
+                        subtitle = formattedMsg,
                         onRetry = {
                             if (isAdded) {
                                 isProcessFinished = false

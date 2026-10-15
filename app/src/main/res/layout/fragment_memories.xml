@@ -15,11 +15,14 @@
         app:showBackButton="true"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:layout_marginBottom="18dp"
         app:layout_constraintBottom_toTopOf="@+id/btnCreateVideo"
         app:layout_constraintTop_toBottomOf="@+id/header">
 
@@ -29,7 +32,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="36dp">
 
             <!-- Section 1: Ảnh của bạn -->
             <LinearLayout
@@ -370,6 +373,7 @@
                 android:layout_marginTop="12dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_music_category_chip" />
 
@@ -379,11 +383,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_memories_music" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Create Video / Preview Action Button -->
     <LinearLayout
@@ -391,9 +396,12 @@
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="24dp"
+        android:alpha="0.5"
         android:background="@drawable/bg_btn_create_video_pill"
         android:clickable="true"
+        android:elevation="4dp"
         android:focusable="true"
         android:gravity="center"
         android:orientation="horizontal"

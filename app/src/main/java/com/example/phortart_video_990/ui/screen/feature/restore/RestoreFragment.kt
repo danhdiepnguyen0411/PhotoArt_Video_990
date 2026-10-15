@@ -7,6 +7,8 @@ import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.core.utils.safePopBackStack
 import com.example.phortart_video_990.databinding.FragmentRestoreBinding
 
+import com.example.phortart_video_990.core.utils.setOnSingleClickListener
+
 class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBinding::inflate) {
 
     override fun initView() {
@@ -20,7 +22,7 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(FragmentRestoreBind
             }
         }
 
-        binding.btnStartRestore.setOnClickListener {
+        binding.btnStartRestore.setOnSingleClickListener(700L) {
             if (isAdded) {
                 findNavController().navigateSafe(R.id.action_restoreFragment_to_restorePickPhotoFragment)
             }

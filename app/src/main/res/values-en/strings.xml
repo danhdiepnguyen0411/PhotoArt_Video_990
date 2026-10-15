@@ -108,7 +108,7 @@
     <string name="tap_to_select_change_music">Tap to select or change AI background music</string>
     <string name="btn_select_music">Select Music</string>
     <string name="btn_create_video_now">Create Video Now</string>
-    <string name="template_video_result_title">AI Template Video</string>
+    <string name="template_video_result_title">Your Video</string>
     <string name="original_audio">Original Audio</string>
     <string name="tap_to_change_bg_music">Tap to change background music</string>
     <string name="btn_change_music">Change Music</string>
@@ -131,7 +131,7 @@
     <string name="btn_view_photos">View photos</string>
     <string name="choose_bg_song">Select background music</string>
     <string name="browse_ai_music_catalog">Tap to browse AI music catalog</string>
-    <string name="video_result_title">Memories Video</string>
+    <string name="video_result_title">Your Video</string>
     <string name="no_music_selected">No music selected</string>
     <string name="btn_save">Save</string>
     <string name="exporting_video_merging_music">Exporting video &amp; merging music...</string>
@@ -145,8 +145,8 @@
     <string name="prompt_suggestions">Prompt suggestions</string>
     <string name="btn_generate_image">Generate Image</string>
     <string name="loading_please_wait">Please wait a moment</string>
-    <string name="enhance_result_subtitle">Your prompt has been turned into a beautiful image!</string>
-    <string name="enhance_your_prompt">YOUR PROMPT</string>
+    <string name="enhance_result_subtitle">Your content has been turned into a beautiful image!</string>
+    <string name="enhance_your_prompt">YOUR CONTENT</string>
     <string name="btn_generate_again">Generate again</string>
     <string name="restore_title">Photo Restore</string>
     <string name="restore_main_desc">Turn old, blurry, damaged photos into clear and vivid memories.</string>
@@ -254,6 +254,11 @@ a premium experience.</string>
     <string name="toast_create_video_failed">Video creation failed: %1$s</string>
     <string name="toast_process_video_failed">Video processing failed: %1$s</string>
     <string name="toast_error_occurred">An error occurred: %1$s</string>
+    <string name="error_no_face_detected">No face detected in the photo. Please select a photo with a clear face.</string>
+    <string name="error_network_connection">Network connection error. Please check your connection and try again.</string>
+    <string name="error_server_busy">Server is busy. Please try again in a few minutes.</string>
+    <string name="error_create_video_general">Unable to create video from this photo. Please try with another photo.</string>
+    <string name="error_video_generation_timeout">Processing took too long. Please try again later.</string>
     <string name="toast_video_play_error">Error playing video</string>
     <string name="toast_cannot_export_video">Cannot export video!</string>
     <string name="toast_cannot_share_video">Cannot share video right now</string>
@@ -362,13 +367,14 @@ a premium experience.</string>
     <string name="toast_permission_needed_for_photos">Permission required to access device photos</string>
     <string name="picker_empty_photos">No photos found in device gallery</string>
     <string name="toast_cannot_open_gallery">Cannot open photo gallery</string>
-    <string name="dance_video_title">Create Dance Video</string>
+    <string name="dance_video_title">Create Video</string>
     <string name="dance_upload_title">Upload photos from gallery</string>
     <string name="dance_upload_card_title">Tap to select photos from gallery</string>
     <string name="dance_upload_card_desc">Select 1 or more photos (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Select 1 photo (JPG, PNG...)</string>
     <string name="dance_select_template">Select template</string>
     <string name="dance_bg_music">Background music</string>
-    <string name="btn_create_dance_video">Create dance video</string>
+    <string name="btn_create_dance_video">Create Video</string>
     <string name="toast_please_select_photo">Please select photos from gallery to create video</string>
     <string name="banner_1_chip">AI Photo &amp; Video</string>
     <string name="banner_1_title">Combine photos, cherish memories</string>

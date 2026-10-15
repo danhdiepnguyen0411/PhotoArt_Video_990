@@ -383,6 +383,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.rvHomeCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvHomeCategories.adapter = homeCategoryAdapter
+        binding.rvHomeCategories.visibility = View.GONE
     }
 
     private fun applyCategoryFilter(category: CategoryModel) {
@@ -434,6 +435,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             putString("template_category", template.category)
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, template.safeImageUrl)
             putString("template_thumb", template.safeImageUrl)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TYPE, template.templateType)
+            putString("template_type", template.templateType)
             putString("template_audio_url", template.safeAudioUrl)
             putFloat("selected_template_duration_sec", template.durationSeconds.toFloat())
             putInt("selected_template_photo_count", template.targetPhotoCount)

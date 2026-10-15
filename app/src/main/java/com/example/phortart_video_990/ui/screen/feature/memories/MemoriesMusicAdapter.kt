@@ -39,7 +39,7 @@ class MemoriesMusicAdapter(
     override fun getItemCount(): Int = tracks.size
 
     fun submitList(newList: List<TemplateModel>) {
-        tracks = newList
+        tracks = ArrayList(newList)
         notifyDataSetChanged()
     }
 

@@ -60,7 +60,7 @@ class DanceTemplatePickerAdapter(
 
         fun bind(item: TemplateModel, isSelected: Boolean) {
             binding.tvTemplateTitle.text = item.title
-            binding.tvDuration.text = item.displayDuration
+            binding.tvViews.text = item.displayViews
 
             // Highlight border when selected
             if (isSelected) {

@@ -58,6 +58,8 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     private var lastShareClickTime = 0L
 
     override fun initView() {
+        binding.header.applyTitleGradient()
+
         val args = arguments
         videoPath = args?.getString(ARG_VIDEO_PATH)
         photoUris = args?.getStringArrayList(ARG_PHOTOS) ?: emptyList()
@@ -66,6 +68,11 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
         musicAudioUrl = args?.getString(ARG_AUDIO_URL)
         musicAudioFilePath = args?.getString(ARG_AUDIO_PATH)
         musicImageUrl = args?.getString(ARG_IMAGE_URL)
+
+        binding.cardVideoInfo.isClickable = false
+        binding.cardVideoInfo.isFocusable = false
+        binding.flVideoNote.isClickable = false
+        binding.flVideoNote.isFocusable = false
 
         updateMusicInfoUi()
         updatePlayStateUi(false)
@@ -519,24 +526,6 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
     override fun initListener() {
         binding.header.setOnBackClickListener {
             findNavController().popBackStack()
-        }
-
-        binding.cardVideoInfo.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("selected_track_id", musicTrackId)
-                putString("selected_music_title", musicTitle)
-                putString("selected_music_audio_url", musicAudioUrl)
-            }
-            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment, bundle)
-        }
-
-        binding.flVideoNote.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("selected_track_id", musicTrackId)
-                putString("selected_music_title", musicTitle)
-                putString("selected_music_audio_url", musicAudioUrl)
-            }
-            findNavController().navigateSafe(R.id.action_videoResultFragment_to_musicFragment, bundle)
         }
 
         binding.cardVideoStage.setOnClickListener {

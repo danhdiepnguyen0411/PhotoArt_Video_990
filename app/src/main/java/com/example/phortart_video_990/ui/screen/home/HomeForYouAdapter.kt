@@ -59,8 +59,7 @@ class HomeForYouAdapter(
 
         fun bind(item: TemplateModel, position: Int) {
             binding.tvTemplateTitle.text = item.title
-            binding.tvDuration.text = item.displayDuration
-            binding.tvPhotoCount.text = item.displayPhotoCount
+            binding.tvViews.text = item.displayViews
 
             // Category tag & styling
             val categoryName = item.categoryDisplayName

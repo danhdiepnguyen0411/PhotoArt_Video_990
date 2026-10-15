@@ -64,13 +64,14 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <!-- Duration / Play Preview -->
+                    <!-- Duration / Play Preview (Hidden) -->
                     <LinearLayout
                         android:id="@+id/llDurationBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/ivPlayIcon"
@@ -91,9 +92,9 @@
                     </LinearLayout>
 
                     <ImageView
+                        android:id="@+id/ivViewsIcon"
                         android:layout_width="12dp"
                         android:layout_height="12dp"
-                        android:layout_marginStart="8dp"
                         android:contentDescription="Views"
                         android:src="@drawable/ic_eye_small" />
 
@@ -107,11 +108,13 @@
                         tools:text="892,4K" />
 
                     <ImageView
+                        android:id="@+id/ivPhotoIcon"
                         android:layout_width="12dp"
                         android:layout_height="12dp"
                         android:layout_marginStart="8dp"
                         android:contentDescription="Photos"
-                        android:src="@drawable/ic_template_images" />
+                        android:src="@drawable/ic_template_images"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/tvPhotoCount"
@@ -120,6 +123,7 @@
                         android:layout_marginStart="3dp"
                         android:textColor="#8E9BB0"
                         android:textSize="11sp"
+                        android:visibility="gone"
                         tools:text="5" />
                 </LinearLayout>
 

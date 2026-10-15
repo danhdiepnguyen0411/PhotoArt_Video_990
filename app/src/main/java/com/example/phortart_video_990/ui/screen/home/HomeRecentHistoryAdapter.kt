@@ -52,19 +52,9 @@ class HomeRecentHistoryAdapter(
                 error(R.drawable.bg_card_white)
             }
 
-            if (item.isVideo) {
-                binding.llDurationPill.visibility = View.VISIBLE
-                binding.tvDuration.text = item.displayDuration
-
-                binding.llPhotoCountPill.visibility = View.VISIBLE
-                binding.tvPhotoCount.text = item.displayPhotoCount
-
-                binding.llPhotoOnlyPill.visibility = View.GONE
-            } else {
-                binding.llDurationPill.visibility = View.GONE
-                binding.llPhotoCountPill.visibility = View.GONE
-                binding.llPhotoOnlyPill.visibility = View.VISIBLE
-            }
+            binding.llDurationPill.visibility = View.GONE
+            binding.llPhotoCountPill.visibility = View.GONE
+            binding.llPhotoOnlyPill.visibility = View.GONE
 
             binding.root.setOnClickListener {
                 onItemClick(item)

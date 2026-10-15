@@ -30,6 +30,7 @@ class SelectedPhotosBottomSheetDialog(
     private fun setupViews() {
         updateCountText()
 
+        var isActionTriggered = false
         adapter = SelectedPhotosGridAdapter(
             photos = photos,
             maxLimit = maxLimit,
@@ -45,8 +46,11 @@ class SelectedPhotosBottomSheetDialog(
                 }
             },
             onAddClick = {
-                dismiss()
-                onAddMoreRequested()
+                if (!isActionTriggered) {
+                    isActionTriggered = true
+                    dismiss()
+                    onAddMoreRequested()
+                }
             }
         )
 

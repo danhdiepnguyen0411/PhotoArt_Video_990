@@ -487,6 +487,38 @@ class TemplateRepository(
     }
 
     /**
+     * Generate static video using ArtMagicClient SDK backend.
+     */
+    suspend fun generateStaticVideo(
+        code: String,
+        file: java.io.File,
+        options: String = "{}",
+        prompt: String? = null
+    ): Result<JsonElement> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val client = getClient()
+            if (client == null) {
+                if (continuation.isActive) continuation.resume(Result.failure(Exception("ArtMagicClient is not initialized")))
+                return@suspendCancellableCoroutine
+            }
+
+            Log.i(TAG_VIDEOGEN, "[API Request] Calling generateStaticVideo: code='$code', file='${file.name}' (${file.length() / 1024} KB)")
+            client.generateStaticVideo(code, file, options, prompt) { result, error ->
+                if (!continuation.isActive) return@generateStaticVideo
+                if (error != null) {
+                    Log.e(TAG_VIDEOGEN, "[API Response] generateStaticVideo FAILED: ${error.message}")
+                    continuation.resume(Result.failure(error))
+                } else if (result != null) {
+                    Log.i(TAG_VIDEOGEN, "[API Response] generateStaticVideo SUCCEEDED: $result")
+                    continuation.resume(Result.success(result))
+                } else {
+                    continuation.resume(Result.failure(Exception("Unknown error generating static video")))
+                }
+            }
+        }
+    }
+
+    /**
      * Poll result for image editing by requestId.
      */
     suspend fun getImageEditingResult(requestId: String): Result<JsonElement> = withContext(Dispatchers.IO) {
@@ -591,6 +623,12 @@ class TemplateRepository(
             ?: obj.get("request_id")?.asString
             ?: obj.get("taskId")?.asString
             ?: obj.get("task_id")?.asString
+    }
+
+    fun extractRequestIdFromError(errorMessage: String?): String? {
+        if (errorMessage.isNullOrBlank()) return null
+        val uuidMatch = Regex("([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})").find(errorMessage)
+        return uuidMatch?.groupValues?.get(1)
     }
 
     fun extractVideoUrl(element: JsonElement?): String? {

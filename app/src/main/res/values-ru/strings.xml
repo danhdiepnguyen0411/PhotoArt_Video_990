@@ -114,7 +114,7 @@
     <string name="tap_to_select_change_music">Нажмите для выбора или замены AI-музыки</string>
     <string name="btn_select_music">Выбрать музыку</string>
     <string name="btn_create_video_now">Создать видео сейчас</string>
-    <string name="template_video_result_title">AI видео по шаблону</string>
+    <string name="template_video_result_title">Ваше видео</string>
     <string name="original_audio">Оригинальный звук</string>
     <string name="tap_to_change_bg_music">Нажмите, чтобы сменить фоновую музыку</string>
     <string name="btn_change_music">Сменить музыку</string>
@@ -130,7 +130,7 @@
     <string name="btn_view_photos">Смотреть фото</string>
     <string name="choose_bg_song">Выбрать фоновую музыку</string>
     <string name="browse_ai_music_catalog">Нажмите, чтобы просмотреть каталог AI-музыки</string>
-    <string name="video_result_title">Видео воспоминаний</string>
+    <string name="video_result_title">Ваше видео</string>
     <string name="no_music_selected">Музыка не выбрана</string>
     <string name="btn_save">Сохранить</string>
     <string name="exporting_video_merging_music">Экспорт видео и сведение музыки...</string>
@@ -249,6 +249,11 @@
     <string name="toast_create_video_failed">Не удалось создать видео: %1$s</string>
     <string name="toast_process_video_failed">Ошибка обработки видео: %1$s</string>
     <string name="toast_error_occurred">Произошла ошибка: %1$s</string>
+    <string name="error_no_face_detected">Лицо на фото не обнаружено. Пожалуйста, выберите фото с четким лицом.</string>
+    <string name="error_network_connection">Ошибка сетевого подключения. Пожалуйста, проверьте подключение и повторите попытку.</string>
+    <string name="error_server_busy">Сервер перегружен. Пожалуйста, повторите попытку через несколько минут.</string>
+    <string name="error_create_video_general">Не удалось создать видео из этого фото. Пожалуйста, попробуйте другое фото.</string>
+    <string name="error_video_generation_timeout">Обработка заняла слишком много времени. Пожалуйста, повторите попытку позже.</string>
     <string name="toast_video_play_error">Ошибка воспроизведения видео</string>
     <string name="toast_cannot_export_video">Не удалось экспортировать видео!</string>
     <string name="toast_cannot_share_video">Не удается поделиться видео сейчас</string>
@@ -352,6 +357,7 @@
     <string name="dance_upload_title">Загрузить фото из галереи</string>
     <string name="dance_upload_card_title">Нажмите, чтобы выбрать фото из галереи</string>
     <string name="dance_upload_card_desc">Выберите 1 или несколько фото (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Выберите 1 фото (JPG, PNG...)</string>
     <string name="dance_select_template">Выбрать шаблон</string>
     <string name="dance_bg_music">Фоновая музыка</string>
     <string name="btn_create_dance_video">Создать видео танца</string>

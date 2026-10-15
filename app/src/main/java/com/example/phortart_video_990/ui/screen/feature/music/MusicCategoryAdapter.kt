@@ -44,10 +44,10 @@ class MusicCategoryAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: CategoryModel) {
-            val isAll = category.code.equals("ALL", ignoreCase = true) ||
-                    category.name.equals("Tất cả", ignoreCase = true) ||
-                    category.code.isBlank()
-            binding.tvCategoryName.text = if (isAll) "Dành cho bạn" else category.displayName
+            val displayName = com.example.phortart_video_990.ui.screen.template.CategoryAdapter.getLocalizedCategoryName(
+                binding.root.context, category
+            )
+            binding.tvCategoryName.text = displayName
 
             val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
                     (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))

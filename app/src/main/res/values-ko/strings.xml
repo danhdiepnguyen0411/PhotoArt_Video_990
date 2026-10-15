@@ -106,7 +106,7 @@ AI가 그려내는</string>
     <string name="prompt_style_portrait">꽃밭 속 소녀의 시네마틱 초현실적 인물 사진, 부드러운 햇살, 얕은 심도, 8K 디테일</string>
     <string name="prompt_style_fantasy">구름 위에 떠 있는 마법의 성, 빛나는 크리스털과 밤하늘의 오로라, 웅장한 판타지 컨셉 아트</string>
     <string name="prompt_style_selfie">트렌디한 옷을 입은 젊은이의 밝고 세련된 셀카, 부드러운 자연광, 화사한 배경, 트렌디한 감성</string>
-    <string name="template_video_result_title">AI 템플릿 비디오</string>
+    <string name="template_video_result_title">내 비디오</string>
     <string name="original_audio">원본 오디오</string>
     <string name="tap_to_change_bg_music">탭하여 배경 음악 변경</string>
     <string name="btn_change_music">음악 변경</string>
@@ -122,7 +122,7 @@ AI가 그려내는</string>
     <string name="btn_view_photos">사진 보기</string>
     <string name="choose_bg_song">배경 음악 선택</string>
     <string name="browse_ai_music_catalog">탭하여 AI 음악 카탈로그 찾아보기</string>
-    <string name="video_result_title">추억 영상</string>
+    <string name="video_result_title">내 비디오</string>
     <string name="no_music_selected">음악 미선택</string>
     <string name="btn_save">저장</string>
     <string name="exporting_video_merging_music">비디오 내보내기 및 음악 합성 중...</string>
@@ -241,6 +241,11 @@ AI가 그려내는</string>
     <string name="toast_create_video_failed">비디오 생성 실패: %1$s</string>
     <string name="toast_process_video_failed">비디오 처리 실패: %1$s</string>
     <string name="toast_error_occurred">오류가 발생했습니다: %1$s</string>
+    <string name="error_no_face_detected">사진에서 얼굴을 찾을 수 없습니다. 얼굴이 선명한 사진을 선택해 주세요.</string>
+    <string name="error_network_connection">네트워크 연결 오류입니다. 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="error_server_busy">서버가 혼잡합니다. 잠시 후 다시 시도해 주세요.</string>
+    <string name="error_create_video_general">이 사진으로 비디오를 생성할 수 없습니다. 다른 사진으로 시도해 주세요.</string>
+    <string name="error_video_generation_timeout">처리 시간이 너무 오래 걸립니다. 나중에 다시 시도해 주세요.</string>
     <string name="toast_video_play_error">비디오 재생 오류</string>
     <string name="toast_cannot_export_video">비디오를 내보낼 수 없습니다!</string>
     <string name="toast_cannot_share_video">지금은 비디오를 공유할 수 없습니다</string>
@@ -344,6 +349,7 @@ AI가 그려내는</string>
     <string name="dance_upload_title">갤러리에서 사진 업로드</string>
     <string name="dance_upload_card_title">갤러리에서 사진을 선택하려면 탭하세요</string>
     <string name="dance_upload_card_desc">1장 이상의 사진 선택 (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">사진 1장 선택 (JPG, PNG...)</string>
     <string name="dance_select_template">템플릿 선택</string>
     <string name="dance_bg_music">배경 음악</string>
     <string name="btn_create_dance_video">댄스 비디오 만들기</string>

@@ -84,7 +84,7 @@ AI बना देगा</string>
     <string name="tap_to_select_change_music">AI बैकग्राउंड संगीत चुनने या बदलने के लिए टैप करें</string>
     <string name="btn_select_music">संगीत चुनें</string>
     <string name="btn_create_video_now">अभी वीडियो बनाएं</string>
-    <string name="template_video_result_title">AI टेम्पलेट वीडियो</string>
+    <string name="template_video_result_title">आपका वीडियो</string>
     <string name="original_audio">मूल ऑडियो</string>
     <string name="tap_to_change_bg_music">बैकग्राउंड संगीत बदलने के लिए टैप करें</string>
     <string name="btn_change_music">संगीत बदलें</string>
@@ -100,7 +100,7 @@ AI बना देगा</string>
     <string name="btn_view_photos">फ़ोटो देखें</string>
     <string name="choose_bg_song">बैकग्राउंड संगीत चुनें</string>
     <string name="browse_ai_music_catalog">AI संगीत सूची ब्राउज़ करने के लिए टैप करें</string>
-    <string name="video_result_title">यादों का वीडियो</string>
+    <string name="video_result_title">आपका वीडियो</string>
     <string name="no_music_selected">कोई संगीत नहीं चुना गया</string>
     <string name="btn_save">सहेजें</string>
     <string name="exporting_video_merging_music">वीडियो निर्यात और संगीत जोड़ा जा रहा है...</string>
@@ -219,6 +219,11 @@ AI बना देगा</string>
     <string name="toast_create_video_failed">वीडियो निर्माण विफल रहा: %1$s</string>
     <string name="toast_process_video_failed">वीडियो प्रसंस्करण विफल रहा: %1$s</string>
     <string name="toast_error_occurred">एक त्रुटि हुई: %1$s</string>
+    <string name="error_no_face_detected">फ़ोटो में कोई चेहरा नहीं मिला। कृपया स्पष्ट चेहरे वाली फ़ोटो चुनें।</string>
+    <string name="error_network_connection">नेटवर्क कनेक्शन त्रुटि। कृपया अपना कनेक्शन जांचें और पुन: प्रयास करें।</string>
+    <string name="error_server_busy">सर्वर व्यस्त है। कृपया कुछ मिनटों बाद पुन: प्रयास करें।</string>
+    <string name="error_create_video_general">इस फ़ोटो से वीडियो नहीं बनाया जा सका। कृपया किसी अन्य फ़ोटो के साथ प्रयास करें।</string>
+    <string name="error_video_generation_timeout">प्रोसेसिंग में बहुत अधिक समय लगा। कृपया बाद में पुन: प्रयास करें।</string>
     <string name="toast_video_play_error">वीडियो चलाने में त्रुटि</string>
     <string name="toast_cannot_export_video">वीडियो निर्यात नहीं किया जा सकता!</string>
     <string name="toast_cannot_share_video">अभी वीडियो साझा नहीं किया जा सकता</string>
@@ -322,6 +327,7 @@ AI बना देगा</string>
     <string name="dance_upload_title">गैलरी से फ़ोटो अपलोड करें</string>
     <string name="dance_upload_card_title">गैलरी से फ़ोटो चुनने के लिए टैप करें</string>
     <string name="dance_upload_card_desc">1 या अधिक फ़ोटो चुनें (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">1 फ़ोटो चुनें (JPG, PNG...)</string>
     <string name="dance_select_template">टेम्पलेट चुनें</string>
     <string name="dance_bg_music">पृष्ठभूमि संगीत</string>
     <string name="btn_create_dance_video">डांस वीडियो बनाएं</string>

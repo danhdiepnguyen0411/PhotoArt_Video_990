@@ -85,7 +85,7 @@
     <string name="tap_to_select_change_music">انقر لاختيار أو تغيير موسيقى الذكاء الاصطناعي</string>
     <string name="btn_select_music">اختر الموسيقى</string>
     <string name="btn_create_video_now">إنشاء الفيديو الآن</string>
-    <string name="template_video_result_title">فيديو نموذج AI</string>
+    <string name="template_video_result_title">الفيديو الخاص بك</string>
     <string name="original_audio">الصوت الأصلي</string>
     <string name="tap_to_change_bg_music">المس لتغيير الموسيقى الخلفية</string>
     <string name="btn_change_music">تغيير الموسيقى</string>
@@ -101,7 +101,7 @@
     <string name="btn_view_photos">عرض الصور</string>
     <string name="choose_bg_song">اختر موسيقى الخلفية</string>
     <string name="browse_ai_music_catalog">انقر لاستعراض قائمة الموسيقى الذكية</string>
-    <string name="video_result_title">فيديو الذكريات</string>
+    <string name="video_result_title">الفيديو الخاص بك</string>
     <string name="no_music_selected">لم يتم اختيار موسيقى</string>
     <string name="btn_save">حفظ</string>
     <string name="exporting_video_merging_music">جارٍ تصدير الفيديو ودمج الموسيقى...</string>
@@ -220,6 +220,11 @@
     <string name="toast_create_video_failed">فشل إنشاء الفيديو: %1$s</string>
     <string name="toast_process_video_failed">فشلت معالجة الفيديو: %1$s</string>
     <string name="toast_error_occurred">حدث خطأ: %1$s</string>
+    <string name="error_no_face_detected">لم يتم اكتشاف أي وجه في الصورة. يرجى اختيار صورة بوجه واضح.</string>
+    <string name="error_network_connection">خطأ في الاتصال بالشبكة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.</string>
+    <string name="error_server_busy">الخادم مشغول. يرجى المحاولة مرة أخرى بعد بضع دقائق.</string>
+    <string name="error_create_video_general">تعذر إنشاء الفيديو من هذه الصورة. يرجى تجربة صورة أخرى.</string>
+    <string name="error_video_generation_timeout">استغرقت المعالجة وقتاً طويلاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
     <string name="toast_video_play_error">خطأ أثناء تشغيل الفيديو</string>
     <string name="toast_cannot_export_video">تعذر تصدير الفيديو!</string>
     <string name="toast_cannot_share_video">تعذر مشاركة الفيديو الآن</string>
@@ -323,6 +328,7 @@
     <string name="dance_upload_title">تحميل الصور من المعرض</string>
     <string name="dance_upload_card_title">اضغط لاختيار الصور من المعرض</string>
     <string name="dance_upload_card_desc">حدد صورة واحدة أو أكثر (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">حدد صورة واحدة (JPG, PNG...)</string>
     <string name="dance_select_template">حدد قالباً</string>
     <string name="dance_bg_music">موسيقى الخلفية</string>
     <string name="btn_create_dance_video">إنشاء فيديو رقص</string>

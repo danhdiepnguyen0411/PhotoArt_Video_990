@@ -85,7 +85,7 @@ e nitide</string>
     <string name="tap_to_select_change_music">Tocca per scegliere o cambiare musica AI</string>
     <string name="btn_select_music">Scegli musica</string>
     <string name="btn_create_video_now">Crea video adesso</string>
-    <string name="template_video_result_title">Video modello AI</string>
+    <string name="template_video_result_title">Il tuo video</string>
     <string name="original_audio">Audio originale</string>
     <string name="tap_to_change_bg_music">Tocca per cambiare la musica di fondo</string>
     <string name="btn_change_music">Cambia musica</string>
@@ -101,7 +101,7 @@ e nitide</string>
     <string name="btn_view_photos">Vedi foto</string>
     <string name="choose_bg_song">Scegli musica di sottofondo</string>
     <string name="browse_ai_music_catalog">Tocca per esplorare il catalogo musicale AI</string>
-    <string name="video_result_title">Video ricordi</string>
+    <string name="video_result_title">Il tuo video</string>
     <string name="no_music_selected">Nessuna musica selezionata</string>
     <string name="btn_save">Salva</string>
     <string name="exporting_video_merging_music">Esportazione video e mix audio in corso...</string>
@@ -220,6 +220,11 @@ un\'esperienza superiore.</string>
     <string name="toast_create_video_failed">Creazione video fallita: %1$s</string>
     <string name="toast_process_video_failed">Elaborazione video fallita: %1$s</string>
     <string name="toast_error_occurred">Si è verificato un errore: %1$s</string>
+    <string name="error_no_face_detected">Nessun volto rilevato nella foto. Seleziona una foto con un viso ben visibile.</string>
+    <string name="error_network_connection">Errore di connessione di rete. Controlla la connessione e riprova.</string>
+    <string name="error_server_busy">Il server è occupato. Riprova tra qualche minuto.</string>
+    <string name="error_create_video_general">Impossibile creare il video da questa foto. Prova con un\'altra foto.</string>
+    <string name="error_video_generation_timeout">L\'elaborazione ha richiesto troppo tempo. Riprova più tardi.</string>
     <string name="toast_video_play_error">Errore durante la riproduzione video</string>
     <string name="toast_cannot_export_video">Impossibile esportare il video!</string>
     <string name="toast_cannot_share_video">Impossibile condividere il video al momento</string>
@@ -323,6 +328,7 @@ un\'esperienza superiore.</string>
     <string name="dance_upload_title">Carica foto dalla galleria</string>
     <string name="dance_upload_card_title">Tocca per selezionare le foto dalla galleria</string>
     <string name="dance_upload_card_desc">Seleziona 1 o più foto (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Seleziona 1 foto (JPG, PNG...)</string>
     <string name="dance_select_template">Seleziona modello</string>
     <string name="dance_bg_music">Musica di sottofondo</string>
     <string name="btn_create_dance_video">Crea video di danza</string>

@@ -57,8 +57,7 @@ class HomeHotAdapter(
 
         fun bind(item: TemplateModel, position: Int) {
             binding.tvTemplateTitle.text = item.title
-            binding.tvDuration.text = item.displayDuration
-            binding.tvPhotoCount.text = item.displayPhotoCount
+            binding.tvViews.text = item.displayViews
 
             // Image Thumbnail with shimmer loading light beam (NO static template images as placeholder)
             val shimmerPlaceholder = ShimmerDrawable()
@@ -72,19 +71,8 @@ class HomeHotAdapter(
                 error(shimmerPlaceholder)
             }
 
-            val isPlaying = position == playingPosition
-            val isLoading = position == loadingPosition
-
-            if (isLoading) {
-                binding.pbLoading.visibility = View.VISIBLE
-                binding.ivPlayIcon.visibility = View.GONE
-            } else {
-                binding.pbLoading.visibility = View.GONE
-                binding.ivPlayIcon.visibility = View.VISIBLE
-                binding.ivPlayIcon.setImageResource(
-                    if (isPlaying) R.drawable.ic_pause_small else R.drawable.ic_play_small
-                )
-            }
+            binding.pbLoading.visibility = View.GONE
+            binding.ivPlayIcon.visibility = View.GONE
 
             binding.ivPlayIcon.isClickable = false
             binding.ivPlayIcon.isFocusable = false

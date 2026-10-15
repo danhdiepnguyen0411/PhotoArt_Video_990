@@ -89,13 +89,14 @@ object AppDialogHelper {
      */
     fun showRestoreErrorDialog(
         activity: Activity,
+        subtitle: String? = null,
         onRetry: (() -> Unit)? = null,
         onCancel: (() -> Unit)? = null
     ) {
         showErrorDialog(
             activity = activity,
             title = activity.getString(R.string.restore_error_title),
-            subtitle = activity.getString(R.string.restore_error_desc),
+            subtitle = subtitle ?: activity.getString(R.string.restore_error_desc),
             onRetry = onRetry,
             onCancel = onCancel
         )
