@@ -9,6 +9,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.phortart_video_990.MainActivity
+import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
 import kotlinx.coroutines.*
 
 object NotificationPermissionManager {
@@ -95,17 +96,22 @@ object NotificationPermissionManager {
     }
 
     fun getDeniedCount(context: Context): Int {
+        val appDenied = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context).notificationDeniedCount
+        if (appDenied > 0) return appDenied
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         return prefs.getInt(KEY_DENIED_COUNT, 0)
     }
 
     fun incrementDeniedCount(context: Context) {
+        val appPrefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context)
+        appPrefs.notificationDeniedCount++
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val current = prefs.getInt(KEY_DENIED_COUNT, 0)
         prefs.edit().putInt(KEY_DENIED_COUNT, current + 1).apply()
     }
 
     fun resetDeniedCount(context: Context) {
+        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context).notificationDeniedCount = 0
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().putInt(KEY_DENIED_COUNT, 0).apply()
     }
@@ -116,7 +122,6 @@ object NotificationPermissionManager {
         if (hasShownNotificationDialogThisSession) return false
         if (isUserRevoked(context)) return true
         if (systemPermissionRequestedThisSession) return false
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return getDeniedCount(context) >= 2
     }
 
@@ -131,81 +136,15 @@ object NotificationPermissionManager {
         targetActivityClass: Class<*> = MainActivity::class.java,
         onGranted: (() -> Unit)? = null
     ) {
-        monitoringJob?.cancel()
-        val appContext = context.applicationContext
-
-        val initialPostNotif = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(
-                appContext, android.Manifest.permission.POST_NOTIFICATIONS
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        } else {
-            NotificationManagerCompat.from(appContext).areNotificationsEnabled()
-        }
-        val initialNotifEnabled = NotificationManagerCompat.from(appContext).areNotificationsEnabled()
-
-        monitoringJob = CoroutineScope(Dispatchers.IO).launch {
-            delay(500)
-            var count = 0
-            while (count < 150) { // poll for ~60s
-                delay(400)
-                count++
-
-                val currentPostNotif = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    ContextCompat.checkSelfPermission(
-                        appContext, android.Manifest.permission.POST_NOTIFICATIONS
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                } else {
-                    NotificationManagerCompat.from(appContext).areNotificationsEnabled()
-                }
-                val currentNotifEnabled = NotificationManagerCompat.from(appContext).areNotificationsEnabled()
-
-                val newlyGrantedPostNotif = currentPostNotif && !initialPostNotif
-                val newlyEnabledNotif = currentNotifEnabled && !initialNotifEnabled
-                val allGrantedNow = currentPostNotif && currentNotifEnabled
-
-                if (newlyGrantedPostNotif || newlyEnabledNotif || (allGrantedNow && (!initialPostNotif || !initialNotifEnabled))) {
-                    withContext(Dispatchers.Main) {
-                        bringToFront(appContext, targetActivityClass)
-                        onGranted?.invoke()
-                    }
-                    break
-                }
-            }
-        }
+        NotificationDialogHelper.startPollingForNotificationPermission(context, onGranted)
     }
 
     fun bringToFront(context: Context, targetActivityClass: Class<*> = MainActivity::class.java) {
-        try {
-            val intent = Intent(context, targetActivityClass).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                val options = android.app.ActivityOptions.makeBasic().apply {
-                    setPendingIntentBackgroundActivityStartMode(android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
-                }
-                val pendingIntent = android.app.PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                )
-                pendingIntent.send(options.toBundle())
-            } else {
-                context.startActivity(intent)
-            }
-        } catch (e: Exception) {
-            try {
-                val intent = Intent(context, targetActivityClass).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                }
-                context.startActivity(intent)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
+        PermissionReturnHelper.bringAppToFront(context)
     }
 
     fun stopMonitoring() {
+        NotificationDialogHelper.stopPolling()
         monitoringJob?.cancel()
         monitoringJob = null
         isAwaitingSettingsResult = false
@@ -218,20 +157,15 @@ object NotificationPermissionManager {
     ) {
         try {
             isAwaitingSettingsResult = true
-            val intent = createSettingsIntent(context)
-            if (context !is Activity) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-            startMonitoringPermissionAndBringToFront(context, targetActivityClass, onGranted)
+            PermissionReturnHelper.openAppSettings(context)
+            NotificationDialogHelper.startPollingForNotificationPermission(context, onGranted)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun openAppSettings(context: Context, onGranted: (() -> Unit)? = null) {
-        val targetClass = if (context is Activity) context.javaClass else MainActivity::class.java
-        openAppSettings(context, targetClass, onGranted)
+        openAppSettings(context, MainActivity::class.java, onGranted)
     }
 
     fun openNotificationSettings(
@@ -241,25 +175,14 @@ object NotificationPermissionManager {
     ) {
         try {
             isAwaitingSettingsResult = true
-            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                }
-            } else {
-                createSettingsIntent(context)
-            }
-            if (context !is Activity) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-            startMonitoringPermissionAndBringToFront(context, targetActivityClass, onGranted)
+            PermissionReturnHelper.openNotificationSettings(context)
+            NotificationDialogHelper.startPollingForNotificationPermission(context, onGranted)
         } catch (e: Exception) {
             openAppSettings(context, targetActivityClass, onGranted)
         }
     }
 
     fun openNotificationSettings(context: Context, onGranted: (() -> Unit)? = null) {
-        val targetClass = if (context is Activity) context.javaClass else MainActivity::class.java
-        openNotificationSettings(context, targetClass, onGranted)
+        openNotificationSettings(context, MainActivity::class.java, onGranted)
     }
 }

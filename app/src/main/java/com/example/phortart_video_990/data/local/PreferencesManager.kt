@@ -38,6 +38,14 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean(KEY_HAS_COMPLETED_INTRO, false)
         set(value) = prefs.edit().putBoolean(KEY_HAS_COMPLETED_INTRO, value).apply()
 
+    var notificationDeniedCount: Int
+        get() = prefs.getInt("notification_denied_count", 0)
+        set(value) = prefs.edit().putInt("notification_denied_count", value).apply()
+
+    var shouldShowNotiDialogOnHome: Boolean
+        get() = prefs.getBoolean("should_show_noti_dialog_on_home", false)
+        set(value) = prefs.edit().putBoolean("should_show_noti_dialog_on_home", value).apply()
+
     fun clearLegacyUninstallFlags() {
         if (prefs.contains("is_uninstall_active") || prefs.contains("skip_splash_once")) {
             prefs.edit()
