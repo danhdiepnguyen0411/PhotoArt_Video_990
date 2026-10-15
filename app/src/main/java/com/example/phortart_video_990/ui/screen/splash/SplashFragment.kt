@@ -7,8 +7,10 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.phortart_video_990.MainActivity
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
 import com.example.phortart_video_990.core.utils.LocaleHelper
 import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.SystemBarInsetsHelper
@@ -24,6 +26,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
     private var hasNavigated = false
     private var isProgressComplete = false
     private var isWaitingForPermission = false
+    private var hasRequestedPermission = false
     private var progressJob: Job? = null
     private var fallbackJob: Job? = null
 
@@ -32,13 +35,22 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
     ) { isGranted ->
         isWaitingForPermission = false
         context?.let { ctx ->
+            val prefs = PreferencesManager.getInstance(ctx)
             if (isGranted) {
+                prefs.shouldShowNotiDialogOnHome = false
+                MainActivity.shouldCheckNotificationOnResume = false
+                prefs.notificationDeniedCount = 0
+                prefs.isNotificationEnabled = true
                 NotificationPermissionManager.setPreviouslyGranted(ctx, true)
                 NotificationPermissionManager.setUserRevoked(ctx, false)
                 NotificationPermissionManager.resetDeniedCount(ctx)
             } else {
+                prefs.notificationDeniedCount++
                 NotificationPermissionManager.incrementDeniedCount(ctx)
             }
+            // Do not show custom noti dialog on Home in the same session where user just saw native popup
+            prefs.shouldShowNotiDialogOnHome = false
+            MainActivity.shouldCheckNotificationOnResume = false
         }
         navigateToNext()
     }
@@ -167,26 +179,39 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
         if (hasNavigated) return
 
         val ctx = context ?: return
+        val prefs = PreferencesManager.getInstance(ctx)
+
+        if (NotificationDialogHelper.isNotificationGranted(ctx)) {
+            prefs.shouldShowNotiDialogOnHome = false
+            MainActivity.shouldCheckNotificationOnResume = false
+            navigateToNext()
+            return
+        }
 
         // Request POST_NOTIFICATIONS up to 2 times at Splash (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isGranted = NotificationPermissionManager.isNotificationPermissionGranted(ctx)
-            val isRevoked = NotificationPermissionManager.isUserRevoked(ctx)
-            val deniedCount = NotificationPermissionManager.getDeniedCount(ctx)
-            if (!isGranted && !isRevoked && deniedCount < 2) {
-                NotificationPermissionManager.systemPermissionRequestedThisSession = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && prefs.notificationDeniedCount < 2) {
+            if (!hasRequestedPermission) {
+                hasRequestedPermission = true
                 isWaitingForPermission = true
+                NotificationPermissionManager.systemPermissionRequestedThisSession = true
                 try {
                     requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     return
                 } catch (e: Exception) {
                     e.printStackTrace()
                     isWaitingForPermission = false
+                    navigateToNext()
                 }
+            } else {
+                navigateToNext()
             }
+        } else {
+            // User denied twice already, or 3rd access without permission:
+            // Prepare custom notification popup for Home screen
+            prefs.shouldShowNotiDialogOnHome = true
+            MainActivity.shouldCheckNotificationOnResume = true
+            navigateToNext()
         }
-
-        navigateToNext()
     }
 
     private fun navigateToNext() {
