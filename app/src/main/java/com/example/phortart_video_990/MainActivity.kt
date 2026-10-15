@@ -13,6 +13,10 @@ import com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
 
+    companion object {
+        var shouldCheckNotificationOnResume: Boolean = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -98,8 +102,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         SystemBarInsetsHelper.hideSystemBars(window)
         NotificationPermissionManager.onAppForegrounded(this)
 
-        if (NotificationPermissionManager.isNotificationPermissionGranted(this)) {
+        if (NotificationDialogHelper.isNotificationGranted(this)) {
             NotificationDialogHelper.dismissNotificationDialog(this)
+            NotificationDialogHelper.stopPolling()
         }
     }
 

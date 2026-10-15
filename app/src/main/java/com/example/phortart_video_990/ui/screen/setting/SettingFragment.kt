@@ -91,19 +91,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
     }
 
     private fun openAppInfoSettings() {
-        val ctx = context ?: return
-        try {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", ctx.packageName, null)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            try {
-                val fallbackIntent = Intent(Settings.ACTION_SETTINGS)
-                startActivity(fallbackIntent)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
+        val act = activity ?: return
+        com.example.phortart_video_990.core.utils.PermissionReturnHelper.openNotificationSettings(act)
+        com.example.phortart_video_990.core.dialog.NotificationDialogHelper.startPollingForNotificationPermission(act) {
+            updateNotificationState(animate = true)
         }
     }
 }

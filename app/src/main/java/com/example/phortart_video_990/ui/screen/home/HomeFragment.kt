@@ -13,10 +13,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.example.phortart_video_990.MainActivity
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
 import com.example.phortart_video_990.core.utils.navigateSafe
+import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.BannerItemModel
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.HomeMediaItemModel
@@ -166,10 +169,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun checkCustomNotificationPermission() {
-        if (com.example.phortart_video_990.core.utils.NotificationPermissionManager.shouldShowNotificationDialog(requireContext())) {
-            binding.root.post {
-                if (isAdded && com.example.phortart_video_990.core.utils.NotificationPermissionManager.shouldShowNotificationDialog(requireContext())) {
-                    com.example.phortart_video_990.core.dialog.NotificationDialogHelper.showNotificationDialog(requireActivity())
+        if (!MainActivity.shouldCheckNotificationOnResume) return
+        MainActivity.shouldCheckNotificationOnResume = false
+
+        val ctx = context ?: return
+        if (!NotificationDialogHelper.isNotificationGranted(ctx)) {
+            val prefs = PreferencesManager.getInstance(ctx)
+            if (prefs.notificationDeniedCount >= 2 && prefs.shouldShowNotiDialogOnHome) {
+                prefs.shouldShowNotiDialogOnHome = false
+                binding.root.post {
+                    if (isAdded) {
+                        NotificationDialogHelper.showNotificationDialog(requireActivity())
+                    }
                 }
             }
         }
