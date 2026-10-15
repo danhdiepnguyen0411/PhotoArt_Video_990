@@ -106,7 +106,7 @@ class HistoryAdapter(
                 binding.ivHistoryThumb.setImageResource(R.drawable.bg_card_white)
             }
 
-            binding.tvHistoryTitle.text = item.title
+            binding.tvHistoryTitle.text = item.getLocalizedTitle(binding.root.context)
             binding.tvHistoryDate.text = item.date
             binding.root.setOnClickListener { onItemClick(item) }
         }

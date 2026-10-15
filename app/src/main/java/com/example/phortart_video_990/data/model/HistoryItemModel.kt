@@ -102,4 +102,64 @@ data class HistoryItemModel(
             }
             return if (date.contains("•")) date.split("•")[0].trim() else date.trim()
         }
+
+    fun getLocalizedTitle(context: android.content.Context): String {
+        val t = type.lowercase()
+        val tit = title.trim()
+
+        // 1. Restore item
+        if (t.contains("khôi phục") || t.contains("restore") || t.contains("phục") ||
+            tit in listOf(
+                "Restore Old Photos", "老照片高清修复", "Hồi sinh ảnh cũ",
+                "Реставрация старых фото", "Pulihkan Foto Lama", "Restaurar fotos antigas",
+                "오래된 사진 복원", "古い写真の復元", "Ripristina vecchie foto",
+                "Restaurer anciennes photos", "पुरानी फ़ोटो बहाली", "Restaurar fotos viejas",
+                "Alte Fotos restaurieren", "إحياء الصور القديمة"
+            )
+        ) {
+            return context.getString(com.example.phortart_video_990.R.string.func_02_restore)
+        }
+
+        // 2. Video from photos
+        if (tit.contains("AI photo", ignoreCase = true) ||
+            tit.contains("ảnh AI", ignoreCase = true) ||
+            tit.contains("фото AI", ignoreCase = true) ||
+            tit.contains("foto AI", ignoreCase = true) ||
+            tit.startsWith("Video from", ignoreCase = true) ||
+            tit.startsWith("Video từ", ignoreCase = true) ||
+            tit.startsWith("Видео из", ignoreCase = true) ||
+            tit.startsWith("Video dari", ignoreCase = true)
+        ) {
+            val countMatch = Regex("""(\d+)""").find(tit)
+            val count = countMatch?.groupValues?.get(1)?.toIntOrNull() ?: displayPhotoCount.toIntOrNull() ?: 2
+            val musicPart = if (tit.contains("•")) {
+                val afterBullet = tit.substringAfter("•").trim()
+                if (afterBullet.contains(":")) afterBullet.substringAfter(":").trim() else afterBullet
+            } else null
+
+            return if (!musicPart.isNullOrBlank()) {
+                context.getString(com.example.phortart_video_990.R.string.video_title_with_music, count, musicPart)
+            } else {
+                context.getString(com.example.phortart_video_990.R.string.video_title_no_music, count)
+            }
+        }
+
+        // 3. Known prompt templates
+        val lowerTit = tit.lowercase()
+        return when {
+            lowerTit.contains("anime girl") || lowerTit.contains("manga") || lowerTit.contains("truyện tranh nhật") || lowerTit.contains("аниме-девушка") || lowerTit.contains("动漫美少女") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_anime_full)
+            lowerTit.contains("lâu đài") || lowerTit.contains("floating castle") || lowerTit.contains("парящий замок") || lowerTit.contains("kastil fantasi") || lowerTit.contains("天空之城") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_fantasy_full)
+            lowerTit.contains("mèo con") || lowerTit.contains("tách trà") || lowerTit.contains("котёнок") || lowerTit.contains("cute pet") || lowerTit.contains("anak kucing") || lowerTit.contains("tea cup") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_pet_full)
+            lowerTit.contains("cyberpunk") || lowerTit.contains("киберпанк") || lowerTit.contains("neon rực sáng") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_cyberpunk_full)
+            lowerTit.contains("rừng cây") || lowerTit.contains("waterfall") || lowerTit.contains("phát sáng bên hồ") || lowerTit.contains("водопад") || lowerTit.contains("hồ nước") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_nature_full)
+            lowerTit.contains("chân dung thiếu nữ") || lowerTit.contains("vintage artistic portrait") || lowerTit.contains("портрет женщины") || lowerTit.contains("potret artistik") ->
+                context.getString(com.example.phortart_video_990.R.string.prompt_portrait_full)
+            else -> tit
+        }
+    }
 }

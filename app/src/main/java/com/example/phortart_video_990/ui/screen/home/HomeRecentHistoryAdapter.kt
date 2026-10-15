@@ -36,7 +36,7 @@ class HomeRecentHistoryAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: HistoryItemModel) {
-            binding.tvHistoryTitle.text = item.title
+            binding.tvHistoryTitle.text = item.getLocalizedTitle(binding.root.context)
             binding.tvHistoryDate.text = item.displayDate
 
             val rawSource: Any? = item.imageUrl ?: item.imageUri ?: if (item.imageRes != 0) item.imageRes else null
