@@ -94,8 +94,8 @@
     <string name="style_neon_glow">Phát sáng Neon</string>
     <string name="style_fantasy">Huyền ảo</string>
     <string name="style_selfie">Selfie</string>
-    <string name="prompt_style_cyber_move">Vũ công phong cách cyber chuyển động điêu luyện, viền neon rực rỡ, vệt sáng ma mị, thành phố tương lai, điện ảnh chi tiết cao</string>
-    <string name="prompt_style_street_vibes">Chân dung phong cách đường phố của bạn trẻ mặc streetwear thời thượng, tường graffiti nghệ thuật, ánh sáng hoàng hôn ấm áp, màu phim 35mm</string>
+    <string name="prompt_style_cyber_move">Vũ công phong cách cyber chuyển động điêu luyện, viền neon rực rỡ, vệt sáng ma mị</string>
+    <string name="prompt_style_street_vibes">Chân dung phong cách đường phố của bạn trẻ mặc streetwear thời thượng, tường graffiti nghệ thuật, ánh sáng hoàng hôn ấm áp</string>
     <string name="prompt_style_urban_renaissance">Cảnh quan đô thị phục hưng lúc chạng vạng, kiến trúc cổ điển hòa quyện cùng các tòa nhà chọc trời hiện đại, ánh sáng ấm, phong cách hội họa sắc nét</string>
     <string name="prompt_style_dreamy">Khung cảnh màu pastel mộng mơ với những đám mây mềm mại, cánh hoa bay lượn và ánh sáng lung linh, không khí huyền ảo, tranh minh họa thần tiên</string>
     <string name="prompt_style_vintage">Bức ảnh phim thập niên 1970 cổ điển về cặp đôi trên chuyến du ngoạn bên bờ biển, màu sắc hoài niệm, vệt sáng ánh kim, hạt phim hoài cổ</string>
@@ -117,7 +117,7 @@
     <string name="tap_to_select_change_music">Nhấn để chọn hoặc đổi nhạc nền AI</string>
     <string name="btn_select_music">Chọn nhạc</string>
     <string name="btn_create_video_now">Tạo video ngay</string>
-    <string name="template_video_result_title">Video AI Tạo Mẫu</string>
+    <string name="template_video_result_title">Video của bạn</string>
     <string name="original_audio">Âm thanh gốc</string>
     <string name="tap_to_change_bg_music">Chạm để đổi nhạc nền</string>
     <string name="btn_change_music">Đổi nhạc</string>
@@ -140,7 +140,7 @@
     <string name="btn_view_photos">Xem ảnh</string>
     <string name="choose_bg_song">Chọn bài hát nền</string>
     <string name="browse_ai_music_catalog">Nhấn để duyệt danh mục nhạc AI</string>
-    <string name="video_result_title">Gom kỷ niệm</string>
+    <string name="video_result_title">Video của bạn</string>
     <string name="memories_of_us">Kỷ niệm của chúng ta</string>
     <string name="video_subtitle_format">Tạo bởi AI · %1$s · %2$s</string>
     <string name="video_subtitle_no_music_format">Tạo bởi AI · %1$s</string>

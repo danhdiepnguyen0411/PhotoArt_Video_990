@@ -108,7 +108,7 @@
     <string name="tap_to_select_change_music">Tap to select or change AI background music</string>
     <string name="btn_select_music">Select Music</string>
     <string name="btn_create_video_now">Create Video Now</string>
-    <string name="template_video_result_title">AI Template Video</string>
+    <string name="template_video_result_title">Your Video</string>
     <string name="original_audio">Original Audio</string>
     <string name="tap_to_change_bg_music">Tap to change background music</string>
     <string name="btn_change_music">Change Music</string>
@@ -131,7 +131,7 @@
     <string name="btn_view_photos">View photos</string>
     <string name="choose_bg_song">Select background music</string>
     <string name="browse_ai_music_catalog">Tap to browse AI music catalog</string>
-    <string name="video_result_title">Memories Video</string>
+    <string name="video_result_title">Your Video</string>
     <string name="no_music_selected">No music selected</string>
     <string name="btn_save">Save</string>
     <string name="exporting_video_merging_music">Exporting video &amp; merging music...</string>

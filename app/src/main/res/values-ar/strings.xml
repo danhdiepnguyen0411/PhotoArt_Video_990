@@ -85,7 +85,7 @@
     <string name="tap_to_select_change_music">انقر لاختيار أو تغيير موسيقى الذكاء الاصطناعي</string>
     <string name="btn_select_music">اختر الموسيقى</string>
     <string name="btn_create_video_now">إنشاء الفيديو الآن</string>
-    <string name="template_video_result_title">فيديو نموذج AI</string>
+    <string name="template_video_result_title">الفيديو الخاص بك</string>
     <string name="original_audio">الصوت الأصلي</string>
     <string name="tap_to_change_bg_music">المس لتغيير الموسيقى الخلفية</string>
     <string name="btn_change_music">تغيير الموسيقى</string>
@@ -101,7 +101,7 @@
     <string name="btn_view_photos">عرض الصور</string>
     <string name="choose_bg_song">اختر موسيقى الخلفية</string>
     <string name="browse_ai_music_catalog">انقر لاستعراض قائمة الموسيقى الذكية</string>
-    <string name="video_result_title">فيديو الذكريات</string>
+    <string name="video_result_title">الفيديو الخاص بك</string>
     <string name="no_music_selected">لم يتم اختيار موسيقى</string>
     <string name="btn_save">حفظ</string>
     <string name="exporting_video_merging_music">جارٍ تصدير الفيديو ودمج الموسيقى...</string>

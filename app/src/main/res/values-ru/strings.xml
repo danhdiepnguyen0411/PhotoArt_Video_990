@@ -114,7 +114,7 @@
     <string name="tap_to_select_change_music">Нажмите для выбора или замены AI-музыки</string>
     <string name="btn_select_music">Выбрать музыку</string>
     <string name="btn_create_video_now">Создать видео сейчас</string>
-    <string name="template_video_result_title">AI видео по шаблону</string>
+    <string name="template_video_result_title">Ваше видео</string>
     <string name="original_audio">Оригинальный звук</string>
     <string name="tap_to_change_bg_music">Нажмите, чтобы сменить фоновую музыку</string>
     <string name="btn_change_music">Сменить музыку</string>
@@ -130,7 +130,7 @@
     <string name="btn_view_photos">Смотреть фото</string>
     <string name="choose_bg_song">Выбрать фоновую музыку</string>
     <string name="browse_ai_music_catalog">Нажмите, чтобы просмотреть каталог AI-музыки</string>
-    <string name="video_result_title">Видео воспоминаний</string>
+    <string name="video_result_title">Ваше видео</string>
     <string name="no_music_selected">Музыка не выбрана</string>
     <string name="btn_save">Сохранить</string>
     <string name="exporting_video_merging_music">Экспорт видео и сведение музыки...</string>

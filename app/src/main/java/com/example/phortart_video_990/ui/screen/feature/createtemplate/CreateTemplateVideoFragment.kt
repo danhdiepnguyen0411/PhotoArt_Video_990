@@ -59,6 +59,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private var templateTitle: String = ""
     private var templateCategory: String = ""
     private var templateThumbnailUrl: String = ""
+    private var templateType: String = ""
+    private var userChangedMusic: Boolean = false
 
     // Selected music
     private var selectedMusicTrackId: String? = null
@@ -163,6 +165,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         savedInstanceState?.getString("saved_template_code")?.let {
             if (it.isNotBlank()) templateCode = it
         }
+        savedInstanceState?.getString("saved_template_type")?.let {
+            if (it.isNotBlank()) templateType = it
+        }
         savedInstanceState?.getString("saved_music_id")?.let {
             if (it.isNotBlank()) selectedMusicTrackId = it
         }
@@ -172,6 +177,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         super.onSaveInstanceState(outState)
         selectedPhotoUri?.let { outState.putString("saved_photo_uri", it.toString()) }
         if (templateCode.isNotBlank()) outState.putString("saved_template_code", templateCode)
+        if (templateType.isNotBlank()) outState.putString("saved_template_type", templateType)
         selectedMusicTrackId?.let { outState.putString("saved_music_id", it) }
     }
 
@@ -224,6 +230,10 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         val initialTemplateThumb = args?.getString(ARG_TEMPLATE_THUMB)?.takeIf { it.isNotBlank() }
             ?: args?.getString("template_thumb").orEmpty()
         if (initialTemplateThumb.isNotBlank()) templateThumbnailUrl = initialTemplateThumb
+
+        val initialTemplateType = args?.getString(ARG_TEMPLATE_TYPE)?.takeIf { it.isNotBlank() }
+            ?: args?.getString("template_type").orEmpty()
+        if (initialTemplateType.isNotBlank()) templateType = initialTemplateType
 
         // Initial Music from arguments
         val initialMusicId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
@@ -331,6 +341,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             templateTitle = template.title
             templateCategory = template.category
             templateThumbnailUrl = template.safeImageUrl.orEmpty()
+            templateType = template.templateType.orEmpty()
 
             // If music hasn't been explicitly changed, sync template audio as well
             if (selectedMusicTrackId == null && !template.safeAudioUrl.isNullOrBlank()) {
@@ -360,6 +371,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             tracks = emptyList(),
             selectedTrackId = selectedMusicTrackId,
             onTrackSelected = { track ->
+                userChangedMusic = true
                 if (track != null) {
                     selectedMusicTrackId = track.id
                     selectedMusicTitle = track.title
@@ -448,8 +460,13 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                         templateTitle = first.title
                         templateCategory = first.category
                         templateThumbnailUrl = first.safeImageUrl.orEmpty()
+                        templateType = first.templateType.orEmpty()
                         danceTemplateAdapter.setSelectedId(first.id)
                     } else {
+                        val matching = dancingTemplates.firstOrNull { it.id == templateCode }
+                        if (matching != null && templateType.isBlank()) {
+                            templateType = matching.templateType.orEmpty()
+                        }
                         danceTemplateAdapter.setSelectedId(templateCode)
                     }
                 }
@@ -705,42 +722,59 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     ImageCompressor.compressIfNeeded(requireContext(), rawFile)
                 }
 
-                // 3. Gọi backend processImageEditing
+                // 3. Gọi backend processImageEditing hoặc generateStaticVideo
                 val codeToUse = templateCode.ifBlank { "ai_dance_default" }
                 if (isAdded) {
                     loadingDialog?.updateMessage(getString(R.string.loading_sending_video_request), getString(R.string.loading_backend_ai_processing))
                 }
 
-                val processResult = templateRepository.processImageEditing(
-                    file = compressedFile,
-                    code = codeToUse,
-                    options = "{}"
-                )
+                val isStatic = templateType.equals("GENERATE_STATIC_VIDEO", ignoreCase = true) ||
+                        templateType.equals("GEN_VIDEO_STATIC", ignoreCase = true)
+
+                val processResult = if (isStatic) {
+                    templateRepository.generateStaticVideo(
+                        code = codeToUse,
+                        file = compressedFile,
+                        options = "{}",
+                        prompt = null
+                    )
+                } else {
+                    templateRepository.processImageEditing(
+                        file = compressedFile,
+                        code = codeToUse,
+                        options = "{}"
+                    )
+                }
+
+                var requestId: String? = null
+                var videoUrl: String? = null
 
                 if (processResult.isFailure) {
-                    val rawError = processResult.exceptionOrNull()?.message
-                    val errorMsg = ErrorFormatter.formatVideoErrorMessage(requireContext(), rawError)
-                    val reqId = templateRepository.extractRequestId(null)
-                    if (reqId.isNullOrBlank()) {
+                    val errorMsg = processResult.exceptionOrNull()?.message ?: ""
+                    val extractedUuid = templateRepository.extractRequestIdFromError(errorMsg)
+                    if (!extractedUuid.isNullOrBlank()) {
+                        requestId = extractedUuid
+                    } else {
                         isGeneratingVideo = false
+                        val friendlyError = context?.let { ErrorFormatter.formatVideoErrorMessage(it, errorMsg) } ?: errorMsg
                         if (isResumed && isAdded) {
                             hideLoadingDialog()
                             bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
-                            Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, friendlyError), Toast.LENGTH_LONG).show()
                         } else {
-                            pendingErrorMsg = errorMsg
+                            pendingErrorMsg = friendlyError
                         }
                         return@launch
                     }
+                } else {
+                    val jsonResponse = processResult.getOrNull()
+                    videoUrl = templateRepository.extractVideoUrl(jsonResponse)
+                    requestId = templateRepository.extractRequestId(jsonResponse)
                 }
-
-                val jsonResponse = processResult.getOrNull()
-                var videoUrl = templateRepository.extractVideoUrl(jsonResponse)
-                val requestId = templateRepository.extractRequestId(jsonResponse)
 
                 if (videoUrl.isNullOrBlank() && requestId.isNullOrBlank()) {
                     isGeneratingVideo = false
-                    val errorMsg = ErrorFormatter.formatVideoErrorMessage(requireContext(), jsonResponse?.toString())
+                    val errorMsg = ErrorFormatter.formatVideoErrorMessage(requireContext(), processResult.getOrNull()?.toString())
                     if (isResumed && isAdded) {
                         hideLoadingDialog()
                         bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
@@ -753,11 +787,12 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                 // 4. Poll kết quả nếu cần
                 if (videoUrl.isNullOrBlank() && !requestId.isNullOrBlank()) {
+                    val currentRequestId = requestId
                     if (isAdded) {
                         loadingDialog?.updateMessage(getString(R.string.loading_generating_video_ai), getString(R.string.loading_processing_progress, 30))
                     }
                     val pollResult = templateRepository.pollImageEditingResult(
-                        requestId = requestId,
+                        requestId = currentRequestId,
                         intervalMillis = 5_000L,
                         timeoutMillis = 180_000L,
                         onProgress = { progress ->
@@ -803,7 +838,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
 
                     if (rawVideoFile != null && rawVideoFile.exists()) {
-                        val mergedFile = if (chosenMusic != null && (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank())) {
+                        val shouldMergeAudio = (!isStatic || userChangedMusic) &&
+                                chosenMusic != null && (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank())
+                        val mergedFile = if (shouldMergeAudio) {
                             if (isAdded) {
                                 loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
                             }
@@ -883,6 +920,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private fun navigateToResult(videoUrl: String?, inputPhotoUri: String, audioPath: String?) {
         val bundle = Bundle().apply {
             putString(TemplateVideoResultFragment.ARG_VIDEO_URL, videoUrl)
+            putString(TemplateVideoResultFragment.ARG_TEMPLATE_TITLE, templateTitle)
+            putString(TemplateVideoResultFragment.ARG_TEMPLATE_THUMB, templateThumbnailUrl)
             if (!selectedMusicTrackId.isNullOrBlank()) {
                 putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, selectedMusicTrackId)
                 putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, selectedMusicTitle.orEmpty())
@@ -978,6 +1017,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         const val ARG_TEMPLATE_TITLE = "arg_template_title"
         const val ARG_TEMPLATE_CATEGORY = "arg_template_category"
         const val ARG_TEMPLATE_THUMB = "arg_template_thumb"
+        const val ARG_TEMPLATE_TYPE = "arg_template_type"
         const val ARG_INITIAL_IMAGE = "extra_initial_image_1"
     }
 }

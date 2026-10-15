@@ -85,7 +85,7 @@ e nitide</string>
     <string name="tap_to_select_change_music">Tocca per scegliere o cambiare musica AI</string>
     <string name="btn_select_music">Scegli musica</string>
     <string name="btn_create_video_now">Crea video adesso</string>
-    <string name="template_video_result_title">Video modello AI</string>
+    <string name="template_video_result_title">Il tuo video</string>
     <string name="original_audio">Audio originale</string>
     <string name="tap_to_change_bg_music">Tocca per cambiare la musica di fondo</string>
     <string name="btn_change_music">Cambia musica</string>
@@ -101,7 +101,7 @@ e nitide</string>
     <string name="btn_view_photos">Vedi foto</string>
     <string name="choose_bg_song">Scegli musica di sottofondo</string>
     <string name="browse_ai_music_catalog">Tocca per esplorare il catalogo musicale AI</string>
-    <string name="video_result_title">Video ricordi</string>
+    <string name="video_result_title">Il tuo video</string>
     <string name="no_music_selected">Nessuna musica selezionata</string>
     <string name="btn_save">Salva</string>
     <string name="exporting_video_merging_music">Esportazione video e mix audio in corso...</string>
