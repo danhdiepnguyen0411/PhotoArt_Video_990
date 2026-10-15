@@ -32,7 +32,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         com.example.phortart_video_990.core.utils.ShortcutHelper.initUninstallShortcut(this)
 
         setupNavigationGraph(intent)
-        checkAndResumeUninstallIfActive(intent)
 
         NotificationPermissionManager.resetSessionState()
     }
@@ -41,54 +40,24 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         super.onNewIntent(intent)
         setIntent(intent)
         setupNavigationGraph(intent)
-        checkAndResumeUninstallIfActive(intent)
-    }
-
-    private fun checkAndResumeUninstallIfActive(intent: Intent?): Boolean {
-        if (intent?.getStringExtra("target_screen") == "home") {
-            // User explicitly navigated to Home from UninstallActivity
-            com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallClosed(this)
-            return false
-        }
-
-        val isNewUninstallShortcut = intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
-                intent?.getStringExtra("target_screen") == "uninstall"
-
-        // If it's a new uninstall action from shortcut, let SplashFragment run first
-        if (isNewUninstallShortcut) {
-            return false
-        }
-
-        // If user was already in UninstallActivity and reopened app from launcher icon, resume it
-        if (com.example.phortart_video_990.core.utils.UninstallSessionState.isUninstallActive(this)) {
-            val uninstallIntent = Intent(this, UninstallActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            }
-            startActivity(uninstallIntent)
-            return true
-        }
-        return false
     }
 
     private fun shouldSkipSplash(intent: Intent?): Boolean {
         val isNewUninstallShortcut = intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
                 intent?.getStringExtra("target_screen") == "uninstall"
 
-        // User requested: entering uninstall MUST show splash screen
+        // Entering uninstall shortcut MUST show splash screen
         if (isNewUninstallShortcut) {
             return false
         }
 
-        val prefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this)
         return intent?.getStringExtra("target_screen") == "home" ||
                 intent?.getBooleanExtra("skip_splash", false) == true ||
-                com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash ||
-                prefs.shouldSkipSplashOnce
+                com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash
     }
 
     private fun consumeSkipSplashFlags() {
         com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = false
-        com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this).shouldSkipSplashOnce = false
     }
 
     private fun setupNavigationGraph(intent: Intent?) {

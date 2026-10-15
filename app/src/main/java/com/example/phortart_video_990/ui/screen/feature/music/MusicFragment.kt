@@ -216,6 +216,7 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
             loadCategoriesAndTracks()
         }
 
+
         b.llEmptyState.setOnClickListener {
             loadCategoriesAndTracks()
         }

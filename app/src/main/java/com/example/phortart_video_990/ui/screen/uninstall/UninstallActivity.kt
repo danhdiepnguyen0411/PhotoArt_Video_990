@@ -57,7 +57,6 @@ class UninstallActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_uninstall)
 
-        com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallActive(this)
 
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -380,13 +379,8 @@ class UninstallActivity : AppCompatActivity() {
         btnStillWantToUninstallStep2.alpha = if (isOptionSelected) 1.0f else 0.4f
     }
 
-    override fun onStop() {
-        super.onStop()
-        com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallActive(this)
-    }
-
     private fun navigateToMain() {
-        com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallClosed(this)
+        com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = true
 
         NotificationPermissionManager.hasShownNotificationDialogThisSession = true
         NotificationPermissionManager.suppressNotificationDialog = true

@@ -130,6 +130,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="@string/feature_dance_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -177,6 +178,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="@string/feature_prompt_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -224,6 +226,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="@string/feature_restore_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -271,6 +274,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="@string/feature_video_title"
+                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />

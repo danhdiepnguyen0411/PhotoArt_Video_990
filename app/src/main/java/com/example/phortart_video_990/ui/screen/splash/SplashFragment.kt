@@ -60,24 +60,18 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
         val ctx = context
         if (ctx != null) {
-            val prefs = PreferencesManager.getInstance(ctx)
+
             val isNewUninstallShortcut = activity?.intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
                     activity?.intent?.getStringExtra("target_screen") == "uninstall"
 
             val isSkip = !isNewUninstallShortcut && (
                     activity?.intent?.getStringExtra("target_screen") == "home" ||
                     activity?.intent?.getBooleanExtra("skip_splash", false) == true ||
-                    com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash ||
-                    prefs.shouldSkipSplashOnce
+                    com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash
             )
 
             if (isSkip) {
-                if (activity?.intent?.getStringExtra("target_screen") == "home") {
-                    com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallClosed(ctx)
-                } else {
-                    com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = false
-                    prefs.shouldSkipSplashOnce = false
-                }
+                com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash = false
                 hasNavigated = true
                 findNavController().navigateSafe(R.id.action_splashFragment_to_mainFragment)
                 return
@@ -230,7 +224,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
             intent?.action = null
             intent?.removeExtra("target_screen")
 
-            com.example.phortart_video_990.core.utils.UninstallSessionState.markUninstallActive(ctx)
+
             val uninstallIntent = android.content.Intent(ctx, com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity::class.java).apply {
                 flags = android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
