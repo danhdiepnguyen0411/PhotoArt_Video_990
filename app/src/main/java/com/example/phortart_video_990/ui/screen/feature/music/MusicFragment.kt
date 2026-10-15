@@ -751,8 +751,12 @@ class MusicFragment : BaseFragment<FragmentMusicBinding>(FragmentMusicBinding::i
         selectedTrackId = track.id
         findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_track_id", track.id)
 
-        val musicSubtitle = track.displayDuration
-
+        val artistText = (if (track.category.startsWith("MUSIC_", ignoreCase = true)) {
+            track.category.substring(6)
+        } else {
+            track.category
+        }).ifBlank { "Photo AI" }
+        val musicSubtitle = "$artistText • ${track.displayDuration}"
         if (isTabMode) {
             val bundle = android.os.Bundle().apply {
                 putString("selected_track_id", track.id)

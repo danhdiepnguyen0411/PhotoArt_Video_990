@@ -57,6 +57,7 @@ class UninstallActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_uninstall)
 
+
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (currentStep == 2) {

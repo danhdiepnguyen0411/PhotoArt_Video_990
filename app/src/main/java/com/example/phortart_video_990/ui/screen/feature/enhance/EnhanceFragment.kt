@@ -175,6 +175,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             if (isAdded) findNavController().safePopBackStack()
         }
 
+
         // Start Generate
         binding.btnGeneratePrompt.setOnClickListener {
             val userPrompt = binding.etPromptInput.text?.toString()?.trim().orEmpty()

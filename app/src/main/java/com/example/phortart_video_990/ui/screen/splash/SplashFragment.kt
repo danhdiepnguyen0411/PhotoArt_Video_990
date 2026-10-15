@@ -60,6 +60,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
         val ctx = context
         if (ctx != null) {
+
             val isNewUninstallShortcut = activity?.intent?.action == "com.example.phortart_video_990.ACTION_UNINSTALL" ||
                     activity?.intent?.getStringExtra("target_screen") == "uninstall"
 
@@ -222,6 +223,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
         if (isUninstallTarget) {
             intent?.action = null
             intent?.removeExtra("target_screen")
+
 
             val uninstallIntent = android.content.Intent(ctx, com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity::class.java).apply {
                 flags = android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP

@@ -161,6 +161,8 @@ a premium experience.</string>
     <string name="setting_language">Language</string>
     <string name="setting_notification">Notifications</string>
     <string name="setting_notification_desc">Manage your notifications</string>
+    <string name="setting_permission">Permission</string>
+    <string name="setting_permission_desc">Manage app access permissions</string>
     <string name="settings_group_support">Support</string>
     <string name="setting_rate">Rate App</string>
     <string name="setting_rate_desc">Share your experience</string>

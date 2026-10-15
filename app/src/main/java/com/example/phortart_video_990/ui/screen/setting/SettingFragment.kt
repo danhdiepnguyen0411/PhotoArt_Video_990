@@ -1,15 +1,11 @@
 package com.example.phortart_video_990.ui.screen.setting
 
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.AppDialogHelper
-import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.databinding.FragmentSettingBinding
@@ -19,7 +15,6 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
     override fun initView() {
         val prefs = PreferencesManager.getInstance(requireContext())
         binding.tvCurrentLanguage.text = prefs.languageName
-        updateNotificationState(animate = false)
         updateRateVisibility()
     }
 
@@ -27,19 +22,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
         super.onResume()
         val prefs = PreferencesManager.getInstance(requireContext())
         binding.tvCurrentLanguage.text = prefs.languageName
-        updateNotificationState(animate = true)
         updateRateVisibility()
-    }
-
-    private fun updateNotificationState(animate: Boolean = true) {
-        val ctx = context ?: return
-        val isGranted = NotificationPermissionManager.isNotificationPermissionGranted(ctx)
-        PreferencesManager.getInstance(ctx).isNotificationEnabled = isGranted
-        if (animate) {
-            binding.switchNotification.isChecked = isGranted
-        } else {
-            binding.switchNotification.setCheckedSilently(isGranted)
-        }
     }
 
     private fun updateRateVisibility() {
@@ -55,12 +38,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
             navController.navigateSafe(R.id.action_mainFragment_to_languageFragment)
         }
 
-        // Notification Toggle / Row: opens App Info screen for user to toggle notifications
-        val onNotificationClick = View.OnClickListener {
+        // Permission Option: opens app details settings in device
+        binding.rowPermission.setOnClickListener {
             openAppInfoSettings()
         }
-        binding.rowNotification.setOnClickListener(onNotificationClick)
-        binding.switchNotification.setOnClickListener(onNotificationClick)
 
         // Header PRO Button
         binding.headerSetting.setOnProClickListener {
@@ -91,10 +72,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
     }
 
     private fun openAppInfoSettings() {
-        val act = activity ?: return
-        com.example.phortart_video_990.core.utils.PermissionReturnHelper.openNotificationSettings(act)
-        com.example.phortart_video_990.core.dialog.NotificationDialogHelper.startPollingForNotificationPermission(act) {
-            updateNotificationState(animate = true)
-        }
+        val act = activity ?: context ?: return
+        com.example.phortart_video_990.core.utils.PermissionReturnHelper.openAppSettings(act)
     }
 }
