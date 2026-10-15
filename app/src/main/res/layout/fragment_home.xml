@@ -98,7 +98,6 @@
                 android:background="@drawable/bg_feature_pink"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
@@ -146,7 +145,6 @@
                 android:background="@drawable/bg_feature_blue"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
@@ -194,7 +192,6 @@
                 android:background="@drawable/bg_feature_mint"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
@@ -242,7 +239,6 @@
                 android:background="@drawable/bg_feature_violet"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
@@ -373,15 +369,16 @@
 
         </LinearLayout>
 
-        <!-- Dancing Categories Filter Chips -->
+        <!-- Dancing Categories Filter Chips (Hidden per request) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvHomeCategories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="0dp"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp" />
+            android:paddingHorizontal="16dp"
+            android:visibility="gone" />
 
         <!-- Section 2: Gợi ý chủ đề cho bạn -->
         <LinearLayout

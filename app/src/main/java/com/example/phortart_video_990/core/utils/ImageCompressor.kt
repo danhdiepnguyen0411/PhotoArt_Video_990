@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Resize + nén ảnh thông minh trước khi upload lên backend AI.
@@ -58,48 +59,65 @@ object ImageCompressor {
         val sampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, currentMaxDim)
 
         val opts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
-        var bitmap = BitmapFactory.decodeFile(srcFile.absolutePath, opts)
-            ?: return srcFile
+        var bitmap = try {
+            BitmapFactory.decodeFile(srcFile.absolutePath, opts)
+        } catch (oom: OutOfMemoryError) {
+            System.gc()
+            opts.inSampleSize = sampleSize * 2
+            try {
+                BitmapFactory.decodeFile(srcFile.absolutePath, opts)
+            } catch (_: Throwable) {
+                null
+            }
+        } ?: return srcFile
 
         val longSide = maxOf(bitmap.width, bitmap.height)
         if (longSide > currentMaxDim) {
             val ratio = currentMaxDim.toFloat() / longSide
             val newW = (bitmap.width * ratio).toInt().coerceAtLeast(1)
             val newH = (bitmap.height * ratio).toInt().coerceAtLeast(1)
-            val scaled = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
-            if (scaled != bitmap) bitmap.recycle()
-            bitmap = scaled
+            try {
+                val scaled = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
+                if (scaled != bitmap) bitmap.recycle()
+                bitmap = scaled
+            } catch (oom: OutOfMemoryError) {
+                System.gc()
+            }
         }
 
         bitmap = fixOrientation(srcFile, bitmap)
 
         var quality = START_QUALITY
-        var bytes: ByteArray
         val stream = ByteArrayOutputStream()
 
         do {
             stream.reset()
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
-            bytes = stream.toByteArray()
-            if (bytes.size <= maxSizeBytes) break
+            if (stream.size() <= maxSizeBytes) break
             quality -= QUALITY_STEP
         } while (quality >= MIN_ALLOWED_QUALITY)
 
-        while (bytes.size > maxSizeBytes && bitmap.width > 720 && bitmap.height > 720) {
+        while (stream.size() > maxSizeBytes && bitmap.width > 720 && bitmap.height > 720) {
             val newW = (bitmap.width * 0.85f).toInt().coerceAtLeast(1)
             val newH = (bitmap.height * 0.85f).toInt().coerceAtLeast(1)
-            val scaled = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
-            if (scaled != bitmap) bitmap.recycle()
-            bitmap = scaled
+            try {
+                val scaled = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
+                if (scaled != bitmap) bitmap.recycle()
+                bitmap = scaled
+            } catch (oom: OutOfMemoryError) {
+                System.gc()
+                break
+            }
 
             stream.reset()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
-            bytes = stream.toByteArray()
-            if (bytes.size <= maxSizeBytes) break
+            if (stream.size() <= maxSizeBytes) break
         }
 
         val outFile = File(context.cacheDir, "compressed_input_${System.currentTimeMillis()}.jpg")
-        outFile.writeBytes(bytes)
+        FileOutputStream(outFile).use { fos ->
+            stream.writeTo(fos)
+        }
         bitmap.recycle()
         return outFile
     }
@@ -107,10 +125,10 @@ object ImageCompressor {
     private fun calculateInSampleSize(width: Int, height: Int, target: Int): Int {
         var inSampleSize = 1
         val longSide = maxOf(width, height)
-        while (longSide / (inSampleSize * 2) >= target) {
+        while (longSide / inSampleSize > target * 1.2f) {
             inSampleSize *= 2
         }
-        return inSampleSize
+        return inSampleSize.coerceAtLeast(1)
     }
 
     fun getExifRotation(file: File): Int {

@@ -221,6 +221,11 @@ uma experiência premium.</string>
     <string name="toast_create_video_failed">Falha ao criar vídeo: %1$s</string>
     <string name="toast_process_video_failed">Falha ao processar vídeo: %1$s</string>
     <string name="toast_error_occurred">Ocorreu um erro: %1$s</string>
+    <string name="error_no_face_detected">Nenhum rosto detectado na foto. Por favor, selecione uma foto com um rosto nítido.</string>
+    <string name="error_network_connection">Erro de conexão de rede. Verifique sua conexão e tente novamente.</string>
+    <string name="error_server_busy">O servidor está ocupado. Tente novamente em alguns minutos.</string>
+    <string name="error_create_video_general">Não foi possível criar o vídeo a partir desta foto. Tente com outra foto.</string>
+    <string name="error_video_generation_timeout">O processamento demorou muito. Tente novamente mais tarde.</string>
     <string name="toast_video_play_error">Erro ao reproduzir o vídeo</string>
     <string name="toast_cannot_export_video">Não foi possível exportar o vídeo!</string>
     <string name="toast_cannot_share_video">Não é possível compartilhar o vídeo agora</string>
@@ -324,6 +329,7 @@ uma experiência premium.</string>
     <string name="dance_upload_title">Carregar fotos da galeria</string>
     <string name="dance_upload_card_title">Toque para selecionar fotos da galeria</string>
     <string name="dance_upload_card_desc">Selecione 1 ou mais fotos (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Selecione 1 foto (JPG, PNG...)</string>
     <string name="dance_select_template">Selecionar modelo</string>
     <string name="dance_bg_music">Música de fundo</string>
     <string name="btn_create_dance_video">Criar vídeo de dança</string>

@@ -8,13 +8,18 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.ClickDebouncer
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.core.utils.safePopBackStack
+import com.example.phortart_video_990.core.utils.setOnSingleClickListener
 import com.example.phortart_video_990.databinding.FragmentRestorePickPhotoBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -100,10 +105,16 @@ class RestorePickPhotoFragment : BaseFragment<FragmentRestorePickPhotoBinding>(F
     }
 
     private fun handleSelectedPhoto(uri: Uri) {
-        val cachedUri = copyUriToAppCache(requireContext(), uri)
-        selectedImageUri = cachedUri
-        findNavController().currentBackStackEntry?.savedStateHandle?.set(SAVED_SELECTED_IMAGE_URI, cachedUri.toString())
+        selectedImageUri = uri
+        findNavController().currentBackStackEntry?.savedStateHandle?.set(SAVED_SELECTED_IMAGE_URI, uri.toString())
         updateUi()
+
+        // Copy to app cache in background Dispatchers.IO so UI is completely responsive
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val cachedUri = copyUriToAppCache(requireContext().applicationContext, uri)
+            selectedImageUri = cachedUri
+            findNavController().currentBackStackEntry?.savedStateHandle?.set(SAVED_SELECTED_IMAGE_URI, cachedUri.toString())
+        }
     }
 
     private fun updateUi() {
@@ -120,9 +131,15 @@ class RestorePickPhotoFragment : BaseFragment<FragmentRestorePickPhotoBinding>(F
             binding.flSelectedPhotoContainer.visibility = View.GONE
             binding.cardUploadContainer.setBackgroundResource(R.drawable.bg_photo_box_empty)
         }
+        val hasPhoto = uri != null
+        binding.btnStartRestore.alpha = if (hasPhoto) 1.0f else 0.5f
     }
 
+    private var lastPickerActionTime: Long = 0L
     private fun launchPhotoPicker() {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastPickerActionTime < 500L) return
+        lastPickerActionTime = now
         try {
             pickVisualMediaLauncher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -149,7 +166,7 @@ class RestorePickPhotoFragment : BaseFragment<FragmentRestorePickPhotoBinding>(F
             launchPhotoPicker()
         }
 
-        binding.btnStartRestore.setOnClickListener {
+        binding.btnStartRestore.setOnSingleClickListener(700L) {
             val uri = selectedImageUri
             if (uri != null) {
                 findNavController().navigateSafe(

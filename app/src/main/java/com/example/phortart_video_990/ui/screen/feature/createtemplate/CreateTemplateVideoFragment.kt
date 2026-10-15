@@ -6,8 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import android.view.ViewGroup
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,10 +20,13 @@ import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.AppLoadingDialog
 import com.example.phortart_video_990.core.utils.AudioCacheManager
+import com.example.phortart_video_990.core.utils.ClickDebouncer
+import com.example.phortart_video_990.core.utils.ErrorFormatter
 import com.example.phortart_video_990.core.utils.ImageCompressor
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.core.utils.safePopBackStack
+import com.example.phortart_video_990.core.utils.setOnSingleClickListener
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.HistoryItemModel
 import com.example.phortart_video_990.data.model.TemplateModel
@@ -103,7 +110,11 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         }
     }
 
+    private var lastPickerActionTime: Long = 0L
     private fun launchSinglePhotoPicker() {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastPickerActionTime < 500L) return
+        lastPickerActionTime = now
         try {
             pickSingleVisualMediaLauncher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -179,12 +190,24 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             hideLoadingDialog()
             bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
             context?.let { ctx ->
-                Toast.makeText(ctx, getString(R.string.toast_error_occurred, errorMsg), Toast.LENGTH_SHORT).show()
+                val friendly = ErrorFormatter.formatVideoErrorMessage(ctx, errorMsg)
+                Toast.makeText(ctx, getString(R.string.toast_create_video_failed, friendly), Toast.LENGTH_LONG).show()
             }
         }
     }
 
     override fun initView() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val density = resources.displayMetrics.density
+            binding.btnCreateDanceVideo.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = navBarInset + (20 * density).toInt()
+                leftMargin = (20 * density).toInt()
+                rightMargin = (20 * density).toInt()
+            }
+            insets
+        }
+
         val args = arguments
         val initialTemplateCode = args?.getString(ARG_TEMPLATE_CODE)?.takeIf { it.isNotBlank() }
             ?: args?.getString("template_code").orEmpty()
@@ -284,6 +307,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         } else {
             clearSinglePhoto()
         }
+        val hasPhoto = uri != null
+        binding.btnCreateDanceVideo.alpha = if (hasPhoto) 1.0f else 0.5f
     }
 
     private fun setupTemplatesSection() {
@@ -361,7 +386,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     }
 
     override fun initListener() {
-        binding.btnCreateDanceVideo.setOnClickListener {
+        binding.btnCreateDanceVideo.setOnSingleClickListener(700L) {
             if (selectedPhotoUri == null) {
                 Toast.makeText(
                     requireContext(),
@@ -369,7 +394,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     Toast.LENGTH_SHORT
                 ).show()
                 launchSinglePhotoPicker()
-                return@setOnClickListener
+                return@setOnSingleClickListener
             }
 
             stopAudio()
@@ -380,12 +405,40 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private fun loadAllData() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 1. Fetch dancing categories and templates
-                val dancingCats = templateRepository.getDancingCategories()
-                templateCategoryAdapter.submitList(dancingCats)
-
+                // 1. Fetch dancing templates first
                 val dancingTemplates = templateRepository.getDancingTemplates()
                 cachedDancingTemplates = dancingTemplates
+
+                // 2. Extract categories dynamically from the template list (lấy chuẩn từ danh sách, không fix cứng)
+                val dynamicCategories = mutableListOf(CategoryModel.ALL)
+                val seenCategoryCodes = mutableSetOf("all", "tất cả")
+
+                dancingTemplates.forEach { template ->
+                    val rawCat = template.category.trim()
+                    if (rawCat.isNotBlank() && !rawCat.startsWith("MUSIC_", ignoreCase = true)) {
+                        val key = rawCat.lowercase()
+                        if (seenCategoryCodes.add(key)) {
+                            val displayName = template.categoryDisplayName.ifBlank {
+                                rawCat.replace("_", " ").split(" ")
+                                    .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                            }
+                            dynamicCategories.add(
+                                CategoryModel(
+                                    code = rawCat,
+                                    name = displayName,
+                                    active = true
+                                )
+                            )
+                        }
+                    }
+                }
+
+                if (dynamicCategories.size > 1) {
+                    templateCategoryAdapter.submitList(dynamicCategories)
+                } else {
+                    val dancingCats = templateRepository.getDancingCategories()
+                    templateCategoryAdapter.submitList(dancingCats)
+                }
 
                 if (dancingTemplates.isNotEmpty()) {
                     danceTemplateAdapter.submitList(dancingTemplates)
@@ -401,12 +454,47 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
                 }
 
-                // 2. Fetch music categories and tracks
-                val musicCats = templateRepository.getMusicCategories()
-                musicCategoryAdapter.submitList(musicCats)
-
+                // 3. Fetch music tracks & extract music categories dynamically from tracks or API
                 val musicTracks = templateRepository.getMusicTracks()
                 cachedMusicTracks = musicTracks
+
+                val dynamicMusicCats = mutableListOf(
+                    CategoryModel(
+                        code = "ALL",
+                        name = "Tất cả",
+                        groupCode = "MUSIC",
+                        active = true
+                    )
+                )
+                val seenMusicCats = mutableSetOf("all", "tất cả")
+                musicTracks.forEach { track ->
+                    val rawCat = track.category.trim()
+                    if (rawCat.isNotBlank()) {
+                        val key = rawCat.lowercase()
+                        if (seenMusicCats.add(key)) {
+                            val displayName = track.categoryDisplayName.ifBlank {
+                                val clean = if (rawCat.startsWith("MUSIC_", ignoreCase = true)) rawCat.substring(6) else rawCat
+                                clean.replace("_", " ").split(" ")
+                                    .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                            }
+                            dynamicMusicCats.add(
+                                CategoryModel(
+                                    code = rawCat,
+                                    name = displayName,
+                                    groupCode = "MUSIC",
+                                    active = true
+                                )
+                            )
+                        }
+                    }
+                }
+
+                if (dynamicMusicCats.size > 1) {
+                    musicCategoryAdapter.submitList(dynamicMusicCats)
+                } else {
+                    val musicCats = templateRepository.getMusicCategories()
+                    musicCategoryAdapter.submitList(musicCats)
+                }
 
                 if (musicTracks.isNotEmpty()) {
                     danceMusicAdapter.submitList(musicTracks)
@@ -441,6 +529,11 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             }
             danceTemplateAdapter.submitList(if (filtered.isNotEmpty()) filtered else pool)
         }
+
+        (binding.rvTemplates.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        binding.rvTemplates.post {
+            (binding.rvTemplates.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        }
     }
 
     private fun filterMusicByCategory(category: CategoryModel) {
@@ -462,6 +555,11 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 itemCat == target || itemCat.removePrefix("music_") == cleanTarget || itemCat.contains(cleanTarget)
             }
             danceMusicAdapter.submitList(filtered)
+        }
+
+        (binding.rvMusicTracks.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        binding.rvMusicTracks.post {
+            (binding.rvMusicTracks.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
         }
     }
 
@@ -620,7 +718,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 )
 
                 if (processResult.isFailure) {
-                    val errorMsg = processResult.exceptionOrNull()?.message ?: "AI Error"
+                    val rawError = processResult.exceptionOrNull()?.message
+                    val errorMsg = ErrorFormatter.formatVideoErrorMessage(requireContext(), rawError)
                     val reqId = templateRepository.extractRequestId(null)
                     if (reqId.isNullOrBlank()) {
                         isGeneratingVideo = false
@@ -638,6 +737,19 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val jsonResponse = processResult.getOrNull()
                 var videoUrl = templateRepository.extractVideoUrl(jsonResponse)
                 val requestId = templateRepository.extractRequestId(jsonResponse)
+
+                if (videoUrl.isNullOrBlank() && requestId.isNullOrBlank()) {
+                    isGeneratingVideo = false
+                    val errorMsg = ErrorFormatter.formatVideoErrorMessage(requireContext(), jsonResponse?.toString())
+                    if (isResumed && isAdded) {
+                        hideLoadingDialog()
+                        bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
+                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_LONG).show()
+                    } else {
+                        pendingErrorMsg = errorMsg
+                    }
+                    return@launch
+                }
 
                 // 4. Poll kết quả nếu cần
                 if (videoUrl.isNullOrBlank() && !requestId.isNullOrBlank()) {
@@ -661,12 +773,13 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     if (pollResult.isSuccess) {
                         videoUrl = templateRepository.extractVideoUrl(pollResult.getOrNull())
                     } else {
-                        val pollError = pollResult.exceptionOrNull()?.message ?: getString(R.string.loading_timeout_error)
+                        val rawPollError = pollResult.exceptionOrNull()?.message
+                        val pollError = ErrorFormatter.formatVideoErrorMessage(requireContext(), rawPollError)
                         isGeneratingVideo = false
                         if (isResumed && isAdded) {
                             hideLoadingDialog()
                             bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
-                            Toast.makeText(requireContext(), getString(R.string.toast_process_video_failed, pollError), Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, pollError), Toast.LENGTH_LONG).show()
                         } else {
                             pendingErrorMsg = pollError
                         }
@@ -737,12 +850,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             } catch (e: Exception) {
                 if (!isGeneratingVideo) return@launch
                 isGeneratingVideo = false
+                val friendlyError = context?.let { ErrorFormatter.formatVideoErrorMessage(it, e.message) }
+                    ?: (e.message ?: "")
                 if (isResumed && isAdded) {
                     hideLoadingDialog()
                     bindingOrNull?.btnCreateDanceVideo?.isEnabled = true
-                    Toast.makeText(requireContext(), getString(R.string.toast_error_occurred, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, friendlyError), Toast.LENGTH_LONG).show()
                 } else {
-                    pendingErrorMsg = e.message ?: ""
+                    pendingErrorMsg = friendlyError
                 }
             } finally {
                 generateVideoJob = null

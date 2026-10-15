@@ -38,7 +38,37 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <!-- Duration / Play Preview Pill -->
+                <!-- Views Count Pill (matching Figma) -->
+                <LinearLayout
+                    android:id="@+id/llViewsPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pill_dark"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp">
+
+                    <ImageView
+                        android:id="@+id/ivViewsIcon"
+                        android:layout_width="9dp"
+                        android:layout_height="9dp"
+                        android:contentDescription="Views"
+                        android:src="@drawable/ic_eye_small"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvViews"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        tools:text="645,2K" />
+                </LinearLayout>
+
+                <!-- Duration / Play Preview Pill (Hidden) -->
                 <LinearLayout
                     android:id="@+id/llDurationBadge"
                     android:layout_width="wrap_content"
@@ -47,7 +77,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="5dp"
-                    android:paddingVertical="2dp">
+                    android:paddingVertical="2dp"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/ivPlayIcon"
@@ -76,7 +107,7 @@
                         tools:text="00:12" />
                 </LinearLayout>
 
-                <!-- Photo Count Pill -->
+                <!-- Photo Count Pill (Hidden) -->
                 <LinearLayout
                     android:id="@+id/llPhotoCountPill"
                     android:layout_width="wrap_content"
@@ -86,7 +117,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="5dp"
-                    android:paddingVertical="2dp">
+                    android:paddingVertical="2dp"
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="8dp"

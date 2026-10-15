@@ -83,6 +83,8 @@
                 android:fontFamily="@font/inter_medium"
                 android:lineHeight="20sp"
                 android:lineSpacingExtra="3dp"
+                android:maxLines="4"
+                android:ellipsize="end"
                 android:textColor="#243572"
                 android:textSize="13.5sp"
                 tools:text="Cô gái anime dưới ánh hoàng hôn" />
@@ -100,7 +102,11 @@
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
+        app:cardBackgroundColor="#F0F3FA"
         app:strokeWidth="0dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHeight_min="220dp"
         app:layout_constraintBottom_toTopOf="@+id/btnGenerateAgain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -109,6 +115,14 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/pbImageLoading"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="#6E64EB" />
 
             <ImageView
                 android:id="@+id/ivResultImage"

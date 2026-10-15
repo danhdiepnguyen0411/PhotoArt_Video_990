@@ -97,10 +97,10 @@ class DanceMusicPickerAdapter(
             isPlaying: Boolean,
             isLoading: Boolean
         ) {
-            // Track title & duration
+            // Track title
             binding.tvTrackTitle.text = track.title
             binding.tvTrackTitle.isSelected = true
-            binding.tvTrackDuration.text = track.displayDuration
+            binding.tvTrackDuration.visibility = View.GONE
 
             // Cover Image
             if (!track.safeImageUrl.isNullOrBlank()) {

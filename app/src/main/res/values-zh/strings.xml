@@ -252,6 +252,11 @@ AI 即可描摹</string>
     <string name="toast_create_video_failed">视频制作失败：%1$s</string>
     <string name="toast_process_video_failed">视频处理失败：%1$s</string>
     <string name="toast_error_occurred">发生错误：%1$s</string>
+    <string name="error_no_face_detected">照片中未检测到人脸，请选择面部清晰的照片。</string>
+    <string name="error_network_connection">网络连接错误，请检查网络后重试。</string>
+    <string name="error_server_busy">服务器繁忙，请稍后重试。</string>
+    <string name="error_create_video_general">无法从此照片制作视频，请尝试其他照片。</string>
+    <string name="error_video_generation_timeout">处理超时，请稍后重试。</string>
     <string name="toast_video_play_error">播放视频出错</string>
     <string name="toast_cannot_export_video">无法导出视频！</string>
     <string name="toast_cannot_share_video">当前无法分享视频</string>
@@ -355,6 +360,7 @@ AI 即可描摹</string>
     <string name="dance_upload_title">从相册上传照片</string>
     <string name="dance_upload_card_title">点击从相册选择照片</string>
     <string name="dance_upload_card_desc">选择1张或多张照片 (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">选择1张照片 (JPG, PNG...)</string>
     <string name="dance_select_template">选择模板</string>
     <string name="dance_bg_music">背景音乐</string>
     <string name="btn_create_dance_video">制作跳舞视频</string>

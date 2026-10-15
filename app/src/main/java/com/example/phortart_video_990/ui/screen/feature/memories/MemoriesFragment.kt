@@ -18,9 +18,12 @@ import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.utils.AudioCacheManager
+import com.example.phortart_video_990.core.utils.ClickDebouncer
+import com.example.phortart_video_990.core.utils.ErrorFormatter
 import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.core.utils.safePopBackStack
+import com.example.phortart_video_990.core.utils.setOnSingleClickListener
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
@@ -48,6 +51,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private var selectedAspectRatio: String = "9:16"
     private var maxPhotoLimit: Int = 10
     private var templateDurationSec: Float? = null
+    private var activeBottomSheetDialog: SelectedPhotosBottomSheetDialog? = null
 
     // Native Photo Picker launcher
     private val pickVisualMediaLauncher = registerForActivityResult(
@@ -141,7 +145,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             hideLoading()
             bindingOrNull?.btnCreateVideo?.isEnabled = true
             context?.let { ctx ->
-                Toast.makeText(ctx, getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_SHORT).show()
+                val friendly = ErrorFormatter.formatVideoErrorMessage(ctx, errorMsg)
+                Toast.makeText(ctx, getString(R.string.toast_create_video_failed, friendly), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -272,20 +277,17 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 toggleTrackPlayback(track)
             }
         )
-        binding.rvMusicTracks.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.rvMusicTracks.layoutManager = object : LinearLayoutManager(requireContext(), VERTICAL, false) {
+            override fun canScrollVertically(): Boolean = false
+        }
+        binding.rvMusicTracks.isNestedScrollingEnabled = false
+        binding.rvMusicTracks.setHasFixedSize(false)
         binding.rvMusicTracks.adapter = memoriesMusicAdapter
     }
 
     private fun loadMusicData() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val cats = templateRepository.getMusicCategories()
-                if (cats.isNotEmpty()) {
-                    musicCategories = cats
-                    musicCategoryAdapter.submitList(cats)
-                }
-
                 val tracks = templateRepository.getMusicTracks()
                 val validTracks = if (tracks.isNotEmpty()) {
                     tracks
@@ -293,6 +295,47 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     templateRepository.getDefaultMusicTracks()
                 }
                 allMusicTracks = validTracks
+
+                // Extract dynamic music categories with "ALL" first, matching the Video section
+                val dynamicMusicCats = mutableListOf(
+                    CategoryModel(
+                        code = "ALL",
+                        name = "Tất cả",
+                        groupCode = "MUSIC",
+                        active = true
+                    )
+                )
+                val seenMusicCats = mutableSetOf("all", "tất cả")
+                validTracks.forEach { track ->
+                    val rawCat = track.category.trim()
+                    if (rawCat.isNotBlank()) {
+                        val key = rawCat.lowercase()
+                        if (seenMusicCats.add(key)) {
+                            val displayName = track.categoryDisplayName.ifBlank {
+                                val clean = if (rawCat.startsWith("MUSIC_", ignoreCase = true)) rawCat.substring(6) else rawCat
+                                clean.replace("_", " ").split(" ")
+                                    .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                            }
+                            dynamicMusicCats.add(
+                                CategoryModel(
+                                    code = rawCat,
+                                    name = displayName,
+                                    groupCode = "MUSIC",
+                                    active = true
+                                )
+                            )
+                        }
+                    }
+                }
+
+                if (dynamicMusicCats.size > 1) {
+                    musicCategories = dynamicMusicCats
+                    musicCategoryAdapter.submitList(dynamicMusicCats)
+                } else {
+                    val fallbackCats = templateRepository.getMusicCategories()
+                    musicCategories = fallbackCats
+                    musicCategoryAdapter.submitList(fallbackCats)
+                }
 
                 // Restore or select default track
                 val ctx = context
@@ -319,19 +362,30 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     private fun applyCategoryFilter() {
-        val isAll = selectedCategoryCode.equals("ALL", ignoreCase = true) ||
-                selectedCategoryCode.equals("Tất cả", ignoreCase = true) ||
-                selectedCategoryCode.isBlank()
+        val isAll = selectedCategoryCode.isBlank() ||
+                selectedCategoryCode.equals("ALL", ignoreCase = true) ||
+                selectedCategoryCode.equals("Tất cả", ignoreCase = true)
 
         val filtered = if (isAll) {
             allMusicTracks
         } else {
-            allMusicTracks.filter {
-                it.category.equals(selectedCategoryCode, ignoreCase = true) ||
-                        it.templateType.equals(selectedCategoryCode, ignoreCase = true)
+            val target = selectedCategoryCode.trim().lowercase()
+            val cleanTarget = target.removePrefix("music_")
+            allMusicTracks.filter { item ->
+                val itemCat = item.category.trim().lowercase()
+                val itemType = item.templateType?.trim()?.lowercase().orEmpty()
+                itemCat == target ||
+                        itemCat.removePrefix("music_") == cleanTarget ||
+                        itemCat.contains(cleanTarget) ||
+                        itemType == target ||
+                        itemType.contains(cleanTarget)
             }
         }
         memoriesMusicAdapter.submitList(filtered)
+        binding.rvMusicTracks.post {
+            binding.rvMusicTracks.requestLayout()
+            binding.nestedScrollView.requestLayout()
+        }
     }
 
     private fun selectTrack(track: TemplateModel, rememberPref: Boolean = true) {
@@ -433,6 +487,9 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private fun updatePhotosUi() {
         val count = selectedPhotos.size
         val density = resources.displayMetrics.density
+
+        val hasPhotos = count > 0
+        binding.btnCreateVideo.alpha = if (hasPhotos) 1.0f else 0.5f
 
         if (count == 0) {
             binding.tvPhotosSectionTitle.text = getString(R.string.memories_upload_title)
@@ -559,7 +616,16 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
     }
 
+    private var lastPickerActionTime = 0L
+    private fun canTriggerPickerAction(): Boolean {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastPickerActionTime < 500L) return false
+        lastPickerActionTime = now
+        return true
+    }
+
     private fun onUploadAreaClicked() {
+        if (!canTriggerPickerAction()) return
         if (selectedPhotos.isEmpty()) {
             launchImagePicker()
         } else {
@@ -568,7 +634,10 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     private fun showSelectedPhotosBottomSheet() {
-        SelectedPhotosBottomSheetDialog(
+        if (!isAdded || isStateSaved) return
+        if (activeBottomSheetDialog?.isShowing == true) return
+
+        val dialog = SelectedPhotosBottomSheetDialog(
             context = requireContext(),
             photos = selectedPhotos,
             maxLimit = maxPhotoLimit,
@@ -579,7 +648,14 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             onAddMoreRequested = {
                 launchImagePicker()
             }
-        ).show()
+        )
+        activeBottomSheetDialog = dialog
+        dialog.setOnDismissListener {
+            if (activeBottomSheetDialog == dialog) {
+                activeBottomSheetDialog = null
+            }
+        }
+        dialog.show()
     }
 
     private fun launchImagePicker() {
@@ -612,6 +688,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
 
         binding.btnAddPhotos.setOnClickListener {
+            if (!canTriggerPickerAction()) return@setOnClickListener
             if (selectedPhotos.size >= maxPhotoLimit) {
                 Toast.makeText(
                     requireContext(),
@@ -672,6 +749,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             if (selectedPhotos.isEmpty()) {
                 Log.w(TAG, "[MEMORIES] No photos selected!")
                 Toast.makeText(requireContext(), getString(R.string.toast_select_at_least_1_photo), Toast.LENGTH_SHORT).show()
+                launchImagePicker()
                 return@setOnClickListener
             }
 
@@ -796,7 +874,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     if (isResumed && isAdded) {
                         hideLoading()
                         bindingOrNull?.btnCreateVideo?.isEnabled = true
-                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                        val friendly = ErrorFormatter.formatVideoErrorMessage(requireContext(), e.message)
+                        Toast.makeText(requireContext(), getString(R.string.toast_create_video_failed, friendly), Toast.LENGTH_SHORT).show()
                     } else {
                         pendingVideoErrorMsg = e.message ?: ""
                     }
@@ -808,6 +887,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     }
 
     override fun onDestroyView() {
+        activeBottomSheetDialog?.dismiss()
+        activeBottomSheetDialog = null
         stopPreviewAudio()
         if (isGeneratingVideo) {
             generateVideoJob?.cancel()

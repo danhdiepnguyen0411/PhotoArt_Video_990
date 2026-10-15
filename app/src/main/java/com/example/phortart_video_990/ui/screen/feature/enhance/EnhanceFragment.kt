@@ -177,7 +177,8 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
         // Start Generate
         binding.btnGeneratePrompt.setOnClickListener {
-            val userPrompt = binding.etPromptInput.text?.toString()?.trim().orEmpty()
+            val rawPrompt = binding.etPromptInput.text?.toString().orEmpty()
+            val userPrompt = rawPrompt.replace(Regex("\\n{2,}"), "\n").trim()
             if (userPrompt.isBlank()) {
                 updateGenerateButtonState()
                 return@setOnClickListener
@@ -213,7 +214,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         val hasPrompt = !binding.etPromptInput.text?.toString()?.trim().isNullOrEmpty()
         binding.btnGeneratePrompt.isEnabled = hasPrompt
         binding.btnGeneratePrompt.isClickable = hasPrompt
-        binding.btnGeneratePrompt.alpha = if (hasPrompt) 1.0f else 0.4f
+        binding.btnGeneratePrompt.alpha = if (hasPrompt) 1.0f else 0.5f
     }
 
     private fun findMatchingStyleIndex(prompt: String, styleHint: String?): Int {

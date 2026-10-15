@@ -221,6 +221,11 @@ d\'une expérience premium.</string>
     <string name="toast_create_video_failed">Échec de création vidéo : %1$s</string>
     <string name="toast_process_video_failed">Échec du traitement vidéo : %1$s</string>
     <string name="toast_error_occurred">Une erreur est survenue : %1$s</string>
+    <string name="error_no_face_detected">Aucun visage détecté sur la photo. Veuillez sélectionner une photo avec un visage net.</string>
+    <string name="error_network_connection">Erreur de connexion réseau. Veuillez vérifier votre connexion et réessayer.</string>
+    <string name="error_server_busy">Le serveur est occupé. Veuillez réessayer dans quelques minutes.</string>
+    <string name="error_create_video_general">Impossible de créer la vidéo à partir de cette photo. Veuillez essayer avec une autre photo.</string>
+    <string name="error_video_generation_timeout">Le traitement a pris trop de temps. Veuillez réessayer plus tard.</string>
     <string name="toast_video_play_error">Erreur de lecture vidéo</string>
     <string name="toast_cannot_export_video">Impossible d\'exporter la vidéo !</string>
     <string name="toast_cannot_share_video">Impossible de partager la vidéo pour le moment</string>
@@ -324,6 +329,7 @@ d\'une expérience premium.</string>
     <string name="dance_upload_title">Importer des photos de la galerie</string>
     <string name="dance_upload_card_title">Appuyez pour sélectionner des photos</string>
     <string name="dance_upload_card_desc">Sélectionnez 1 ou plusieurs photos (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Sélectionnez 1 photo (JPG, PNG...)</string>
     <string name="dance_select_template">Sélectionner un modèle</string>
     <string name="dance_bg_music">Musique de fond</string>
     <string name="btn_create_dance_video">Créer la vidéo de danse</string>
