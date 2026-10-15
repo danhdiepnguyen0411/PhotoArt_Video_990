@@ -46,6 +46,14 @@ class PreferencesManager(context: Context) {
         get() = prefs.getBoolean("is_uninstall_active", false)
         set(value) = prefs.edit().putBoolean("is_uninstall_active", value).apply()
 
+    var notificationDeniedCount: Int
+        get() = prefs.getInt("notification_denied_count", 0)
+        set(value) = prefs.edit().putInt("notification_denied_count", value).apply()
+
+    var shouldShowNotiDialogOnHome: Boolean
+        get() = prefs.getBoolean("should_show_noti_dialog_on_home", false)
+        set(value) = prefs.edit().putBoolean("should_show_noti_dialog_on_home", value).apply()
+
     var languageCode: String
         get() {
             val code = prefs.getString(KEY_LANGUAGE_CODE, null)
