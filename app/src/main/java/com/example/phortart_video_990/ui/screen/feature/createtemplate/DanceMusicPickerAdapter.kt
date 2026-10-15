@@ -13,7 +13,7 @@ import com.example.phortart_video_990.databinding.ItemDanceMusicPickerBinding
 class DanceMusicPickerAdapter(
     private var tracks: List<TemplateModel>,
     private var selectedTrackId: String? = null,
-    private val onTrackSelected: (TemplateModel) -> Unit,
+    private val onTrackSelected: (TemplateModel?) -> Unit,
     private val onPreviewClick: (TemplateModel) -> Unit
 ) : RecyclerView.Adapter<DanceMusicPickerAdapter.ViewHolder>() {
 
@@ -39,9 +39,6 @@ class DanceMusicPickerAdapter(
 
     fun submitList(newList: List<TemplateModel>) {
         tracks = newList
-        if (selectedTrackId == null && newList.isNotEmpty()) {
-            selectedTrackId = newList[0].id
-        }
         notifyDataSetChanged()
     }
 
@@ -58,7 +55,8 @@ class DanceMusicPickerAdapter(
     fun getSelectedTrackId(): String? = selectedTrackId
 
     fun getSelectedTrack(): TemplateModel? {
-        return tracks.find { it.id == selectedTrackId } ?: tracks.firstOrNull()
+        val curId = selectedTrackId ?: return null
+        return tracks.find { it.id == curId }
     }
 
     fun setPlayingState(trackId: String?, isPlaying: Boolean) {
@@ -160,8 +158,9 @@ class DanceMusicPickerAdapter(
             // Click on right action container (checkmark or play button)
             binding.flActionContainer.setOnClickListener {
                 if (isSelected) {
-                    // Tapping selected track's checkmark toggles play / pause preview
-                    onPreviewClick(track)
+                    // Tapping selected track's checkmark deselects the track -> Reverts to template original audio
+                    setSelectedTrackId(null)
+                    onTrackSelected(null)
                 } else {
                     // Tapping play on unselected track selects it and starts playing
                     setSelectedTrackId(track.id)
@@ -170,7 +169,7 @@ class DanceMusicPickerAdapter(
                 }
             }
 
-            // Click anywhere on card selects track and starts preview playback
+            // Click anywhere on card selects track or toggles preview if already selected
             binding.cardTrack.setOnClickListener {
                 if (isSelected) {
                     onPreviewClick(track)

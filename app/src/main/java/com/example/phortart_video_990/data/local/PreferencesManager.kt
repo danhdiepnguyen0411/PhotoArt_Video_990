@@ -13,6 +13,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_HAS_COMPLETED_INTRO = "has_completed_intro"
         private const val KEY_LANGUAGE_CODE = "language_code"
         private const val KEY_LANGUAGE_NAME = "language_name"
+        private const val KEY_HAS_RATED_APP = "has_rated_app"
 
         @Volatile
         private var INSTANCE: PreferencesManager? = null
@@ -24,6 +25,10 @@ class PreferencesManager(context: Context) {
             }
         }
     }
+
+    var hasRatedApp: Boolean
+        get() = prefs.getBoolean(KEY_HAS_RATED_APP, false)
+        set(value) = prefs.edit().putBoolean(KEY_HAS_RATED_APP, value).apply()
 
     var isFirstLanguageSelected: Boolean
         get() = prefs.getBoolean(KEY_IS_FIRST_LANGUAGE_SELECTED, false)

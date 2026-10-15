@@ -62,17 +62,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         return listOf(
             BannerItemModel(
                 imageRes = R.drawable.banner_1,
-                chip = getString(R.string.banner_1_chip),
-                title = getString(R.string.banner_1_title),
+                titleLine1 = getString(R.string.banner_1_title_line1),
+                titleLine2Prefix = getString(R.string.banner_1_title_line2),
                 highlight = getString(R.string.banner_1_highlight),
                 description = getString(R.string.banner_1_desc),
                 buttonText = getString(R.string.banner_1_btn),
-                targetFeature = "dance"
+                targetFeature = "video"
             ),
             BannerItemModel(
                 imageRes = R.drawable.banner_2,
-                chip = getString(R.string.banner_2_chip),
-                title = getString(R.string.banner_2_title),
+                titleLine1 = getString(R.string.banner_2_title_line1),
+                titleLine2Prefix = getString(R.string.banner_2_title_line2),
                 highlight = getString(R.string.banner_2_highlight),
                 description = getString(R.string.banner_2_desc),
                 buttonText = getString(R.string.banner_2_btn),
@@ -80,8 +80,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             ),
             BannerItemModel(
                 imageRes = R.drawable.banner_3,
-                chip = getString(R.string.banner_3_chip),
-                title = getString(R.string.banner_3_title),
+                titleLine1 = getString(R.string.banner_3_title_line1),
+                titleLine2Prefix = getString(R.string.banner_3_title_line2),
                 highlight = getString(R.string.banner_3_highlight),
                 description = getString(R.string.banner_3_desc),
                 buttonText = getString(R.string.banner_3_btn),
@@ -413,10 +413,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, template.safeImageUrl)
             putString("template_thumb", template.safeImageUrl)
             putString("template_audio_url", template.safeAudioUrl)
-            putString("selected_track_id", template.id)
-            putString("selected_music_title", template.title)
-            putString("selected_music_audio_url", template.safeAudioUrl)
-            putString("selected_music_image_url", template.safeImageUrl)
             putFloat("selected_template_duration_sec", template.durationSeconds.toFloat())
             putInt("selected_template_photo_count", template.targetPhotoCount)
         }
@@ -601,12 +597,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             ?: findNavController()
         when (featureId) {
             "dance" -> navController.navigateSafe(R.id.action_mainFragment_to_createTemplateVideoFragment)
-            "video" -> {
-                val bundle = android.os.Bundle().apply {
-                    putBoolean("is_start_merge_flow", true)
-                }
-                navController.navigateSafe(R.id.action_mainFragment_to_musicFragment, bundle)
-            }
+            "video" -> navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
             "prompt" -> navController.navigateSafe(R.id.action_mainFragment_to_enhanceFragment)
             "restore" -> navController.navigateSafe(R.id.action_mainFragment_to_restoreFragment)
             "music" -> navController.navigateSafe(R.id.action_mainFragment_to_musicFragment)

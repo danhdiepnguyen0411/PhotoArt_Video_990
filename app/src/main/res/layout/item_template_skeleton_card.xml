@@ -6,8 +6,9 @@
     android:layout_margin="5dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="18dp"
-    app:cardElevation="0dp"
-    app:cardPreventCornerOverlap="false"
+    app:cardElevation="0.5dp"
+    app:cardPreventCornerOverlap="true"
+    android:clipToOutline="true"
     app:strokeColor="#EFF2F7"
     app:strokeWidth="1dp">
 
@@ -16,11 +17,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Solid light gray block for thumbnail, NO image used -->
+        <!-- Solid light gray block for thumbnail with rounded top corners -->
         <View
             android:layout_width="match_parent"
             android:layout_height="180dp"
-            android:background="#EFF2F7" />
+            android:background="@drawable/bg_skeleton_thumb" />
 
         <!-- Info container -->
         <LinearLayout

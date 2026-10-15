@@ -45,6 +45,10 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     private var onBackClickListener: (() -> Unit)? = null
     private var onProClickListener: (() -> Unit)? = null
+    private var userSpecifiedCenterTitle: Boolean? = null
+
+    val isTitleCentered: Boolean
+        get() = userSpecifiedCenterTitle ?: (btnBack.visibility == View.VISIBLE)
 
     init {
         val density = resources.displayMetrics.density
@@ -107,6 +111,11 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
                 val showPro = typedArray.getBoolean(R.styleable.CommonTabHeaderView_showProButton, false)
                 setProButtonVisible(showPro)
+
+                if (typedArray.hasValue(R.styleable.CommonTabHeaderView_centerTitle)) {
+                    userSpecifiedCenterTitle = typedArray.getBoolean(R.styleable.CommonTabHeaderView_centerTitle, false)
+                }
+                updateTitleConstraints()
             } finally {
                 typedArray.recycle()
             }
@@ -123,6 +132,44 @@ class CommonTabHeaderView @JvmOverloads constructor(
             }
             insets
         }
+    }
+
+    fun setTitleCentered(centered: Boolean) {
+        userSpecifiedCenterTitle = centered
+        updateTitleConstraints()
+    }
+
+    fun updateTitleConstraints() {
+        val lp = llTitleGroup.layoutParams as? LayoutParams ?: return
+        val density = resources.displayMetrics.density
+        if (isTitleCentered) {
+            lp.startToStart = LayoutParams.PARENT_ID
+            lp.endToEnd = LayoutParams.PARENT_ID
+            lp.startToEnd = LayoutParams.UNSET
+            lp.endToStart = LayoutParams.UNSET
+            lp.horizontalBias = 0.5f
+            lp.marginStart = (48 * density).toInt()
+            lp.marginEnd = (48 * density).toInt()
+        } else {
+            if (btnBack.visibility == View.VISIBLE) {
+                lp.startToStart = LayoutParams.UNSET
+                lp.startToEnd = R.id.btnBack
+                lp.endToEnd = LayoutParams.UNSET
+                lp.endToStart = R.id.flHeaderRightAction
+                lp.horizontalBias = 0.0f
+                lp.marginStart = (12 * density).toInt()
+                lp.marginEnd = (12 * density).toInt()
+            } else {
+                lp.startToStart = LayoutParams.PARENT_ID
+                lp.startToEnd = LayoutParams.UNSET
+                lp.endToEnd = LayoutParams.UNSET
+                lp.endToStart = R.id.flHeaderRightAction
+                lp.horizontalBias = 0.0f
+                lp.marginStart = 0
+                lp.marginEnd = (12 * density).toInt()
+            }
+        }
+        llTitleGroup.layoutParams = lp
     }
 
     private fun handleDefaultBackAction() {
@@ -150,6 +197,7 @@ class CommonTabHeaderView @JvmOverloads constructor(
     fun setBackButtonVisible(visible: Boolean) {
         btnBack.visibility = if (visible) View.VISIBLE else View.GONE
         tvTitle.textSize = if (visible) 24f else 32f
+        updateTitleConstraints()
         applyTitleGradient()
     }
 
@@ -233,6 +281,7 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        updateTitleConstraints()
         applyTitleGradient()
         if (llBrand.visibility == View.VISIBLE) {
             applyBrandAiGradient()

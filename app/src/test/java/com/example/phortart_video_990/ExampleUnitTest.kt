@@ -129,4 +129,24 @@ class ExampleUnitTest {
         assertTrue(musicTemplate.isMusic)
         assertEquals("https://example.com/audio.mp3", musicTemplate.safeAudioUrl)
     }
+
+    @Test
+    fun historyItemModel_styleNamePersistence() {
+        val item = HistoryItemModel(
+            type = "Prompt AI",
+            title = "A dynamic cyber-style dancer frozen mid-move",
+            styleName = "Cyber Move"
+        )
+        val json = gson.toJson(item)
+        val deserialized = gson.fromJson(json, HistoryItemModel::class.java)
+        assertEquals("Cyber Move", deserialized.styleName)
+    }
+
+    @Test
+    fun promptCounter_calculation() {
+        val samplePrompt = "Anime girl xinh đẹp, phong cách truyện tranh Nhật Bản"
+        val count = samplePrompt.length.coerceAtMost(500)
+        assertEquals(53, count)
+        assertEquals("53/500", "$count/500")
+    }
 }

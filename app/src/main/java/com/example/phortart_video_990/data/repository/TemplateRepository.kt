@@ -10,6 +10,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -26,9 +29,57 @@ class TemplateRepository(
 
     fun getDefaultTemplates(): List<TemplateModel> = emptyList()
 
-    fun getDefaultMusicCategories(): List<CategoryModel> = listOf(CategoryModel.ALL)
+    fun getDefaultMusicCategories(): List<CategoryModel> = listOf(
+        CategoryModel.ALL,
+        CategoryModel(code = "MUSIC_EDM", name = "EDM", groupCode = "MUSIC"),
+        CategoryModel(code = "MUSIC_CINEMATIC", name = "Cinematic", groupCode = "MUSIC"),
+        CategoryModel(code = "MUSIC_BASS", name = "Bass", groupCode = "MUSIC"),
+        CategoryModel(code = "MUSIC_HIPHOP", name = "Hiphop", groupCode = "MUSIC"),
+        CategoryModel(code = "MUSIC_POP", name = "Pop", groupCode = "MUSIC")
+    )
 
-    fun getDefaultMusicTracks(): List<TemplateModel> = emptyList()
+    fun getDefaultMusicTracks(): List<TemplateModel> = listOf(
+        TemplateModel(
+            id = "music_smith_solace",
+            title = "SmithSolace",
+            category = "MUSIC_EDM",
+            duration = "00:25",
+            audioUrl = "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
+            templateType = "MUSIC"
+        ),
+        TemplateModel(
+            id = "music_burning_ashes",
+            title = "Burning Ashes",
+            category = "MUSIC_CINEMATIC",
+            duration = "00:22",
+            audioUrl = "https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-hum-2852.mp3",
+            templateType = "MUSIC"
+        ),
+        TemplateModel(
+            id = "music_future_bass",
+            title = "Future Bass",
+            category = "MUSIC_BASS",
+            duration = "00:20",
+            audioUrl = "https://assets.mixkit.co/music/preview/mixkit-games-worldbeat-466.mp3",
+            templateType = "MUSIC"
+        ),
+        TemplateModel(
+            id = "music_sub_clair_kpop",
+            title = "Sub Clair K-pop",
+            category = "MUSIC_HIPHOP",
+            duration = "00:24",
+            audioUrl = "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3",
+            templateType = "MUSIC"
+        ),
+        TemplateModel(
+            id = "music_summer_chill",
+            title = "Summer Chill",
+            category = "MUSIC_POP",
+            duration = "00:26",
+            audioUrl = "https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3",
+            templateType = "MUSIC"
+        )
+    )
 
     fun getDefaultDancingCategories(): List<CategoryModel> = listOf(
         CategoryModel.ALL,
@@ -307,50 +358,97 @@ class TemplateRepository(
         }
     }
 
-    /**
-     * Fetch music tracks for the choose music section.
-     */
-    suspend fun getMusicTracks(
-        categoryCode: String? = null
-    ): List<TemplateModel> = withContext(Dispatchers.IO) {
+    // In-memory cache for music tracks
+    private var cachedMusicTracksList: List<TemplateModel>? = null
+
+    private suspend fun fetchMusicTracksForCategory(catCode: String): List<TemplateModel> = withContext(Dispatchers.IO) {
+        val client = getClient() ?: return@withContext emptyList()
         suspendCancellableCoroutine { continuation ->
-            val client = getClient()
-            if (client == null) {
-                if (continuation.isActive) continuation.resume(emptyList())
-                return@suspendCancellableCoroutine
-            }
-
-            val isAll = categoryCode.isNullOrBlank() ||
-                    categoryCode.equals("ALL", ignoreCase = true) ||
-                    categoryCode.equals("Tất cả", ignoreCase = true)
-
-            client.getTemplateApps(page = 0, size = 100, category = "") { jsonElement, throwable ->
+            client.getTemplateApps(page = 0, size = 100, category = catCode) { jsonElement, throwable ->
                 if (!continuation.isActive) return@getTemplateApps
-
                 if (throwable != null || jsonElement == null) {
                     continuation.resume(emptyList())
                 } else {
                     try {
-                        val allItems = parseTemplates(jsonElement)
-                        val musicItems = allItems.filter { it.isMusic }
-                        val pool = if (musicItems.isNotEmpty()) musicItems else allItems
-
-                        if (!isAll && !categoryCode.isNullOrBlank()) {
-                            val target = categoryCode.trim()
-                            val cleanTarget = target.removePrefix("MUSIC_").lowercase()
-                            val filtered = pool.filter {
-                                it.category.equals(target, ignoreCase = true) ||
-                                        it.category.removePrefix("MUSIC_").lowercase() == cleanTarget
-                            }
-                            continuation.resume(filtered)
-                        } else {
-                            continuation.resume(pool)
+                        val items = parseTemplates(jsonElement)
+                        val result = items.map { item ->
+                            if (item.category.isBlank()) item.copy(category = catCode) else item
                         }
+                        continuation.resume(result)
                     } catch (e: Exception) {
                         continuation.resume(emptyList())
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Fetch music tracks for the choose music section.
+     * Truly fetches from MUSIC categories, NOT from visual templates!
+     */
+    suspend fun getMusicTracks(
+        categoryCode: String? = null,
+        forceRefresh: Boolean = false
+    ): List<TemplateModel> = withContext(Dispatchers.IO) {
+        val isAll = categoryCode.isNullOrBlank() ||
+                categoryCode.equals("ALL", ignoreCase = true) ||
+                categoryCode.equals("Tất cả", ignoreCase = true)
+
+        if (isAll) {
+            val cached = cachedMusicTracksList
+            if (!forceRefresh && cached != null && cached.isNotEmpty()) {
+                return@withContext cached
+            }
+
+            val musicCats = getMusicCategories().filter { it.code != "ALL" }
+            if (musicCats.isEmpty()) {
+                return@withContext emptyList<TemplateModel>()
+            }
+
+            val combined: List<TemplateModel> = coroutineScope {
+                val deferreds = musicCats.map { cat ->
+                    async { fetchMusicTracksForCategory(cat.code) }
+                }
+                deferreds.awaitAll().flatten()
+            }
+
+            val seen = mutableSetOf<String>()
+            val deduplicated = combined.filter { track ->
+                val id = track.id.ifBlank { track.title }
+                seen.add(id)
+            }
+            Log.d(TAG, "getMusicTracks: loaded ${deduplicated.size} music tracks across ${musicCats.size} categories")
+            val finalTracks = if (deduplicated.isNotEmpty()) {
+                cachedMusicTracksList = deduplicated
+                deduplicated
+            } else {
+                getDefaultMusicTracks()
+            }
+            finalTracks
+        } else {
+            val targetCode = categoryCode!!.trim()
+            cachedMusicTracksList?.let { cached ->
+                val cleanTarget = targetCode.removePrefix("MUSIC_").lowercase()
+                val fromCache = cached.filter {
+                    it.category.equals(targetCode, ignoreCase = true) ||
+                            it.category.removePrefix("MUSIC_").lowercase() == cleanTarget
+                }
+                if (fromCache.isNotEmpty()) return@withContext fromCache
+            }
+
+            var tracks = fetchMusicTracksForCategory(targetCode)
+            if (tracks.isEmpty() && !targetCode.startsWith("MUSIC_", ignoreCase = true)) {
+                tracks = fetchMusicTracksForCategory("MUSIC_$targetCode")
+            }
+            if (tracks.isEmpty()) {
+                val cleanTarget = targetCode.removePrefix("MUSIC_").lowercase()
+                tracks = getDefaultMusicTracks().filter {
+                    it.category.equals(targetCode, ignoreCase = true) ||
+                            it.category.removePrefix("MUSIC_").lowercase() == cleanTarget
+                }
+            }
+            tracks
         }
     }
 

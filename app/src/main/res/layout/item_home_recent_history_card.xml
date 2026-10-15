@@ -121,7 +121,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
-                        android:text="Ảnh"
+                        android:text="@string/history_badge_photo"
                         android:textColor="@color/white"
                         android:textSize="9.5sp"
                         android:textStyle="bold" />

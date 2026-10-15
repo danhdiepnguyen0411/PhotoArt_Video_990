@@ -22,21 +22,21 @@ class BannerIndicatorView @JvmOverloads constructor(
     private var currentOffset = 0f
 
     private val density = resources.displayMetrics.density
-    private val dotHeight = 8f * density
+    private val dotHeight = 5f * density
     private val cornerRadius = dotHeight / 2f
-    private val inactiveWidth = 8f * density
-    private val activeWidth = 20f * density
-    private val gap = 7f * density
+    private val inactiveWidth = 5f * density
+    private val activeWidth = 16f * density
+    private val gap = 5f * density
 
     private val paintInactive = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#CCFFFFFF")
+        color = Color.parseColor("#CAD7EE")
         style = Paint.Style.FILL
     }
 
     private val paintStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#1A000000")
+        color = Color.TRANSPARENT
         style = Paint.Style.STROKE
-        strokeWidth = 0.5f * density
+        strokeWidth = 0f
     }
 
     private val paintActive = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -108,13 +108,12 @@ class BannerIndicatorView @JvmOverloads constructor(
             if (activeWeight > 0.01f) {
                 val a = (activeWeight * 255).toInt()
                 paintActive.alpha = a
-                val c1 = Color.argb(a, 0x30, 0xC8, 0xF4)
-                val c2 = Color.argb(a, 0x66, 0x76, 0xEE)
-                val c3 = Color.argb(a, 0xD8, 0x5D, 0xDD)
+                val c1 = Color.argb(a, 0x4A, 0x7B, 0xFE)
+                val c2 = Color.argb(a, 0x91, 0x53, 0xEE)
                 paintActive.shader = LinearGradient(
                     dotRect.left, dotRect.top, dotRect.right, dotRect.bottom,
-                    intArrayOf(c1, c2, c3),
-                    floatArrayOf(0f, 0.52f, 1f),
+                    intArrayOf(c1, c2),
+                    null,
                     Shader.TileMode.CLAMP
                 )
                 canvas.drawRoundRect(dotRect, cornerRadius, cornerRadius, paintActive)

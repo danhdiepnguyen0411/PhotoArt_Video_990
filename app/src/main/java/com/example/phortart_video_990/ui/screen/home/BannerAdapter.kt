@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phortart_video_990.data.model.BannerItemModel
@@ -30,8 +31,15 @@ class BannerAdapter(
 
         fun bind(item: BannerItemModel) {
             binding.ivBannerBg.setImageResource(item.imageRes)
-            binding.tvBannerChip.text = item.chip
-            binding.tvBannerTitle.text = item.title
+            binding.tvBannerTitleLine1.text = item.titleLine1
+
+            if (item.titleLine2Prefix.isNotEmpty()) {
+                binding.tvBannerTitleLine2.text = item.titleLine2Prefix
+                binding.tvBannerTitleLine2.visibility = View.VISIBLE
+            } else {
+                binding.tvBannerTitleLine2.visibility = View.GONE
+            }
+
             binding.tvBannerHighlight.text = item.highlight
             binding.tvBannerDesc.text = item.description
             binding.btnBannerAction.text = item.buttonText
@@ -75,8 +83,8 @@ class BannerAdapter(
                 val shader = LinearGradient(
                     0f, 0f, maxWidth.coerceAtLeast(1f), 0f,
                     intArrayOf(
-                        Color.parseColor("#4A8CF2"),
-                        Color.parseColor("#9A5CF0")
+                        Color.parseColor("#4A7BFE"),
+                        Color.parseColor("#9153EE")
                     ),
                     null,
                     Shader.TileMode.CLAMP

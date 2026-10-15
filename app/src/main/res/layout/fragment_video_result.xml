@@ -196,9 +196,9 @@
                     android:ellipsize="end"
                     android:fontFamily="@font/inter_medium"
                     android:maxLines="1"
-                    android:text="Tạo bởi AI · 0:15"
                     android:textColor="#8296BC"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:text="Created by AI · 0:15" />
             </LinearLayout>
 
             <!-- Note Icon (.fl-video-note) with Animation -->

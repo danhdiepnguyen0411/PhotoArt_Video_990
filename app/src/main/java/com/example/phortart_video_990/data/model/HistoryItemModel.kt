@@ -13,7 +13,8 @@ data class HistoryItemModel(
     @param:DrawableRes val imageRes: Int = 0,
     val beforeUri: String? = null,
     val duration: String? = null,
-    val photoCount: String? = null
+    val photoCount: String? = null,
+    val styleName: String? = null
 ) {
     val isVideo: Boolean
         get() {
