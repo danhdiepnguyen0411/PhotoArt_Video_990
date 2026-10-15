@@ -64,10 +64,6 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                     putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, selectedTemplate.safeImageUrl)
                     putString("template_thumb", selectedTemplate.safeImageUrl)
                     putString("template_audio_url", selectedTemplate.safeAudioUrl)
-                    putString("selected_track_id", selectedTemplate.id)
-                    putString("selected_music_title", selectedTemplate.title)
-                    putString("selected_music_audio_url", selectedTemplate.safeAudioUrl)
-                    putString("selected_music_image_url", selectedTemplate.safeImageUrl)
                     putFloat("selected_template_duration_sec", selectedTemplate.durationSeconds.toFloat())
                     putInt("selected_template_photo_count", selectedTemplate.targetPhotoCount)
                 }

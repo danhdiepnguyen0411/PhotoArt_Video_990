@@ -335,11 +335,21 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             tracks = emptyList(),
             selectedTrackId = selectedMusicTrackId,
             onTrackSelected = { track ->
-                selectedMusicTrackId = track.id
-                selectedMusicTitle = track.title
-                selectedMusicAudioUrl = track.safeAudioUrl
-                selectedMusicImageUrl = track.safeImageUrl
-                selectedMusicAudioFilePath = null
+                if (track != null) {
+                    selectedMusicTrackId = track.id
+                    selectedMusicTitle = track.title
+                    selectedMusicAudioUrl = track.safeAudioUrl
+                    selectedMusicImageUrl = track.safeImageUrl
+                    selectedMusicAudioFilePath = null
+                } else {
+                    // Deselect music -> Revert to template original audio
+                    selectedMusicTrackId = null
+                    selectedMusicTitle = null
+                    selectedMusicAudioUrl = null
+                    selectedMusicImageUrl = null
+                    selectedMusicAudioFilePath = null
+                    stopAudio()
+                }
             },
             onPreviewClick = { track ->
                 toggleAudioPreview(track)
@@ -400,15 +410,10 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
                 if (musicTracks.isNotEmpty()) {
                     danceMusicAdapter.submitList(musicTracks)
-                    if (selectedMusicTrackId.isNullOrBlank()) {
-                        val firstMusic = musicTracks.first()
-                        selectedMusicTrackId = firstMusic.id
-                        selectedMusicTitle = firstMusic.title
-                        selectedMusicAudioUrl = firstMusic.safeAudioUrl
-                        selectedMusicImageUrl = firstMusic.safeImageUrl
-                        danceMusicAdapter.setSelectedTrackId(firstMusic.id)
-                    } else {
+                    if (!selectedMusicTrackId.isNullOrBlank()) {
                         danceMusicAdapter.setSelectedTrackId(selectedMusicTrackId)
+                    } else {
+                        danceMusicAdapter.setSelectedTrackId(null)
                     }
                 }
             } catch (e: Exception) {
@@ -456,7 +461,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val itemCat = item.category.trim().lowercase()
                 itemCat == target || itemCat.removePrefix("music_") == cleanTarget || itemCat.contains(cleanTarget)
             }
-            danceMusicAdapter.submitList(if (filtered.isNotEmpty()) filtered else pool)
+            danceMusicAdapter.submitList(filtered)
         }
     }
 
@@ -541,10 +546,17 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
         val chosenMusic = danceMusicAdapter.getSelectedTrack()
         if (chosenMusic != null) {
+            // Người dùng chọn nhạc từ danh sách -> Tắt nhạc của template, dùng bài nhạc đã chọn
             selectedMusicTrackId = chosenMusic.id
             selectedMusicTitle = chosenMusic.title
             selectedMusicAudioUrl = chosenMusic.safeAudioUrl
             selectedMusicImageUrl = chosenMusic.safeImageUrl
+        } else {
+            // Không chọn nhạc ngoài -> Giữ nguyên âm thanh gốc của template
+            selectedMusicTrackId = null
+            selectedMusicTitle = null
+            selectedMusicAudioUrl = null
+            selectedMusicImageUrl = null
         }
 
         showLoadingDialog(
@@ -678,7 +690,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
 
                     if (rawVideoFile != null && rawVideoFile.exists()) {
-                        val mergedFile = if (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank()) {
+                        val mergedFile = if (chosenMusic != null && (!audioPath.isNullOrBlank() || !audioUrl.isNullOrBlank())) {
                             if (isAdded) {
                                 loadingDialog?.updateMessage(getString(R.string.loading_merging_music), getString(R.string.loading_please_wait))
                             }
@@ -756,11 +768,19 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private fun navigateToResult(videoUrl: String?, inputPhotoUri: String, audioPath: String?) {
         val bundle = Bundle().apply {
             putString(TemplateVideoResultFragment.ARG_VIDEO_URL, videoUrl)
-            putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, selectedMusicTrackId)
-            putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, selectedMusicTitle.orEmpty())
-            putString(TemplateVideoResultFragment.ARG_MUSIC_AUDIO_URL, selectedMusicAudioUrl)
-            putString(TemplateVideoResultFragment.ARG_MUSIC_FILE_PATH, audioPath)
-            putString(TemplateVideoResultFragment.ARG_MUSIC_IMAGE_URL, selectedMusicImageUrl)
+            if (!selectedMusicTrackId.isNullOrBlank()) {
+                putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, selectedMusicTrackId)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, selectedMusicTitle.orEmpty())
+                putString(TemplateVideoResultFragment.ARG_MUSIC_AUDIO_URL, selectedMusicAudioUrl)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_FILE_PATH, audioPath)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_IMAGE_URL, selectedMusicImageUrl)
+            } else {
+                putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, null)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, null)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_AUDIO_URL, null)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_FILE_PATH, null)
+                putString(TemplateVideoResultFragment.ARG_MUSIC_IMAGE_URL, null)
+            }
         }
         if (isResumed && isAdded) {
             hideLoadingDialog()

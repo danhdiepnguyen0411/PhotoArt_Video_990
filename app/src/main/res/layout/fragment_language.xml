@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:clipToPadding="false">
+    android:layout_height="match_parent">
 
     <!-- Background Image -->
     <ImageView
@@ -17,7 +15,42 @@
         android:src="@drawable/intro_bg"
         android:contentDescription="@null" />
 
-    <!-- Top Header - chiều cao cố định để không bị giật khi đổi ngôn ngữ -->
+    <!-- Language List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLanguages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="108dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llHeader"
+        tools:listitem="@layout/item_language" />
+
+    <!-- Top Gradient Fade Scrim (Loại bỏ đường cắt cứng ở header khi scroll) -->
+    <View
+        android:id="@+id/vTopFadeScrim"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_language_fade_top"
+        android:clickable="false"
+        android:focusable="false"
+        android:elevation="2dp"
+        app:layout_constraintTop_toBottomOf="@+id/llHeader" />
+
+    <!-- Bottom Gradient Fade Scrim (Loại bỏ đường cắt cứng, tạo hiệu ứng mờ dần mềm mại) -->
+    <View
+        android:id="@+id/vBottomFadeScrim"
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:background="@drawable/bg_language_fade_bottom"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Top Header - elevated and drawn above scrolling list -->
     <LinearLayout
         android:id="@+id/llHeader"
         android:layout_width="match_parent"
@@ -25,7 +58,9 @@
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingTop="42dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="12dp"
+        android:elevation="6dp"
+        android:translationZ="6dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- Nav Row with Back Button -->
@@ -68,44 +103,18 @@
         <TextView
             android:id="@+id/tvLanguageDesc"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="wrap_content"
+            android:minHeight="40dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="6dp"
             android:fontFamily="@font/inter_regular"
             android:gravity="center"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="16dp"
             android:text="@string/language_choose_desc"
             android:textColor="#7B8EB5"
             android:textSize="13.5sp"
-            android:maxLines="2"
-            android:ellipsize="end" />
+            android:maxLines="2" />
     </LinearLayout>
-
-    <!-- Language List with smooth fading edge -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvLanguages"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="108dp"
-        android:requiresFadingEdge="vertical"
-        android:fadingEdgeLength="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llHeader"
-        tools:listitem="@layout/item_language" />
-
-    <!-- Bottom Gradient Fade Scrim (Loại bỏ đường cắt cứng, tạo hiệu ứng mờ dần mềm mại) -->
-    <View
-        android:id="@+id/vBottomFadeScrim"
-        android:layout_width="match_parent"
-        android:layout_height="145dp"
-        android:background="@drawable/bg_language_fade_bottom"
-        android:clickable="false"
-        android:focusable="false"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
     <!-- Confirm Button (Elevated on top of the bottom fade scrim with shadow) -->
     <com.google.android.material.card.MaterialCardView

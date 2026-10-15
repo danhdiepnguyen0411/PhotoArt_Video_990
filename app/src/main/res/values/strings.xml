@@ -29,14 +29,10 @@
     <string name="home_recent_history">Lịch sử gần đây</string>
     <string name="home_suggestions">Dành riêng cho bạn</string>
     <string name="home_hot_templates">Hot</string>
-    <string name="feature_dance_title">Tạo video
-nhảy</string>
-    <string name="feature_prompt_title">Tạo ảnh bằng
-text</string>
-    <string name="feature_restore_title">Hồi sinh
-ảnh cũ</string>
-    <string name="feature_video_title">Gom ảnh
-tạo video</string>
+    <string name="feature_dance_title">Tạo video</string>
+    <string name="feature_prompt_title">Tạo ảnh AI</string>
+    <string name="feature_restore_title">Phục hồi ảnh</string>
+    <string name="feature_video_title">Gom kỷ niệm</string>
     <string name="dance_video_title">Tạo video nhảy</string>
     <string name="dance_upload_title">Tải ảnh lên từ thư viện</string>
     <string name="dance_upload_card_title">Nhấn để chọn ảnh từ thư viện</string>
@@ -52,27 +48,27 @@ tạo video</string>
     <string name="search_music_hint">Tìm kiếm bài hát, nghệ sĩ...</string>
     <string name="btn_next_step">Tiếp theo</string>
     <string name="func_05_upscale">Nâng cấp ảnh</string>
+    <string name="banner_1_title_line1">Gom ảnh</string>
+    <string name="banner_1_title_line2">lưu trọn </string>
+    <string name="banner_1_highlight">kỷ niệm</string>
+    <string name="banner_1_desc">Chọn ảnh, thêm nhạc, tạo video.</string>
+    <string name="banner_1_btn">Tạo ngay</string>
+    <string name="banner_2_title_line1">Tạo ảnh từ chữ,</string>
+    <string name="banner_2_title_line2">vẽ nên </string>
+    <string name="banner_2_highlight">giấc mơ</string>
+    <string name="banner_2_desc">Nhập ý tưởng, AI vẽ tranh.</string>
+    <string name="banner_2_btn">Vẽ ngay</string>
+    <string name="banner_3_title_line1">Hồi sinh ảnh cũ,</string>
+    <string name="banner_3_title_line2">sắc nét </string>
+    <string name="banner_3_highlight">như mới</string>
+    <string name="banner_3_desc">Làm rõ nét, phục hồi màu rực rỡ.</string>
+    <string name="banner_3_btn">Khôi phục</string>
     <string name="banner_1_chip">AI Photo &amp; Video</string>
-    <string name="banner_1_title">Biến ảnh của bạn
-thành những</string>
-    <string name="banner_1_highlight">khoảnh khắc
-tuyệt vời</string>
-    <string name="banner_1_desc">Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây.</string>
-    <string name="banner_1_btn">Thử ngay</string>
+    <string name="banner_1_title">Gom ảnh lưu trọn kỷ niệm</string>
     <string name="banner_2_chip">AI Prompt</string>
-    <string name="banner_2_title">Chỉ cần mô tả,
-AI sẽ vẽ nên</string>
-    <string name="banner_2_highlight">bức ảnh
-trong mơ</string>
-    <string name="banner_2_desc">Nhập ý tưởng của bạn và nhận ngay hình ảnh nghệ thuật độc đáo.</string>
-    <string name="banner_2_btn">Tạo ngay</string>
-    <string name="banner_3_chip">Khôi phục ảnh</string>
-    <string name="banner_3_title">Hồi sinh những
-bức ảnh cũ</string>
-    <string name="banner_3_highlight">như mới
-tinh khôi</string>
-    <string name="banner_3_desc">Làm nét, xoá vết xước và phục hồi màu sắc chỉ với một chạm.</string>
-    <string name="banner_3_btn">Khôi phục ngay</string>
+    <string name="banner_2_title">Tạo ảnh từ chữ, vẽ nên giấc mơ</string>
+    <string name="banner_3_chip">Photo Restore</string>
+    <string name="banner_3_title">Hồi sinh ảnh cũ, sắc nét như mới</string>
     <string name="template_title">Template ✨</string>
     <string name="template_cat_all">Tất cả</string>
     <string name="template_cat_hot">Hot</string>
@@ -129,8 +125,8 @@ tinh khôi</string>
     <string name="music_empty_category">Chưa có bài hát trong danh mục này</string>
     <string name="music_empty_try_other">Vui lòng thử chọn danh mục khác</string>
     <string name="music_btn_choose">Chọn</string>
-    <string name="ai_create_title">AI Create</string>
-    <string name="enter_prompt_hint">Nhập mô tả (Prompt)</string>
+    <string name="ai_create_title">Tạo ảnh bằng text</string>
+    <string name="enter_prompt_hint">Nhập nội dung (Text)</string>
     <string name="prompt_suggestions">Gợi ý prompt</string>
     <string name="btn_generate_image">Tạo ảnh</string>
     <string name="loading_please_wait">Vui lòng đợi trong giây lát</string>
@@ -146,6 +142,7 @@ tinh khôi</string>
     <string name="restore_feature_3_title">Tăng độ chân thực</string>
     <string name="restore_feature_3_desc">Giữ nguyên vẻ tự nhiên của ảnh.</string>
     <string name="btn_start_now">Bắt đầu ngay</string>
+    <string name="btn_start_restore">Bắt đầu khôi phục</string>
     <string name="restoring_photo">Đang khôi phục ảnh</string>
     <string name="restoring_photo_dots">Đang khôi phục ảnh...</string>
     <string name="restore_result_title">Kết quả</string>
@@ -216,6 +213,7 @@ tốt hơn.</string>
     <string name="rate_subtitle">Bạn cảm thấy trải nghiệm tạo ảnh với PHOTO ART &amp; VIDEO như thế nào?</string>
     <string name="btn_rate_submit">Gửi đánh giá</string>
     <string name="btn_rate_not_now">Để sau</string>
+    <string name="rate_success">Cảm ơn bạn đã gửi đánh giá!</string>
     <string name="uninstall_step1_title">Bạn gặp vấn đề gì khi sử dụng PHOTO ART &amp; VIDEO?</string>
     <string name="uninstall_card1_title">Không thể lưu hoặc chất lượng ảnh chưa tốt</string>
     <string name="uninstall_card1_desc">Thử lại với các chế độ AI khác hoặc xem mẹo tạo ảnh đẹp</string>
@@ -261,8 +259,8 @@ tốt hơn.</string>
     <string name="toast_feature_in_progress">Tính năng đang được hoàn thiện</string>
     <string name="toast_please_select_music">Vui lòng chọn bài hát</string>
 
-    <!-- Auto-added localized feature keys -->
-    <string name="prompt_hint">Ví dụ: Cô gái anime, mặc váy trắng, đứng giữa cánh đồng hoa...</string>
+    <string name="prompt_hint">Mô tả bức ảnh bạn muốn tạo, hoặc chọn một style bên dưới để tự động điền...</string>
+    <string name="prompt_style_subtitle">Chạm vào một style, AI sẽ tự viết nội dung mô tả cho bạn.</string>
     <string name="prompt_chip_anime">Anime girl</string>
     <string name="prompt_chip_fantasy">Fantasy ...</string>
     <string name="prompt_chip_pet">Cute pet</string>
@@ -350,4 +348,8 @@ tốt hơn.</string>
     <string name="toast_music_url_empty">Không thể phát âm thanh xem trước</string>
     <string name="loading_preparing_image_data">Đang chuẩn bị dữ liệu hình ảnh...</string>
     <string name="loading_preparing_bg_music">Đang chuẩn bị nhạc nền...</string>
+    <string name="btn_change_photo">Đổi ảnh</string>
+    <string name="history_badge_photo">Ảnh</string>
+    <string name="music_tap_to_select">Chạm để chọn</string>
+    <string name="btn_preview">Xem trước</string>
 </resources>
