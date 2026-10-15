@@ -120,7 +120,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 var wasOffline = false
                 com.example.phortart_video_990.core.utils.NetworkMonitor.observeNetwork(requireContext()).collect { isOnline ->
                     if (isOnline) {
-                        val needReload = cachedMusicTracks.isEmpty() ||
+                        val needReload = cachedDancingTemplates.isEmpty() ||
                                 forYouAdapter.itemCount == 0 ||
                                 hotTemplateAdapter.itemCount == 0
                         if (wasOffline || needReload) {
@@ -143,7 +143,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         checkCustomNotificationPermission()
         restoreScrollPosition()
 
-        if ((cachedMusicTracks.isEmpty() || forYouAdapter.itemCount == 0) &&
+        if ((cachedDancingTemplates.isEmpty() || forYouAdapter.itemCount == 0) &&
             com.example.phortart_video_990.core.utils.NetworkMonitor.isOnline(requireContext())) {
             loadHomeData(forceRefresh = true)
         }
