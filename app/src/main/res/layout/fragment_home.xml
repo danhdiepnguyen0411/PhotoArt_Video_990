@@ -83,7 +83,7 @@
         <LinearLayout
             android:id="@+id/llFeatureCards"
             android:layout_width="match_parent"
-            android:layout_height="124dp"
+            android:layout_height="94dp"
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:paddingHorizontal="14dp">
@@ -102,30 +102,34 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/ivFeatureDance"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:contentDescription="Dance Video"
                     android:scaleType="fitCenter"
                     android:src="@drawable/feature_dance" />
 
-                <TextView
+                <com.example.phortart_video_990.core.view.MarqueeTextView
                     android:id="@+id/tvFeatureDanceTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:fontFamily="@font/inter_bold"
                     app:fontFamily="@font/inter_bold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.01"
-                    android:lineSpacingMultiplier="1.1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="@string/feature_dance_title"
-                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -145,30 +149,34 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/ivFeaturePrompt"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:contentDescription="AI Prompt"
                     android:scaleType="fitCenter"
                     android:src="@drawable/feature_ai_prompt" />
 
-                <TextView
+                <com.example.phortart_video_990.core.view.MarqueeTextView
                     android:id="@+id/tvFeaturePromptTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:fontFamily="@font/inter_bold"
                     app:fontFamily="@font/inter_bold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.01"
-                    android:lineSpacingMultiplier="1.1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="@string/feature_prompt_title"
-                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -188,30 +196,34 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/ivFeatureRestore"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:contentDescription="Restore Photo"
                     android:scaleType="fitCenter"
                     android:src="@drawable/feature_restore_photo" />
 
-                <TextView
+                <com.example.phortart_video_990.core.view.MarqueeTextView
                     android:id="@+id/tvFeatureRestoreTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:fontFamily="@font/inter_bold"
                     app:fontFamily="@font/inter_bold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.01"
-                    android:lineSpacingMultiplier="1.1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="@string/feature_restore_title"
-                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
@@ -231,30 +243,34 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingHorizontal="4dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/ivFeatureVideo"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:contentDescription="Create Video"
                     android:scaleType="fitCenter"
                     android:src="@drawable/feature_create_video" />
 
-                <TextView
+                <com.example.phortart_video_990.core.view.MarqueeTextView
                     android:id="@+id/tvFeatureVideoTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:fontFamily="@font/inter_bold"
                     app:fontFamily="@font/inter_bold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.01"
-                    android:lineSpacingMultiplier="1.1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="@string/feature_video_title"
-                    android:textAlignment="center"
                     android:textColor="#16296B"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />

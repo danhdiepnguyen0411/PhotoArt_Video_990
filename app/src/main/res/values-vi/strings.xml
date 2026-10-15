@@ -171,6 +171,8 @@ tốt hơn.</string>
     <string name="setting_language">Ngôn ngữ</string>
     <string name="setting_notification">Thông báo</string>
     <string name="setting_notification_desc">Quản lý thông báo của bạn</string>
+    <string name="setting_permission">Permission</string>
+    <string name="setting_permission_desc">Quản lý quyền truy cập của ứng dụng</string>
     <string name="settings_group_support">Hỗ trợ</string>
     <string name="setting_rate">Đánh giá ứng dụng</string>
     <string name="setting_rate_desc">Chia sẻ cảm nhận của bạn</string>

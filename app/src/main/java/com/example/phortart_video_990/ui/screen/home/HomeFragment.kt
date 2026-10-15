@@ -102,6 +102,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setupHotTemplates()
         loadHomeData()
         setupNetworkObserver()
+        setupMarqueeTitles()
+    }
+
+    private fun setupMarqueeTitles() {
+        bindingOrNull?.let { b ->
+            b.tvFeatureDanceTitle.isSelected = true
+            b.tvFeaturePromptTitle.isSelected = true
+            b.tvFeatureRestoreTitle.isSelected = true
+            b.tvFeatureVideoTitle.isSelected = true
+        }
     }
 
     private fun setupNetworkObserver() {
@@ -127,6 +137,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onResume() {
         super.onResume()
+        setupMarqueeTitles()
         startAutoScroll()
         loadRecentHistory()
         checkCustomNotificationPermission()
