@@ -24,11 +24,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="18dp"
-            android:paddingEnd="0dp"
+            android:paddingEnd="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.60">
+            app:layout_constraintWidth_percent="0.65">
 
             <!-- Chip: Hidden to match Figma -->
             <TextView
@@ -49,13 +49,13 @@
                 android:includeFontPadding="false"
                 android:letterSpacing="-0.02"
                 android:textColor="#16296B"
-                android:textSize="18sp"
+                android:textSize="16.5sp"
                 tools:text="Gom ảnh" />
 
             <!-- Title Line 2 (Dark Navy + Gradient Highlight) -->
             <LinearLayout
                 android:id="@+id/llTitleLine2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:orientation="horizontal">
@@ -71,20 +71,21 @@
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.02"
                     android:textColor="#16296B"
-                    android:textSize="18sp"
+                    android:textSize="16.5sp"
                     tools:text="lưu trọn " />
 
                 <TextView
                     android:id="@+id/tvBannerHighlight"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="@font/inter_black"
                     app:fontFamily="@font/inter_black"
                     android:textStyle="bold"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.02"
                     android:textColor="@color/banner_grad_start"
-                    android:textSize="18sp"
+                    android:textSize="16.5sp"
                     tools:text="kỷ niệm" />
             </LinearLayout>
 
@@ -93,29 +94,29 @@
                 android:id="@+id/tvBannerDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="4dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/inter_medium"
                 android:includeFontPadding="false"
-                android:lineSpacingMultiplier="1.2"
+                android:lineSpacingMultiplier="1.15"
                 android:maxLines="2"
                 android:textColor="#596B8E"
-                android:textSize="11.5sp"
+                android:textSize="11sp"
                 tools:text="Chọn ảnh, thêm nhạc, tạo video." />
 
             <!-- Action Button (Rounded Gradient Pill) -->
             <TextView
                 android:id="@+id/btnBannerAction"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_banner_btn"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:paddingHorizontal="18dp"
+                android:paddingHorizontal="16dp"
                 android:textColor="@color/white"
-                android:textSize="13.5sp"
+                android:textSize="12.5sp"
                 android:fontFamily="@font/inter_bold"
                 android:textStyle="bold"
                 tools:text="Tạo ngay" />

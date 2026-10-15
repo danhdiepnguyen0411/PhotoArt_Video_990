@@ -130,9 +130,9 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             items = stylesList,
             selectedIndex = selectedStyleIndex
         ) { selectedStyle ->
-            selectedStyleName = selectedStyle.title.replace("\n", " ")
+            selectedStyleName = selectedStyle.getLocalizedTitle(requireContext()).replace("\n", " ")
             selectedStyleIndex = styleAdapter.getSelectedIndex()
-            binding.etPromptInput.setText(selectedStyle.prompt)
+            binding.etPromptInput.setText(selectedStyle.getLocalizedPrompt(requireContext()))
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
@@ -159,7 +159,7 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             if (matchedIdx != -1) {
                 selectedStyleIndex = matchedIdx
                 styleAdapter.setSelectedIndex(matchedIdx)
-                selectedStyleName = stylesList[matchedIdx].title.replace("\n", " ")
+                selectedStyleName = stylesList[matchedIdx].getLocalizedTitle(requireContext()).replace("\n", " ")
                 binding.rvStyles.post {
                     binding.rvStyles.scrollToPosition(matchedIdx)
                 }
@@ -233,16 +233,20 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
         val cleanPrompt = prompt.trim()
         if (cleanPrompt.isBlank()) return -1
 
+        val ctx = context
         // Priority 2: Exact prompt match
         val exactIdx = stylesList.indexOfFirst {
-            it.prompt.trim().equals(cleanPrompt, ignoreCase = true)
+            it.prompt.trim().equals(cleanPrompt, ignoreCase = true) ||
+                    (ctx != null && it.getLocalizedPrompt(ctx).trim().equals(cleanPrompt, ignoreCase = true))
         }
         if (exactIdx != -1) return exactIdx
 
         // Priority 3: Prompt contains the style's prompt, or style's prompt contains prompt
         val containsIdx = stylesList.indexOfFirst {
             cleanPrompt.contains(it.prompt.trim(), ignoreCase = true) ||
-                    it.prompt.trim().contains(cleanPrompt, ignoreCase = true)
+                    it.prompt.trim().contains(cleanPrompt, ignoreCase = true) ||
+                    (ctx != null && (cleanPrompt.contains(it.getLocalizedPrompt(ctx).trim(), ignoreCase = true) ||
+                            it.getLocalizedPrompt(ctx).trim().contains(cleanPrompt, ignoreCase = true)))
         }
         if (containsIdx != -1) return containsIdx
 

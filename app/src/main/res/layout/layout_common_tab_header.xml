@@ -91,6 +91,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:fontFamily="@font/inter_bold"
+            android:gravity="center"
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textColor="#4A7BFE"

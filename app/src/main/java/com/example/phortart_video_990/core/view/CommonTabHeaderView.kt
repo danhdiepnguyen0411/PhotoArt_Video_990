@@ -18,6 +18,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePaddingRelative
+import androidx.core.widget.TextViewCompat
+import android.util.TypedValue
 import androidx.navigation.findNavController
 import com.example.phortart_video_990.R
 
@@ -196,7 +198,14 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     fun setBackButtonVisible(visible: Boolean) {
         btnBack.visibility = if (visible) View.VISIBLE else View.GONE
-        tvTitle.textSize = if (visible) 24f else 32f
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(
+            tvTitle, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE
+        )
+        if (visible) {
+            tvTitle.textSize = 19f
+        } else {
+            tvTitle.textSize = 32f
+        }
         updateTitleConstraints()
         applyTitleGradient()
     }
