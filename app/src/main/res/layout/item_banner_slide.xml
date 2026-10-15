@@ -23,93 +23,102 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="16dp"
+            android:paddingStart="18dp"
             android:paddingEnd="0dp"
-            android:paddingTop="18dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.62">
+            app:layout_constraintWidth_percent="0.60">
 
-            <!-- Chip: AI Photo & Video -->
+            <!-- Chip: Hidden to match Figma -->
             <TextView
                 android:id="@+id/tvBannerChip"
                 android:layout_width="wrap_content"
-                android:layout_height="22dp"
-                android:background="@drawable/bg_banner_chip"
-                android:drawableStart="@drawable/ic_sparkle_chip"
-                android:drawablePadding="5dp"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:paddingHorizontal="9dp"
-                android:textColor="@color/banner_chip_text"
-                android:textSize="11sp"
-                android:fontFamily="@font/inter_medium"
-                android:textStyle="bold"
-                tools:text="AI Photo &amp; Video" />
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="gone" />
 
-            <!-- Title: Part 1 -->
+            <!-- Title Line 1 (Dark Navy) -->
             <TextView
-                android:id="@+id/tvBannerTitle"
+                android:id="@+id/tvBannerTitleLine1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:fontFamily="@font/inter_black"
                 app:fontFamily="@font/inter_black"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
-                android:letterSpacing="-0.03"
-                android:lineSpacingMultiplier="1.15"
-                android:textColor="#17327C"
-                android:textSize="25sp"
-                tools:text="Biến ảnh của bạn&#10;thành những" />
+                android:letterSpacing="-0.02"
+                android:textColor="#16296B"
+                android:textSize="18sp"
+                tools:text="Gom ảnh" />
 
-            <!-- Highlight Title (Gradient royal blue to purple) -->
-            <TextView
-                android:id="@+id/tvBannerHighlight"
+            <!-- Title Line 2 (Dark Navy + Gradient Highlight) -->
+            <LinearLayout
+                android:id="@+id/llTitleLine2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:fontFamily="@font/inter_black"
-                app:fontFamily="@font/inter_black"
-                android:textStyle="bold"
-                android:includeFontPadding="false"
-                android:letterSpacing="-0.03"
-                android:lineSpacingMultiplier="1.15"
-                android:textColor="@color/banner_grad_start"
-                android:textSize="25sp"
-                tools:text="khoảnh khắc&#10;tuyệt vời" />
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvBannerTitleLine2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.02"
+                    android:textColor="#16296B"
+                    android:textSize="18sp"
+                    tools:text="lưu trọn " />
+
+                <TextView
+                    android:id="@+id/tvBannerHighlight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_black"
+                    app:fontFamily="@font/inter_black"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.02"
+                    android:textColor="@color/banner_grad_start"
+                    android:textSize="18sp"
+                    tools:text="kỷ niệm" />
+            </LinearLayout>
 
             <!-- Description -->
             <TextView
                 android:id="@+id/tvBannerDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="5dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/inter_medium"
                 android:includeFontPadding="false"
-                android:lineSpacingMultiplier="1.35"
-                android:maxLines="3"
-                android:textColor="#7A8CB5"
-                android:textSize="12.5sp"
-                tools:text="Tạo video sống động, ảnh nghệ thuật và nhiều hiệu ứng AI chỉ trong vài giây." />
+                android:lineSpacingMultiplier="1.2"
+                android:maxLines="2"
+                android:textColor="#596B8E"
+                android:textSize="11.5sp"
+                tools:text="Chọn ảnh, thêm nhạc, tạo video." />
 
-            <!-- Action Button -->
+            <!-- Action Button (Rounded Gradient Pill) -->
             <TextView
                 android:id="@+id/btnBannerAction"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="34dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_banner_btn"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:paddingHorizontal="22dp"
+                android:paddingHorizontal="18dp"
                 android:textColor="@color/white"
-                android:textSize="15sp"
-                android:fontFamily="@font/inter_medium"
+                android:textSize="13.5sp"
+                android:fontFamily="@font/inter_bold"
                 android:textStyle="bold"
-                tools:text="Thử ngay" />
+                tools:text="Tạo ngay" />
 
         </LinearLayout>
 

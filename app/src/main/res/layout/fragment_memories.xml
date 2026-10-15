@@ -60,7 +60,8 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/no_photos_selected"
                         android:textColor="#64748B"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <TextView
@@ -75,7 +76,8 @@
                     android:text="@string/add_photos_pill"
                     android:textColor="#3B82F6"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -97,7 +99,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <ImageView
                         android:id="@+id/ivEmptyPhotoIllustration"
@@ -122,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/select_multiple_photos"
+                        android:text="@string/dance_upload_card_desc"
                         android:textColor="#7C8CA0"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -351,120 +353,69 @@
 
             </LinearLayout>
 
-            <!-- Section 3: Nhạc nền cho video -->
+            <!-- Section 3: Nhạc nền -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:text="@string/video_bg_music"
+                android:text="@string/dance_bg_music"
                 android:textColor="#0F172A"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSelectMusic"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMusicCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_music_category_chip" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMusicTracks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E2EEFF"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
-
-                    <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_orange_music_icon">
-
-                        <ImageView
-                            android:id="@+id/ivMusicIcon"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Music Icon"
-                            android:src="@drawable/ic_music_note" />
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/ivMusicCover"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:visibility="gone"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvSelectedMusicTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Lovely"
-                            android:textColor="#132B68"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvSelectedMusicSubtitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Billie Eilish • 03:20"
-                            android:textColor="#8E9BB0"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/btnChangeMusic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_btn_change_music_pill"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="6dp"
-                        android:text="@string/btn_change_music"
-                        android:textColor="#3B82F6"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_memories_music" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Create Video Action Button -->
-    <androidx.appcompat.widget.AppCompatButton
+    <!-- Create Video / Preview Action Button -->
+    <LinearLayout
         android:id="@+id/btnCreateVideo"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_btn_create_video_pill"
-        android:elevation="0dp"
-        android:text="@string/btn_create_video_now"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/ivPreviewIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_preview_eye"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/tvCreateVideoTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_preview"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

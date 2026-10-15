@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.data.local.PreferencesManager
 
 class RateAppDialogFragment : DialogFragment() {
 
@@ -88,30 +90,18 @@ class RateAppDialogFragment : DialogFragment() {
         }
 
         btnSubmit.setOnClickListener {
-            val prefs = requireContext().getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-            prefs.edit().putBoolean("has_rated_app", true).apply()
+            val ctx = requireContext()
+            // Mark as rated in PreferencesManager and legacy app_settings
+            PreferencesManager.getInstance(ctx).hasRatedApp = true
+            val legacyPrefs = ctx.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+            legacyPrefs.edit().putBoolean("has_rated_app", true).apply()
 
+            // Notify user rating was successful
+            Toast.makeText(ctx, getString(R.string.rate_success), Toast.LENGTH_SHORT).show()
+
+            // Invoke callback to update UI (hide rate option in settings)
             onRatedListener?.invoke()
 
-            if (currentRating >= 4) {
-                try {
-                    val packageName = requireContext().packageName
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("market://details?id=$packageName")
-                        )
-                    )
-                } catch (e: Exception) {
-                    val packageName = requireContext().packageName
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
-                        )
-                    )
-                }
-            }
             dismiss()
         }
 

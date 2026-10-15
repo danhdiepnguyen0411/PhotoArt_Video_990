@@ -58,8 +58,8 @@ class HomeMusicAdapter(
             binding.tvMusicTitle.text = item.title
 
             val cat = item.category.replace("MUSIC_", "").ifBlank { "HOT" }
-            binding.tvCategoryTag.text = cat
-            binding.tvMusicSubtitle.text = "${item.displayDuration} • Chạm để chọn"
+            val tapText = binding.root.context.getString(R.string.music_tap_to_select)
+            binding.tvMusicSubtitle.text = "${item.displayDuration} • $tapText"
 
             val coverSource = item.safeImageUrl
             if (!coverSource.isNullOrBlank()) {

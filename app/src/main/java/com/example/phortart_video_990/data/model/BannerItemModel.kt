@@ -4,10 +4,11 @@ import androidx.annotation.DrawableRes
 
 data class BannerItemModel(
     @param:DrawableRes val imageRes: Int,
-    val chip: String,
-    val title: String,
+    val titleLine1: String,
+    val titleLine2Prefix: String,
     val highlight: String,
     val description: String,
     val buttonText: String,
-    val targetFeature: String
+    val targetFeature: String,
+    val chip: String = ""
 )

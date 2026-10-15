@@ -121,7 +121,17 @@
         android:label="RestoreFragment"
         tools:layout="@layout/fragment_restore">
         <action
-            android:id="@+id/action_restoreFragment_to_restoreLoadingFragment"
+            android:id="@+id/action_restoreFragment_to_restorePickPhotoFragment"
+            app:destination="@id/restorePickPhotoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/restorePickPhotoFragment"
+        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestorePickPhotoFragment"
+        android:label="RestorePickPhotoFragment"
+        tools:layout="@layout/fragment_restore_pick_photo">
+        <action
+            android:id="@+id/action_restorePickPhotoFragment_to_restoreLoadingFragment"
             app:destination="@id/restoreLoadingFragment" />
     </fragment>
 
@@ -133,7 +143,7 @@
         <action
             android:id="@+id/action_restoreLoadingFragment_to_restoreResultFragment"
             app:destination="@id/restoreResultFragment"
-            app:popUpTo="@id/restoreFragment"
+            app:popUpTo="@id/restorePickPhotoFragment"
             app:popUpToInclusive="false" />
     </fragment>
 

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardStyle"
+    android:layout_width="112dp"
+    android:layout_height="148dp"
+    android:layout_marginEnd="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/transparent"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:cardPreventCornerOverlap="false"
+    app:strokeColor="@color/transparent"
+    app:strokeWidth="0dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/ivStyleThumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Style Thumbnail"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/cyber_move" />
+
+        <!-- Gradient Scrim for text readability -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_style_scrim" />
+
+        <!-- Hot Badge -->
+        <LinearLayout
+            android:id="@+id/layoutHotBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_badge_hot"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:contentDescription="Flame"
+                android:src="@drawable/ic_flame" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="@string/template_cat_hot"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Style Name -->
+        <TextView
+            android:id="@+id/tvStyleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="10dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/inter_bold"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Cyber Move" />
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>
