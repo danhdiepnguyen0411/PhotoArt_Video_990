@@ -29,12 +29,10 @@
     <string name="home_recent_history">Recent History</string>
     <string name="home_suggestions">For You</string>
     <string name="home_hot_templates">Hot</string>
-    <string name="feature_video_title">Merge Photos
-To Video</string>
-    <string name="feature_prompt_title">Generate Image
-With AI Prompt</string>
-    <string name="feature_restore_title">Restore Old
-Photos</string>
+    <string name="feature_dance_title">Create video</string>
+    <string name="feature_prompt_title">AI Generator</string>
+    <string name="feature_restore_title">Restore photo</string>
+    <string name="feature_video_title">Memories</string>
     <string name="func_01_memories">Merge Photos to Video</string>
     <string name="func_02_restore">Restore Old Photos</string>
     <string name="func_03_enhance">AI Prompt Art</string>
@@ -42,27 +40,21 @@ Photos</string>
     <string name="search_music_hint">Search songs, artists...</string>
     <string name="btn_next_step">Next</string>
     <string name="func_05_upscale">Upscale Photo</string>
-    <string name="banner_1_chip">AI Photo &amp; Video</string>
-    <string name="banner_1_title">Turn your photos
-into wonderful</string>
-    <string name="banner_1_highlight">moments
-of wonder</string>
-    <string name="banner_1_desc">Create vivid videos, artistic photos, and stunning AI effects in seconds.</string>
-    <string name="banner_1_btn">Try Now</string>
-    <string name="banner_2_chip">AI Prompt</string>
-    <string name="banner_2_title">Just describe it,
-AI will paint</string>
-    <string name="banner_2_highlight">your dream
-image</string>
-    <string name="banner_2_desc">Type your ideas and get unique artistic imagery instantly.</string>
-    <string name="banner_2_btn">Create Now</string>
-    <string name="banner_3_chip">Photo Restore</string>
-    <string name="banner_3_title">Restore old
-memories to be</string>
-    <string name="banner_3_highlight">crisp &amp;
-as new</string>
-    <string name="banner_3_desc">Sharpen details, remove scratches, and restore vivid colors in one tap.</string>
-    <string name="banner_3_btn">Restore Now</string>
+    <string name="banner_1_title_line1">Combine photos,</string>
+    <string name="banner_1_title_line2">cherish </string>
+    <string name="banner_1_highlight">memories</string>
+    <string name="banner_1_desc">Select photos, add music, make videos.</string>
+    <string name="banner_1_btn">Create now</string>
+    <string name="banner_2_title_line1">Text to image,</string>
+    <string name="banner_2_title_line2">paint your </string>
+    <string name="banner_2_highlight">dream</string>
+    <string name="banner_2_desc">Type prompts, AI paints art.</string>
+    <string name="banner_2_btn">Draw now</string>
+    <string name="banner_3_title_line1">Revive old photos,</string>
+    <string name="banner_3_title_line2">crisp </string>
+    <string name="banner_3_highlight">as new</string>
+    <string name="banner_3_desc">Sharpen details, restore vibrant colors.</string>
+    <string name="banner_3_btn">Restore</string>
     <string name="template_title">Template ✨</string>
     <string name="template_cat_all">All</string>
     <string name="template_cat_hot">Hot</string>
@@ -133,6 +125,7 @@ as new</string>
     <string name="restore_feature_3_title">Authentic Enhancement</string>
     <string name="restore_feature_3_desc">Preserve the original look naturally.</string>
     <string name="btn_start_now">Start Now</string>
+    <string name="btn_start_restore">Start restore</string>
     <string name="restoring_photo">Restoring Photo</string>
     <string name="restoring_photo_dots">Restoring photo...</string>
     <string name="restore_result_title">Result</string>
@@ -203,6 +196,7 @@ a premium experience.</string>
     <string name="rate_subtitle">How do you feel about creating photos with PHOTO ART &amp; VIDEO?</string>
     <string name="btn_rate_submit">Submit</string>
     <string name="btn_rate_not_now">Not now</string>
+    <string name="rate_success">Thank you for rating our app!</string>
     <string name="uninstall_step1_title">What problems did you encounter during use?</string>
     <string name="uninstall_card1_title">Unable to save or poor photo quality</string>
     <string name="uninstall_card1_desc">Try again with different AI modes or view tips for better photos</string>
@@ -334,4 +328,29 @@ a premium experience.</string>
     <string name="toast_permission_needed_for_photos">Permission required to access device photos</string>
     <string name="picker_empty_photos">No photos found in device gallery</string>
     <string name="toast_cannot_open_gallery">Cannot open photo gallery</string>
+    <string name="dance_video_title">Create Dance Video</string>
+    <string name="dance_upload_title">Upload photos from gallery</string>
+    <string name="dance_upload_card_title">Tap to select photos from gallery</string>
+    <string name="dance_upload_card_desc">Select 1 or more photos (JPG, PNG)</string>
+    <string name="dance_select_template">Select template</string>
+    <string name="dance_bg_music">Background music</string>
+    <string name="btn_create_dance_video">Create dance video</string>
+    <string name="toast_please_select_photo">Please select photos from gallery to create video</string>
+    <string name="banner_1_chip">AI Photo &amp; Video</string>
+    <string name="banner_1_title">Combine photos, cherish memories</string>
+    <string name="banner_2_chip">AI Prompt</string>
+    <string name="banner_2_title">Imagine anything, create with AI Art</string>
+    <string name="banner_3_chip">Photo Restore</string>
+    <string name="banner_3_title">Revive old photos, crisp as new</string>
+    <string name="memories_of_us">Our Memories</string>
+    <string name="video_subtitle_format">Created by AI • %1$s • %2$s</string>
+    <string name="video_subtitle_no_music_format">Created by AI • %1$s</string>
+    <string name="prompt_style_subtitle">Tap a style, AI will write a descriptive prompt for you.</string>
+    <string name="toast_music_url_empty">Unable to preview audio track</string>
+    <string name="loading_preparing_image_data">Preparing image data...</string>
+    <string name="loading_preparing_bg_music">Preparing background music...</string>
+    <string name="btn_change_photo">Change photo</string>
+    <string name="history_badge_photo">Photo</string>
+    <string name="music_tap_to_select">Tap to select</string>
+    <string name="btn_preview">Preview</string>
 </resources>

@@ -181,7 +181,8 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
                             title = userPrompt.ifBlank { getString(R.string.func_03_enhance) },
                             date = currentDate,
                             imageUri = outputUrl,
-                            imageUrl = outputUrl
+                            imageUrl = outputUrl,
+                            styleName = styleName
                         )
                         historyRepository.addHistoryItem(historyItem)
                     } catch (e: Exception) {

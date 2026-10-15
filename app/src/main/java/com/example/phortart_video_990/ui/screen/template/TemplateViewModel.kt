@@ -15,7 +15,16 @@ class TemplateViewModel(
     private val repository: TemplateRepository = TemplateRepository()
 ) : ViewModel() {
 
-    private val _categories = MutableStateFlow<List<CategoryModel>>(emptyList())
+    companion object {
+        val DEFAULT_CATEGORIES = listOf(
+            CategoryModel.ALL,
+            CategoryModel(code = "HOT", name = "Hot Trend", active = true),
+            CategoryModel(code = "TIKTOK", name = "TikTok Dance", active = true),
+            CategoryModel(code = "KPOP", name = "K-Pop", active = true)
+        )
+    }
+
+    private val _categories = MutableStateFlow<List<CategoryModel>>(DEFAULT_CATEGORIES)
     val categories: StateFlow<List<CategoryModel>> = _categories.asStateFlow()
 
     private val _selectedCategoryCode = MutableStateFlow("ALL")

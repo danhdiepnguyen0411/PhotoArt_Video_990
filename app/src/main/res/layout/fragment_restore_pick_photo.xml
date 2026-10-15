@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFE">
+
+    <!-- Top Bar: Common Header with Back Button and Title -->
+    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:headerTitle="@string/restore_title"
+        app:showBackButton="true"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@+id/btnStartRestore"
+        app:layout_constraintTop_toBottomOf="@+id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp">
+
+            <!-- Section Title: Tải ảnh lên từ thư viện -->
+            <TextView
+                android:id="@+id/tvSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/memories_upload_title"
+                android:textColor="#0F172A"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Tall Upload Box Container (Chiều dọc dài lên theo yêu cầu của user) -->
+            <FrameLayout
+                android:id="@+id/cardUploadContainer"
+                android:layout_width="match_parent"
+                android:layout_height="380dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_photo_box_empty"
+                android:clickable="true"
+                android:focusable="true">
+
+                <!-- Empty State (Khi chưa chọn ảnh) -->
+                <LinearLayout
+                    android:id="@+id/llEmptyState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivEmptyIllustration"
+                        android:layout_width="144dp"
+                        android:layout_height="104dp"
+                        android:layout_marginBottom="16dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_empty_photo_illustration"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tap_to_select_photos"
+                        android:textColor="#182E6E"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvEmptyDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/dance_upload_card_desc"
+                        android:textColor="#7C8CA0"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Selected Photo State (Hiển thị ảnh được chọn) -->
+                <FrameLayout
+                    android:id="@+id/flSelectedPhotoContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivSelectedPhoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter"
+                        app:shapeAppearanceOverlay="@style/Rounded16ImageView" />
+
+                    <!-- Retake / Change Photo Pill Badge -->
+                    <TextView
+                        android:id="@+id/btnChangePhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/bg_btn_add_photo_pill"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:text="@string/btn_change_photo"
+                        android:textColor="#3B82F6"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Action Button: Bắt đầu khôi phục -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartRestore"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_btn_create_video_pill"
+        android:elevation="0dp"
+        android:text="@string/btn_start_restore"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

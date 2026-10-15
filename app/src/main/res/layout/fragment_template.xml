@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:headerTitle="@string/nav_template"
-        app:showSparkle="true"
+        app:showSparkle="false"
         app:showProButton="true"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,9 +21,11 @@
         android:id="@+id/rvTemplateCategories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
+        android:paddingTop="6dp"
         android:paddingBottom="10dp"
         app:layout_constraintTop_toBottomOf="@+id/headerTemplate"
         tools:listitem="@layout/item_template_category_chip" />

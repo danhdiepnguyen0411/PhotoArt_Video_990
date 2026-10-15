@@ -184,12 +184,16 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:orientation="vertical"
                     android:padding="14dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -211,17 +215,32 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-                        <androidx.appcompat.widget.AppCompatButton
-                            android:id="@+id/btnCopyPrompt"
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardCopyPrompt"
                             android:layout_width="wrap_content"
-                            android:layout_height="28dp"
-                            android:background="@drawable/bg_category_chip_unselected"
-                            android:fontFamily="@font/inter_bold"
-                            android:paddingHorizontal="10dp"
-                            android:text="@string/btn_copy"
-                            android:textAllCaps="false"
-                            android:textColor="#2563EB"
-                            android:textSize="11sp" />
+                            android:layout_height="32dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="3dp"
+                            app:cardMaxElevation="5dp"
+                            app:strokeColor="#E2E8F0"
+                            app:strokeWidth="1dp"
+                            android:outlineSpotShadowColor="#332563EB"
+                            android:outlineAmbientShadowColor="#1A000000">
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/btnCopyPrompt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:background="@android:color/transparent"
+                                android:stateListAnimator="@null"
+                                android:fontFamily="@font/inter_bold"
+                                android:paddingHorizontal="14dp"
+                                android:text="@string/btn_copy"
+                                android:textAllCaps="false"
+                                android:textColor="#2563EB"
+                                android:textSize="11.5sp" />
+                        </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
                     <TextView
@@ -385,9 +404,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:paddingHorizontal="16dp"
         android:paddingTop="12dp"
-        android:paddingBottom="16dp"
+        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <View
@@ -399,40 +420,71 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <!-- Secondary Action (Dùng lại / Tạo mới) -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnRecreate"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRecreate"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_btn_share_outline"
-                android:fontFamily="@font/inter_bold"
-                android:text="@string/btn_create_similar"
-                android:textAllCaps="false"
-                android:textColor="#2563EB"
-                android:textSize="13.5sp"
-                android:textStyle="bold" />
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="5dp"
+                app:cardMaxElevation="8dp"
+                app:strokeColor="#CAD8FE"
+                app:strokeWidth="1.5dp"
+                android:outlineSpotShadowColor="#4D2563EB"
+                android:outlineAmbientShadowColor="#26000000">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnRecreate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:stateListAnimator="@null"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="@string/btn_create_similar"
+                    android:textAllCaps="false"
+                    android:textColor="#2563EB"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Primary Action: Save to Device -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSaveMedia"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSaveMedia"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1.2"
-                android:background="@drawable/bg_btn_setting_iap"
-                android:fontFamily="@font/inter_bold"
-                android:gravity="center"
-                android:text="@string/btn_save_to_device"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                app:cardBackgroundColor="#7663F2"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardMaxElevation="12dp"
+                app:strokeWidth="0dp"
+                android:outlineSpotShadowColor="#B37663F2"
+                android:outlineAmbientShadowColor="#6637A8F8">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSaveMedia"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_btn_setting_iap"
+                    android:stateListAnimator="@null"
+                    android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:text="@string/btn_save_to_device"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

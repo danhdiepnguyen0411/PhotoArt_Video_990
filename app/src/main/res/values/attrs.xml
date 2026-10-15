@@ -6,5 +6,6 @@
         <attr name="showProButton" format="boolean" />
         <attr name="showBrandLogo" format="boolean" />
         <attr name="showBackButton" format="boolean" />
+        <attr name="centerTitle" format="boolean" />
     </declare-styleable>
 </resources>

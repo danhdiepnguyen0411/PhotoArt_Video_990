@@ -129,7 +129,7 @@
     <TextView
         android:id="@+id/btnNotNow"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="48dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_btn_dialog_cancel"
         android:clickable="true"
@@ -137,12 +137,12 @@
         android:fontFamily="@font/inter"
         app:fontFamily="@font/inter"
         android:gravity="center"
-        android:letterSpacing="0.02"
-        android:lineHeight="20sp"
-        app:lineHeight="20sp"
+        android:letterSpacing="0"
+        android:lineHeight="22sp"
         android:text="@string/btn_rate_not_now"
         android:textColor="#64748B"
-        android:textFontWeight="500"
-        android:textSize="14sp" />
+        android:textFontWeight="700"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

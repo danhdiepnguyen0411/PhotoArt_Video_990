@@ -1,27 +1,35 @@
 package com.example.phortart_video_990.ui.screen.feature.memories
 
+import android.content.Context
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.AudioCacheManager
+import com.example.phortart_video_990.core.utils.VideoGenerator
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.core.utils.safePopBackStack
-import com.example.phortart_video_990.core.utils.VideoGenerator
+import com.example.phortart_video_990.data.local.PreferencesManager
+import com.example.phortart_video_990.data.model.CategoryModel
+import com.example.phortart_video_990.data.model.TemplateModel
 import com.example.phortart_video_990.data.repository.HistoryRepository
+import com.example.phortart_video_990.data.repository.TemplateRepository
 import com.example.phortart_video_990.databinding.FragmentMemoriesBinding
-import android.content.Context
-import android.util.Log
+import com.example.phortart_video_990.ui.screen.feature.music.MusicCategoryAdapter
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -35,12 +43,13 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
     private val selectedPhotos = mutableListOf<Uri>()
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
+    private val templateRepository by lazy { TemplateRepository() }
 
     private var selectedAspectRatio: String = "9:16"
     private var maxPhotoLimit: Int = 10
     private var templateDurationSec: Float? = null
 
-    // Native Photo Picker launcher (Media Picker)
+    // Native Photo Picker launcher
     private val pickVisualMediaLauncher = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia()
     ) { uris: List<Uri> ->
@@ -54,14 +63,25 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         handleSelectedPhotos(uris)
     }
 
+    // Music data & adapters
+    private lateinit var musicCategoryAdapter: MusicCategoryAdapter
+    private lateinit var memoriesMusicAdapter: MemoriesMusicAdapter
+    private var musicCategories: List<CategoryModel> = listOf(CategoryModel.ALL)
+    private var allMusicTracks: List<TemplateModel> = emptyList()
+    private var selectedCategoryCode: String = "ALL"
+
     private var selectedMusicTrackId: String? = null
     private var selectedMusicTitle: String? = null
     private var selectedMusicAudioUrl: String? = null
     private var selectedMusicAudioFilePath: String? = null
     private var selectedMusicImageUrl: String? = null
 
+    private var mediaPlayer: MediaPlayer? = null
+    private var currentlyPlayingTrackId: String? = null
+    private var audioActionJob: Job? = null
+
     private var isGeneratingVideo = false
-    private var generateVideoJob: kotlinx.coroutines.Job? = null
+    private var generateVideoJob: Job? = null
     private var pendingVideoResultBundle: Bundle? = null
     private var pendingVideoErrorMsg: String? = null
 
@@ -108,7 +128,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
     override fun onResume() {
         super.onResume()
-        // If video finished generating while the app was in the background, navigate now safely!
         pendingVideoResultBundle?.let { bundle ->
             pendingVideoResultBundle = null
             hideLoading()
@@ -117,7 +136,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             return
         }
 
-        // If an error occurred while the app was in the background, show error toast now!
         pendingVideoErrorMsg?.let { errorMsg ->
             pendingVideoErrorMsg = null
             hideLoading()
@@ -126,6 +144,11 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 Toast.makeText(ctx, getString(R.string.toast_create_video_failed, errorMsg), Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopPreviewAudio()
     }
 
     private fun savePhotosState() {
@@ -163,7 +186,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
     private fun handleSelectedPhotos(uris: List<Uri>) {
         if (uris.isNotEmpty()) {
             val context = requireContext()
-            // Sao chép ngay ảnh về bộ nhớ cache cục bộ để giữ quyền truy cập vĩnh viễn
             val copiedUris = uris.map { copyUriToAppCache(context, it) }
             val newUris = copiedUris.filter { it !in selectedPhotos }
             val remainingSlots = maxPhotoLimit - selectedPhotos.size
@@ -204,41 +226,15 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
         updatePhotosUi()
         updateRatioUi()
+        setupMusicAdapters()
+        loadMusicData()
 
-        // Read music selection from arguments or savedStateHandle
         val args = arguments
-
         val initialTrackId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
             ?: stateHandle?.get<String>("selected_track_id")?.takeIf { it.isNotBlank() }
         if (!initialTrackId.isNullOrBlank()) {
             selectedMusicTrackId = initialTrackId
         }
-
-        val initialTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
-            ?: stateHandle?.get<String>("selected_music_title")?.takeIf { it.isNotBlank() }
-        val initialSubtitle = args?.getString("selected_music_subtitle")?.takeIf { it.isNotBlank() }
-            ?: stateHandle?.get<String>("selected_music_subtitle")?.takeIf { it.isNotBlank() }
-        if (!initialTitle.isNullOrBlank()) {
-            selectedMusicTitle = initialTitle
-            binding.tvSelectedMusicTitle.text = initialTitle
-            binding.tvSelectedMusicSubtitle.text = initialSubtitle ?: "04:17"
-        }
-
-        val initialAudioUrl = args?.getString("selected_music_audio_url")
-            ?: stateHandle?.get<String?>("selected_music_audio_url")
-        if (!initialAudioUrl.isNullOrBlank()) {
-            selectedMusicAudioUrl = initialAudioUrl
-        }
-
-        val initialFilePath = args?.getString("selected_music_file_path")
-            ?: stateHandle?.get<String?>("selected_music_file_path")
-        if (!initialFilePath.isNullOrBlank()) {
-            selectedMusicAudioFilePath = initialFilePath
-        }
-
-        val initialImageUrl = args?.getString("selected_music_image_url")
-            ?: stateHandle?.get<String?>("selected_music_image_url")
-        updateMusicCoverUi(initialImageUrl)
 
         val initialDuration = args?.getFloat("selected_template_duration_sec", 0f)?.takeIf { it > 0f }
             ?: stateHandle?.get<Float>("selected_template_duration_sec")?.takeIf { it > 0f }
@@ -252,86 +248,186 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             maxPhotoLimit = initialPhotoLimit
         }
         updateEmptyPhotoDescription()
+    }
 
-        // Observe returned music selection from MusicFragment
-        stateHandle?.getLiveData<String>("selected_track_id")
-            ?.observe(viewLifecycleOwner) { trackId ->
-                if (!trackId.isNullOrBlank()) {
-                    selectedMusicTrackId = trackId
+    private fun setupMusicAdapters() {
+        musicCategoryAdapter = MusicCategoryAdapter(
+            categories = musicCategories,
+            selectedCategoryCode = selectedCategoryCode
+        ) { category ->
+            selectedCategoryCode = category.code
+            applyCategoryFilter()
+        }
+        binding.rvMusicCategories.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvMusicCategories.adapter = musicCategoryAdapter
+
+        memoriesMusicAdapter = MemoriesMusicAdapter(
+            tracks = emptyList(),
+            selectedTrackId = selectedMusicTrackId,
+            onTrackSelected = { track ->
+                selectTrack(track)
+            },
+            onPlayToggle = { track ->
+                toggleTrackPlayback(track)
+            }
+        )
+        binding.rvMusicTracks.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.rvMusicTracks.adapter = memoriesMusicAdapter
+    }
+
+    private fun loadMusicData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val cats = templateRepository.getMusicCategories()
+                if (cats.isNotEmpty()) {
+                    musicCategories = cats
+                    musicCategoryAdapter.submitList(cats)
                 }
-            }
 
-        stateHandle?.getLiveData<String>("selected_music_title")
-            ?.observe(viewLifecycleOwner) { musicTitle ->
-                if (!musicTitle.isNullOrBlank()) {
-                    selectedMusicTitle = musicTitle
-                    binding.tvSelectedMusicTitle.text = musicTitle
+                val tracks = templateRepository.getMusicTracks()
+                val validTracks = if (tracks.isNotEmpty()) {
+                    tracks
+                } else {
+                    templateRepository.getDefaultMusicTracks()
                 }
-            }
+                allMusicTracks = validTracks
 
-        stateHandle?.getLiveData<String>("selected_music_subtitle")
-            ?.observe(viewLifecycleOwner) { subtitle ->
-                if (!subtitle.isNullOrBlank()) {
-                    binding.tvSelectedMusicSubtitle.text = subtitle
+                // Restore or select default track
+                val ctx = context
+                val savedTrackId = selectedMusicTrackId
+                    ?: (if (ctx != null) PreferencesManager.getInstance(ctx).lastSelectedMusicTrackId else null)
+                val trackToSelect = allMusicTracks.find { it.id == savedTrackId }
+                    ?: allMusicTracks.firstOrNull()
+
+                if (trackToSelect != null) {
+                    selectTrack(trackToSelect, rememberPref = false)
                 }
-            }
 
-        stateHandle?.getLiveData<String?>("selected_music_audio_url")
-            ?.observe(viewLifecycleOwner) { audioUrl ->
-                selectedMusicAudioUrl = audioUrl
-            }
-
-        stateHandle?.getLiveData<String?>("selected_music_file_path")
-            ?.observe(viewLifecycleOwner) { filePath ->
-                selectedMusicAudioFilePath = filePath
-            }
-
-        stateHandle?.getLiveData<String?>("selected_music_image_url")
-            ?.observe(viewLifecycleOwner) { imageUrl ->
-                updateMusicCoverUi(imageUrl)
-            }
-
-        stateHandle?.getLiveData<Float>("selected_template_duration_sec")
-            ?.observe(viewLifecycleOwner) { dur ->
-                if (dur != null && dur > 0f) {
-                    templateDurationSec = dur
+                applyCategoryFilter()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading music in MemoriesFragment: ${e.message}", e)
+                val fallbackTracks = templateRepository.getDefaultMusicTracks()
+                allMusicTracks = fallbackTracks
+                if (fallbackTracks.isNotEmpty()) {
+                    selectTrack(fallbackTracks.first(), rememberPref = false)
                 }
+                applyCategoryFilter()
+            }
+        }
+    }
+
+    private fun applyCategoryFilter() {
+        val isAll = selectedCategoryCode.equals("ALL", ignoreCase = true) ||
+                selectedCategoryCode.equals("Tất cả", ignoreCase = true) ||
+                selectedCategoryCode.isBlank()
+
+        val filtered = if (isAll) {
+            allMusicTracks
+        } else {
+            allMusicTracks.filter {
+                it.category.equals(selectedCategoryCode, ignoreCase = true) ||
+                        it.templateType.equals(selectedCategoryCode, ignoreCase = true)
+            }
+        }
+        memoriesMusicAdapter.submitList(filtered)
+    }
+
+    private fun selectTrack(track: TemplateModel, rememberPref: Boolean = true) {
+        selectedMusicTrackId = track.id
+        selectedMusicTitle = track.title
+        selectedMusicAudioUrl = track.safeAudioUrl
+        selectedMusicImageUrl = track.safeImageUrl
+        selectedMusicAudioFilePath = null
+
+        memoriesMusicAdapter.setSelectedTrackId(track.id)
+
+        if (rememberPref) {
+            context?.let { ctx ->
+                PreferencesManager.getInstance(ctx).lastSelectedMusicTrackId = track.id
+            }
+        }
+    }
+
+    private fun toggleTrackPlayback(track: TemplateModel) {
+        if (currentlyPlayingTrackId == track.id) {
+            stopPreviewAudio()
+        } else {
+            selectTrack(track)
+            playPreviewAudio(track)
+        }
+    }
+
+    private fun playPreviewAudio(track: TemplateModel) {
+        val audioUrl = track.safeAudioUrl
+        if (audioUrl.isNullOrBlank()) {
+            Toast.makeText(requireContext(), getString(R.string.toast_music_preview_unavailable), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        stopPreviewAudio()
+
+        currentlyPlayingTrackId = track.id
+        memoriesMusicAdapter.setLoadingState(track.id)
+
+        audioActionJob = viewLifecycleOwner.lifecycleScope.launch {
+            val ctx = context ?: return@launch
+            val cachedFile = AudioCacheManager.getOrDownloadAudio(ctx, audioUrl)
+
+            if (!isAdded || view == null || bindingOrNull == null) return@launch
+
+            if (cachedFile == null || !cachedFile.exists() || cachedFile.length() == 0L) {
+                memoriesMusicAdapter.setLoadingState(null)
+                currentlyPlayingTrackId = null
+                Toast.makeText(ctx, getString(R.string.toast_cannot_download_preview), Toast.LENGTH_SHORT).show()
+                return@launch
             }
 
-        stateHandle?.getLiveData<Int>("selected_template_photo_count")
-            ?.observe(viewLifecycleOwner) { limit ->
-                if (limit != null && limit > 0) {
-                    maxPhotoLimit = limit
-                    if (selectedPhotos.size > limit) {
-                        val toRemove = selectedPhotos.drop(limit)
-                        selectedPhotos.removeAll(toRemove)
-                        savePhotosState()
-                        updatePhotosUi()
-                    }
-                    updateEmptyPhotoDescription()
+            try {
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setDataSource(cachedFile.absolutePath)
+                    isLooping = true
+                    prepare()
+                    start()
                 }
+                memoriesMusicAdapter.setPlayingState(track.id, true)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error playing preview audio: ${e.message}", e)
+                memoriesMusicAdapter.setPlayingState(null, false)
+                currentlyPlayingTrackId = null
             }
+        }
+    }
+
+    private fun stopPreviewAudio() {
+        audioActionJob?.cancel()
+        audioActionJob = null
+        try {
+            if (mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.stop()
+            }
+            mediaPlayer?.reset()
+            mediaPlayer?.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        mediaPlayer = null
+        currentlyPlayingTrackId = null
+        if (::memoriesMusicAdapter.isInitialized) {
+            memoriesMusicAdapter.setPlayingState(null, false)
+        }
     }
 
     private fun updateEmptyPhotoDescription() {
         val b = bindingOrNull ?: return
-        b.tvEmptyPhotoDescription.text = getString(R.string.select_max_photos_format, maxPhotoLimit)
-    }
-
-    private fun updateMusicCoverUi(imageUrl: String?) {
-        selectedMusicImageUrl = imageUrl
-        val b = bindingOrNull ?: return
-        if (!imageUrl.isNullOrBlank()) {
-            b.ivMusicCover.visibility = View.VISIBLE
-            b.ivMusicIcon.visibility = View.GONE
-            b.ivMusicCover.load(imageUrl) {
-                crossfade(true)
-                error(R.drawable.ic_music_note)
-            }
-        } else {
-            b.ivMusicCover.visibility = View.GONE
-            b.ivMusicIcon.visibility = View.VISIBLE
-        }
+        b.tvEmptyPhotoDescription.text = "Chọn 1 hoặc nhiều ảnh (JPG, PNG)"
     }
 
     private fun updatePhotosUi() {
@@ -348,18 +444,16 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             binding.flPolaroidStack.visibility = View.GONE
             updateEmptyPhotoDescription()
         } else {
-            binding.tvPhotosSectionTitle.text = getString(R.string.your_photos)
-            binding.tvSelectedCount.visibility = View.VISIBLE
-            binding.btnAddPhotos.visibility = View.VISIBLE
+            binding.tvPhotosSectionTitle.text = getString(R.string.memories_upload_title)
+            binding.tvSelectedCount.visibility = View.GONE
+            binding.btnAddPhotos.visibility = View.GONE
             binding.cardPhotoStackContainer.setBackgroundResource(R.drawable.bg_dashed_photo_box)
 
             binding.llEmptyPhotosPrompt.visibility = View.GONE
             binding.flPolaroidStack.visibility = View.VISIBLE
-            binding.tvSelectedCount.text = getString(R.string.selected_x_photos, count)
 
             when (count) {
                 1 -> {
-                    // Only 1 photo selected: show 1 upright card centered
                     binding.cardPolaroidCenter.visibility = View.VISIBLE
                     binding.cardPolaroidCenter.translationX = 0f
                     binding.cardPolaroidCenter.rotation = 0f
@@ -367,12 +461,10 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     binding.ivPolaroidCenter.load(selectedPhotos[0]) {
                         crossfade(true)
                     }
-
                     binding.cardPolaroidLeft.visibility = View.GONE
                     binding.cardPolaroidRight.visibility = View.GONE
                 }
                 2 -> {
-                    // 2 photos selected: show 2 cards slightly fanned
                     binding.cardPolaroidLeft.visibility = View.VISIBLE
                     binding.cardPolaroidLeft.translationX = -32 * density
                     binding.cardPolaroidLeft.rotation = -6f
@@ -392,7 +484,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     binding.cardPolaroidRight.visibility = View.GONE
                 }
                 else -> {
-                    // 3 or more photos: show 3 fanned cards (Image 1 style)
                     binding.cardPolaroidLeft.visibility = View.VISIBLE
                     binding.cardPolaroidLeft.translationX = -42 * density
                     binding.cardPolaroidLeft.rotation = -11f
@@ -563,24 +654,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
             updateRatioUi()
         }
 
-        binding.cardSelectMusic.setOnClickListener {
-            val bundle = android.os.Bundle().apply {
-                putString("selected_track_id", selectedMusicTrackId)
-                putString("selected_music_title", selectedMusicTitle)
-                putString("selected_music_audio_url", selectedMusicAudioUrl)
-            }
-            findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
-        }
-
-        binding.btnChangeMusic.setOnClickListener {
-            val bundle = android.os.Bundle().apply {
-                putString("selected_track_id", selectedMusicTrackId)
-                putString("selected_music_title", selectedMusicTitle)
-                putString("selected_music_audio_url", selectedMusicAudioUrl)
-            }
-            findNavController().navigateSafe(R.id.action_memoriesFragment_to_musicFragment, bundle)
-        }
-
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (isGeneratingVideo) {
@@ -594,7 +667,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
 
         binding.btnCreateVideo.setOnClickListener {
             Log.i(TAG, "==========================================================")
-            Log.i(TAG, ">>> [MEMORIES] User clicked Create Video button. Selected photos: ${selectedPhotos.size}")
+            Log.i(TAG, ">>> [MEMORIES] User clicked Preview / Create Video button. Selected photos: ${selectedPhotos.size}")
             Log.i(TAG, "==========================================================")
             if (selectedPhotos.isEmpty()) {
                 Log.w(TAG, "[MEMORIES] No photos selected!")
@@ -602,11 +675,12 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                 return@setOnClickListener
             }
 
-            val stateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-            val finalTrack = selectedMusicTitle ?: stateHandle?.get<String>("selected_music_title")
-            val finalAudioUrl = selectedMusicAudioUrl ?: stateHandle?.get<String?>("selected_music_audio_url")
-            val finalAudioPath = selectedMusicAudioFilePath ?: stateHandle?.get<String?>("selected_music_file_path")
-            val finalImageUrl = selectedMusicImageUrl ?: stateHandle?.get<String?>("selected_music_image_url")
+            stopPreviewAudio()
+
+            val finalTrack = selectedMusicTitle
+            val finalAudioUrl = selectedMusicAudioUrl
+            val finalAudioPath = selectedMusicAudioFilePath
+            val finalImageUrl = selectedMusicImageUrl
 
             Log.i(TAG, "[MEMORIES] Music params: track=$finalTrack, url=$finalAudioUrl, path=$finalAudioPath")
 
@@ -633,7 +707,7 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                                 subtitle = getString(R.string.loading_please_wait)
                             )
                         }
-                        val downloaded = com.example.phortart_video_990.core.utils.AudioCacheManager.getOrDownloadAudio(
+                        val downloaded = AudioCacheManager.getOrDownloadAudio(
                             requireContext(),
                             finalAudioUrl
                         )
@@ -654,12 +728,11 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                     val transitions = VideoGenerator.generateRandomTransitions(photoCount)
                     val photoUriStrings = selectedPhotos.map { it.toString() }
 
-                    // Nguồn âm thanh (ưu tiên file nội bộ đã tải)
                     val audioSource = resolvedAudioPath?.takeIf { File(it).exists() } ?: finalAudioUrl
 
-                    Log.i(TAG, "MemoriesFragment: Invoking VideoGenerator for $photoCount photos, duration=${videoDurationSec}s, audio=$audioSource")
+                    Log.i(TAG, "MemoriesFragment: Invoking VideoGenerator for $photoCount photos, duration=${videoDurationSec}s, audio=$audioSource, ratio=$selectedAspectRatio")
 
-                    // 3. Render video MP4 hoàn chỉnh (ảnh + chuyển cảnh + ghép nhạc + tỷ lệ khung hình)
+                    // 3. Render video MP4 hoàn chỉnh (fitCenter + blurred background + audio)
                     val generatedVideoFile = VideoGenerator.generateMp4FromPhotos(
                         context = requireContext(),
                         photoUris = photoUriStrings,
@@ -699,7 +772,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                             bindingOrNull?.btnCreateVideo?.isEnabled = true
                             findNavController().navigateSafe(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
                         } else {
-                            // Defer navigation until app comes back to foreground
                             pendingVideoResultBundle = bundle
                         }
                     } else {
@@ -713,7 +785,6 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
                         }
                     }
                 } catch (e: kotlinx.coroutines.CancellationException) {
-                    // Người dùng đã nhấn hủy/thoát: không hiển thị lỗi và không chuyển màn hình
                     Log.i(TAG, "MemoriesFragment: Video generation cancelled by user.")
                     isGeneratingVideo = false
                     hideLoading()
@@ -736,31 +807,8 @@ class MemoriesFragment : BaseFragment<FragmentMemoriesBinding>(FragmentMemoriesB
         }
     }
 
-    private fun navigateToVideoResult(
-        videoPath: String,
-        finalTrack: String?,
-        finalAudioUrl: String?,
-        finalAudioPath: String?,
-        finalImageUrl: String?
-    ) {
-        val bundle = VideoResultFragment.createBundle(
-            videoPath = videoPath,
-            photos = selectedPhotos.map { it.toString() },
-            track = finalTrack,
-            audioUrl = finalAudioUrl,
-            audioPath = finalAudioPath,
-            imageUrl = finalImageUrl
-        )
-        if (isResumed && isAdded) {
-            hideLoading()
-            bindingOrNull?.btnCreateVideo?.isEnabled = true
-            findNavController().navigateSafe(R.id.action_memoriesFragment_to_videoResultFragment, bundle)
-        } else {
-            pendingVideoResultBundle = bundle
-        }
-    }
-
     override fun onDestroyView() {
+        stopPreviewAudio()
         if (isGeneratingVideo) {
             generateVideoJob?.cancel()
             generateVideoJob = null

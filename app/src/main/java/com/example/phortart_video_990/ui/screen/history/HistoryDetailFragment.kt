@@ -168,7 +168,10 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.btnRecreate.setOnClickListener {
                     findNavController().navigateSafe(
                         R.id.action_historyDetailFragment_to_enhanceFragment,
-                        bundleOf(EnhanceFragment.KEY_INITIAL_PROMPT to promptText)
+                        bundleOf(
+                            EnhanceFragment.KEY_INITIAL_PROMPT to promptText,
+                            EnhanceFragment.KEY_INITIAL_STYLE to (item.styleName.orEmpty())
+                        )
                     )
                 }
             }

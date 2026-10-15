@@ -32,38 +32,30 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="home_recent_history">最近の履歴</string>
     <string name="home_suggestions">おすすめ</string>
     <string name="home_hot_templates">人気</string>
-    <string name="feature_video_title">写真から
-動画作成</string>
-    <string name="feature_prompt_title">AIプロンプトで
-画像生成</string>
-    <string name="feature_restore_title">古い写真の
-復元</string>
+    <string name="feature_dance_title">動画作成</string>
+    <string name="feature_prompt_title">AI画像生成</string>
+    <string name="feature_restore_title">写真修復</string>
+    <string name="feature_video_title">思い出まとめ</string>
     <string name="func_01_memories">写真をまとめて動画作成</string>
     <string name="func_02_restore">古い写真の復元</string>
     <string name="func_03_enhance">AIプロンプト画像生成</string>
     <string name="func_04_music">音楽を追加</string>
     <string name="func_05_upscale">高解像度化</string>
-    <string name="banner_1_chip">AI Photo &amp; Video</string>
-    <string name="banner_1_title">あなたの写真を
-素晴らしい</string>
-    <string name="banner_1_highlight">最高の
-瞬間に</string>
-    <string name="banner_1_desc">躍動感あふれる動画、アート写真、多彩なAIエフェクトを数秒で作成。</string>
-    <string name="banner_1_btn">今すぐ試す</string>
-    <string name="banner_2_chip">AI Prompt</string>
-    <string name="banner_2_title">言葉にするだけで、
-AIが描き出す</string>
-    <string name="banner_2_highlight">夢のような
-一枚</string>
-    <string name="banner_2_desc">アイデアを入力すれば、瞬時にユニークなアート作品が完成。</string>
-    <string name="banner_2_btn">今すぐ作成</string>
-    <string name="banner_3_chip">写真復元</string>
-    <string name="banner_3_title">昔の写真を
-まるで新品のように</string>
-    <string name="banner_3_highlight">美しく
-鮮やかに</string>
-    <string name="banner_3_desc">タップ一つでピンボケ補正、キズ除去、色彩の鮮やかさを復元。</string>
-    <string name="banner_3_btn">今すぐ復元</string>
+    <string name="banner_1_title_line1">写真をまとめて</string>
+    <string name="banner_1_title_line2">残す</string>
+    <string name="banner_1_highlight">思い出</string>
+    <string name="banner_1_desc">写真を選んで音楽を添え、動画を作成。</string>
+    <string name="banner_1_btn">今すぐ作成</string>
+    <string name="banner_2_title_line1">文字から画像を、</string>
+    <string name="banner_2_title_line2">描く</string>
+    <string name="banner_2_highlight">夢の世界</string>
+    <string name="banner_2_desc">思いを入力してAIがアートを描画。</string>
+    <string name="banner_2_btn">今すぐ描く</string>
+    <string name="banner_3_title_line1">昔の写真を蘇らせ、</string>
+    <string name="banner_3_title_line2">鮮明に</string>
+    <string name="banner_3_highlight">新品同様</string>
+    <string name="banner_3_desc">より鮮明に、色鮮やかに復元。</string>
+    <string name="banner_3_btn">復元する</string>
     <string name="template_title">テンプレート ✨</string>
     <string name="template_cat_all">すべて</string>
     <string name="template_cat_hot">人気</string>
@@ -317,4 +309,52 @@ AIが描き出す</string>
     <string name="lang_sub_ru">ロシア語</string>
     <string name="lang_sub_hi">ヒンディー語</string>
     <string name="lang_sub_id">インドネシア語</string>
+    <string name="nav_music">音楽</string>
+    <string name="dance_video_title">ダンス動画作成</string>
+    <string name="dance_upload_title">ギャラリーから写真をアップロード</string>
+    <string name="dance_upload_card_title">タップしてギャラリーから写真を選択</string>
+    <string name="dance_upload_card_desc">1枚以上の写真を選択 (JPG, PNG)</string>
+    <string name="dance_select_template">テンプレートを選択</string>
+    <string name="dance_bg_music">BGM</string>
+    <string name="btn_create_dance_video">ダンス動画を作成</string>
+    <string name="toast_please_select_photo">動画を作成するには写真を選択してください</string>
+    <string name="search_music_hint">曲やアーティストを検索...</string>
+    <string name="btn_next_step">次へ</string>
+    <string name="banner_1_chip">AI Photo &amp; Video</string>
+    <string name="banner_1_title">写真を集めて思い出を刻む</string>
+    <string name="banner_2_chip">AI Prompt</string>
+    <string name="banner_2_title">言葉から画像へ、夢を描く</string>
+    <string name="banner_3_chip">Photo Restore</string>
+    <string name="banner_3_title">古い写真を修復、鮮明に蘇る</string>
+    <string name="memories_title">思い出まとめ</string>
+    <string name="your_photos">あなたの写真</string>
+    <string name="selected_x_photos">%1$d枚の写真を選択済み</string>
+    <string name="no_photos_selected">写真が選択されていません</string>
+    <string name="add_photos_pill">+ 写真を追加</string>
+    <string name="aspect_ratio_title">アスペクト比</string>
+    <string name="select_max_photos_format">最大%1$d枚</string>
+    <string name="memories_of_us">私たちの思い出</string>
+    <string name="video_subtitle_format">AI作成 • %1$s • %2$s</string>
+    <string name="video_subtitle_no_music_format">AI作成 • %1$s</string>
+    <string name="btn_start_restore">復元を開始</string>
+    <string name="rate_success">ご評価ありがとうございます！</string>
+    <string name="toast_max_photos_limit">最大%1$d枚までしか選択できません</string>
+    <string name="toast_video_cancelled">動画作成がキャンセルされました</string>
+    <string name="toast_please_select_music">動画のBGMを選択してください</string>
+    <string name="prompt_style_subtitle">スタイルをタップすると、AIがプロンプトを自動作成します。</string>
+    <string name="selected_photos_title">選択した写真</string>
+    <string name="selected_photos_count_format">%1$d/%2$d枚の写真を選択済み</string>
+    <string name="btn_done_short">完了</string>
+    <string name="picker_title">写真を選択</string>
+    <string name="btn_picker_confirm">確定 (%1$d/%2$d)</string>
+    <string name="toast_permission_needed_for_photos">ギャラリーから写真を選択するには権限が必要です</string>
+    <string name="picker_empty_photos">端末のギャラリーに写真が見つかりません</string>
+    <string name="toast_cannot_open_gallery">写真ギャラリーを開けません</string>
+    <string name="toast_music_url_empty">プレビュー音声を再生できません</string>
+    <string name="loading_preparing_image_data">画像データを準備中...</string>
+    <string name="loading_preparing_bg_music">BGMを準備中...</string>
+    <string name="btn_change_photo">写真を変更</string>
+    <string name="history_badge_photo">写真</string>
+    <string name="music_tap_to_select">タップして選択</string>
+    <string name="btn_preview">プレビュー</string>
 </resources>
