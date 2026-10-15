@@ -117,8 +117,8 @@ class MusicAdapter(
             // Category name is hidden on items per request
             binding.tvTrackArtist.visibility = View.GONE
 
-            // Duration
-            binding.tvTrackDuration.text = track.displayDuration
+            // Duration (hidden per request)
+            binding.tvTrackDuration.visibility = View.GONE
 
             // Load Cover Artwork
             if (!track.safeImageUrl.isNullOrBlank()) {

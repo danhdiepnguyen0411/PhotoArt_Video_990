@@ -85,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="@string/dance_upload_card_desc"
+                        android:text="@string/dance_upload_single_desc"
                         android:textColor="#7C8CA0"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -135,6 +135,7 @@
         android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="24dp"
+        android:alpha="0.5"
         android:background="@drawable/bg_btn_create_video_pill"
         android:elevation="0dp"
         android:text="@string/btn_start_restore"

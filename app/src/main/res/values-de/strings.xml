@@ -220,6 +220,11 @@ ein erstklassiges Erlebnis.</string>
     <string name="toast_create_video_failed">Videoerstellung fehlgeschlagen: %1$s</string>
     <string name="toast_process_video_failed">Videoverarbeitung fehlgeschlagen: %1$s</string>
     <string name="toast_error_occurred">Ein Fehler ist aufgetreten: %1$s</string>
+    <string name="error_no_face_detected">Kein Gesicht auf dem Foto erkannt. Bitte wählen Sie ein Foto mit einem deutlichen Gesicht.</string>
+    <string name="error_network_connection">Netzwerkverbindungsfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
+    <string name="error_server_busy">Der Server ist überlastet. Bitte versuchen Sie es in wenigen Minuten erneut.</string>
+    <string name="error_create_video_general">Video konnte aus diesem Foto nicht erstellt werden. Bitte versuchen Sie es mit einem anderen Foto.</string>
+    <string name="error_video_generation_timeout">Die Verarbeitung hat zu lange gedauert. Bitte versuchen Sie es später erneut.</string>
     <string name="toast_video_play_error">Fehler bei der Videowiedergabe</string>
     <string name="toast_cannot_export_video">Video kann nicht exportiert werden!</string>
     <string name="toast_cannot_share_video">Video kann derzeit nicht geteilt werden</string>
@@ -323,6 +328,7 @@ ein erstklassiges Erlebnis.</string>
     <string name="dance_upload_title">Fotos aus der Galerie hochladen</string>
     <string name="dance_upload_card_title">Tippen, um Fotos auszuwählen</string>
     <string name="dance_upload_card_desc">1 oder mehrere Fotos auswählen (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">1 Foto auswählen (JPG, PNG...)</string>
     <string name="dance_select_template">Vorlage auswählen</string>
     <string name="dance_bg_music">Hintergrundmusik</string>
     <string name="btn_create_dance_video">Tanzvideo erstellen</string>

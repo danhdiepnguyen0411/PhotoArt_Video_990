@@ -54,32 +54,31 @@ class TemplateViewModel(
                 val realDancingTemplates = repository.getDancingTemplates()
                 allDancingList = realDancingTemplates
 
-                // 2. Fetch dancing categories from API
-                val apiDancingCategories = repository.getDancingCategories()
+                // 2. Extract categories directly from templates list (lấy chuẩn từ danh sách, không fix cứng)
                 val categoriesList = mutableListOf(CategoryModel.ALL)
-
-                val validDancingCategories = apiDancingCategories.filter {
-                    it.active && it.name.isNotBlank() &&
-                            !it.code.equals("ALL", ignoreCase = true) &&
-                            !it.name.equals("ALL", ignoreCase = true) &&
-                            !it.name.equals("Tất cả", ignoreCase = true)
-                }
-                categoriesList.addAll(validDancingCategories)
-
-                // 3. Dynamically discover any dancing categories from templates
-                val existingCodes = categoriesList.map { it.code.lowercase() }.toMutableSet()
-                existingCodes.addAll(categoriesList.map { it.name.lowercase() })
+                val existingCodes = mutableSetOf("all", "tất cả")
 
                 realDancingTemplates.forEach { item ->
                     val cat = item.category.trim()
                     if (cat.isNotBlank() && !cat.startsWith("MUSIC_", ignoreCase = true)) {
-                        val cleanCat = cat.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
-                        if (!existingCodes.contains(cat.lowercase()) && !existingCodes.contains(cleanCat.lowercase())) {
-                            existingCodes.add(cat.lowercase())
-                            existingCodes.add(cleanCat.lowercase())
+                        val cleanCat = item.categoryDisplayName.ifBlank {
+                            cat.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                        }
+                        if (existingCodes.add(cat.lowercase())) {
                             categoriesList.add(CategoryModel(code = cat, name = cleanCat, active = true))
                         }
                     }
+                }
+
+                if (categoriesList.size <= 1) {
+                    val apiDancingCategories = repository.getDancingCategories()
+                    val validDancingCategories = apiDancingCategories.filter {
+                        it.active && it.name.isNotBlank() &&
+                                !it.code.equals("ALL", ignoreCase = true) &&
+                                !it.name.equals("ALL", ignoreCase = true) &&
+                                !it.name.equals("Tất cả", ignoreCase = true)
+                    }
+                    categoriesList.addAll(validDancingCategories)
                 }
 
                 _categories.value = categoriesList

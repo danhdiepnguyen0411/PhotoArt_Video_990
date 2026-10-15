@@ -234,6 +234,11 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="toast_create_video_failed">動画の作成に失敗しました: %1$s</string>
     <string name="toast_process_video_failed">動画処理に失敗しました: %1$s</string>
     <string name="toast_error_occurred">エラーが発生しました: %1$s</string>
+    <string name="error_no_face_detected">写真から顔が検出されませんでした。顔がはっきりと写っている写真を選択してください。</string>
+    <string name="error_network_connection">ネットワークエラーが発生しました。接続を確認して再試行してください。</string>
+    <string name="error_server_busy">サーバーが混雑しています。しばらくしてからもう一度お試しください。</string>
+    <string name="error_create_video_general">この写真から動画を作成できませんでした。別の写真でお試しください。</string>
+    <string name="error_video_generation_timeout">処理に時間がかかりすぎました。後でもう一度お試しください。</string>
     <string name="toast_video_play_error">動画再生エラー</string>
     <string name="toast_cannot_export_video">動画を書き出せません！</string>
     <string name="toast_cannot_share_video">現在動画を共有できません</string>
@@ -336,6 +341,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="dance_upload_title">ギャラリーから写真をアップロード</string>
     <string name="dance_upload_card_title">タップしてギャラリーから写真を選択</string>
     <string name="dance_upload_card_desc">1枚以上の写真を選択 (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">1枚の写真を選択 (JPG, PNG...)</string>
     <string name="dance_select_template">テンプレートを選択</string>
     <string name="dance_bg_music">BGM</string>
     <string name="btn_create_dance_video">ダンス動画を作成</string>

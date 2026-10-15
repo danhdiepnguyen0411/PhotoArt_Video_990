@@ -240,6 +240,11 @@ pengalaman terbaik.</string>
     <string name="toast_create_video_failed">Pembuatan video gagal: %1$s</string>
     <string name="toast_process_video_failed">Pemrosesan video gagal: %1$s</string>
     <string name="toast_error_occurred">Terjadi kesalahan: %1$s</string>
+    <string name="error_no_face_detected">Wajah tidak terdeteksi pada foto. Silakan pilih foto dengan wajah yang jelas.</string>
+    <string name="error_network_connection">Terjadi kesalahan koneksi internet. Silakan periksa koneksi Anda dan coba lagi.</string>
+    <string name="error_server_busy">Server sedang sibuk. Silakan coba lagi dalam beberapa menit.</string>
+    <string name="error_create_video_general">Tidak dapat membuat video dari foto ini. Silakan coba dengan foto lain.</string>
+    <string name="error_video_generation_timeout">Pemrosesan memakan waktu terlalu lama. Silakan coba lagi nanti.</string>
     <string name="toast_video_play_error">Kesalahan saat memutar video</string>
     <string name="toast_cannot_export_video">Tidak dapat mengekspor video!</string>
     <string name="toast_cannot_share_video">Tidak dapat membagikan video saat ini</string>
@@ -343,6 +348,7 @@ pengalaman terbaik.</string>
     <string name="dance_upload_title">Unggah foto dari galeri</string>
     <string name="dance_upload_card_title">Ketuk untuk memilih foto dari galeri</string>
     <string name="dance_upload_card_desc">Pilih 1 atau beberapa foto (JPG, PNG)</string>
+    <string name="dance_upload_single_desc">Pilih 1 foto (JPG, PNG...)</string>
     <string name="dance_select_template">Pilih templat</string>
     <string name="dance_bg_music">Musik latar</string>
     <string name="btn_create_dance_video">Buat video menari</string>

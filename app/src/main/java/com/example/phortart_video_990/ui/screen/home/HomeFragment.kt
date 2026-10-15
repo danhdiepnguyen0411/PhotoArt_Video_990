@@ -383,6 +383,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.rvHomeCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvHomeCategories.adapter = homeCategoryAdapter
+        binding.rvHomeCategories.visibility = View.GONE
     }
 
     private fun applyCategoryFilter(category: CategoryModel) {

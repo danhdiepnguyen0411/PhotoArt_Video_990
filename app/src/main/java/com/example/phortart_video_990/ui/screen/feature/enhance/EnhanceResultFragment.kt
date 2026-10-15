@@ -20,6 +20,7 @@ import com.example.phortart_video_990.databinding.FragmentEnhanceResultBinding
 import kotlinx.coroutines.launch
 import android.os.SystemClock
 import com.example.phortart_video_990.core.utils.ShareUtils
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,12 +50,26 @@ class EnhanceResultFragment : BaseFragment<FragmentEnhanceResultBinding>(Fragmen
             insets
         }
 
-        binding.tvUserPrompt.text = userPrompt
+        val cleanPrompt = userPrompt.replace(Regex("\\n{2,}"), "\n").trim()
+        binding.tvUserPrompt.text = cleanPrompt
 
         if (imageUrl.isNotBlank()) {
-            binding.ivResultImage.load(imageUrl) {
+            binding.pbImageLoading.visibility = android.view.View.VISIBLE
+            val imgSource: Any = if (File(imageUrl).exists()) File(imageUrl) else imageUrl
+            binding.ivResultImage.load(imgSource) {
                 crossfade(true)
+                listener(
+                    onSuccess = { _, _ ->
+                        binding.pbImageLoading.visibility = android.view.View.GONE
+                    },
+                    onError = { _, result ->
+                        binding.pbImageLoading.visibility = android.view.View.GONE
+                        android.util.Log.e("EnhanceResult", "Failed to load result image from $imageUrl: ${result.throwable.message}", result.throwable)
+                    }
+                )
             }
+        } else {
+            binding.pbImageLoading.visibility = android.view.View.GONE
         }
     }
 
