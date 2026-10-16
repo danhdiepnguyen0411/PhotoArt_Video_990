@@ -1,0 +1,58 @@
+package com.aiart.photo.beauti.editor.ui.screen.home
+
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.core.utils.ShimmerDrawable
+import com.aiart.photo.beauti.editor.data.model.HomeMediaItemModel
+import com.aiart.photo.beauti.editor.databinding.ItemHomeMediaCardBinding
+
+class HomeMediaAdapter(
+    private var items: List<HomeMediaItemModel>,
+    private val onItemClick: (HomeMediaItemModel) -> Unit
+) : RecyclerView.Adapter<HomeMediaAdapter.MediaViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
+        val binding = ItemHomeMediaCardBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return MediaViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
+        holder.bind(items[position])
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    fun submitList(newList: List<HomeMediaItemModel>) {
+        items = newList
+        notifyDataSetChanged()
+    }
+
+    inner class MediaViewHolder(private val binding: ItemHomeMediaCardBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: HomeMediaItemModel) {
+            val shimmerPlaceholder = ShimmerDrawable()
+            val source: Any = item.imageUri ?: item.imageUrl?.trim()?.ifBlank { null }
+                ?: (if (item.imageRes != 0) item.imageRes else "") ?: ""
+
+            binding.ivMediaThumb.load(source) {
+                crossfade(true)
+                placeholder(shimmerPlaceholder)
+                error(shimmerPlaceholder)
+            }
+
+
+            binding.root.setOnClickListener {
+                onItemClick(item)
+            }
+        }
+    }
+}

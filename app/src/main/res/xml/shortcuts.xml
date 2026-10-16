@@ -7,9 +7,9 @@
         android:shortcutShortLabel="@string/shortcut_uninstall"
         android:shortcutLongLabel="@string/shortcut_uninstall_desc">
         <intent
-            android:action="com.example.phortart_video_990.ACTION_UNINSTALL"
-            android:targetPackage="com.example.phortart_video_990"
-            android:targetClass="com.example.phortart_video_990.MainActivity">
+            android:action="com.aiart.photo.beauti.editor.ACTION_UNINSTALL"
+            android:targetPackage="com.aiart.photo.beauti.editor"
+            android:targetClass="com.aiart.photo.beauti.editor.MainActivity">
             <extra android:name="target_screen" android:value="uninstall" />
         </intent>
         <categories android:name="android.shortcut.conversation" />

@@ -7,7 +7,7 @@
     android:background="#F8FAFC">
 
     <!-- Top Bar: Header with Back Button and Gradient Title "Tạo video" -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

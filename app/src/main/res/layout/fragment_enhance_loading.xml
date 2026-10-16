@@ -7,7 +7,7 @@
     android:background="@drawable/bg_ai_create_screen">
 
     <!-- Top Bar: Common Header with Back and Title "AI Create" -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
             android:layout_height="140dp"
             android:layout_marginTop="46dp">
 
-            <com.example.phortart_video_990.ui.screen.feature.restore.widget.CircularProgressView
+            <com.aiart.photo.beauti.editor.ui.screen.feature.restore.widget.CircularProgressView
                 android:id="@+id/progressCircle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

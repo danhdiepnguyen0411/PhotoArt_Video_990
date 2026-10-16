@@ -1,4 +1,4 @@
-package com.example.phortart_video_990.ui.screen.feature.memories
+package com.aiart.photo.beauti.editor.ui.screen.feature.memories
 
 import android.animation.ValueAnimator
 import android.content.Intent
@@ -14,12 +14,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.example.phortart_video_990.R
-import com.example.phortart_video_990.core.base.BaseFragment
-import com.example.phortart_video_990.core.utils.VideoGenerator
-import com.example.phortart_video_990.data.model.HistoryItemModel
-import com.example.phortart_video_990.data.repository.HistoryRepository
-import com.example.phortart_video_990.databinding.FragmentVideoResultBinding
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.core.base.BaseFragment
+import com.aiart.photo.beauti.editor.core.utils.VideoGenerator
+import com.aiart.photo.beauti.editor.data.model.HistoryItemModel
+import com.aiart.photo.beauti.editor.data.repository.HistoryRepository
+import com.aiart.photo.beauti.editor.databinding.FragmentVideoResultBinding
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat

@@ -1,4 +1,4 @@
-package com.example.phortart_video_990.ui.screen.feature.memories
+package com.aiart.photo.beauti.editor.ui.screen.feature.memories
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.example.phortart_video_990.R
-import com.example.phortart_video_990.databinding.ItemResultPhotoStripBinding
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.databinding.ItemResultPhotoStripBinding
 
 class ResultPhotoStripAdapter(
     private var photos: List<String>,

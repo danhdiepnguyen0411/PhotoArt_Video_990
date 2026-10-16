@@ -7,7 +7,7 @@
     android:background="@color/screen_bg">
 
     <!-- Top Bar: Common Header with Back Button and Title -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -228,7 +228,7 @@
 
                 </LinearLayout>
 
-                <com.example.phortart_video_990.ui.screen.feature.music.AudioWaveformView
+                <com.aiart.photo.beauti.editor.ui.screen.feature.music.AudioWaveformView
                     android:id="@+id/waveView"
                     android:layout_width="66dp"
                     android:layout_height="22dp"

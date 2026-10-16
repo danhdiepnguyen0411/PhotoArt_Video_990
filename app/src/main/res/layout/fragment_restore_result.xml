@@ -7,7 +7,7 @@
     android:background="@drawable/bg_restore_screen">
 
     <!-- Top Bar: Common Header with Back Button and Title -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header">
 
-        <com.example.phortart_video_990.ui.screen.feature.restore.widget.BeforeAfterSliderView
+        <com.aiart.photo.beauti.editor.ui.screen.feature.restore.widget.BeforeAfterSliderView
             android:id="@+id/sliderView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -8,7 +8,7 @@
     <!-- Splash Screen -->
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.example.phortart_video_990.ui.screen.splash.SplashFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.splash.SplashFragment"
         android:label="SplashFragment"
         tools:layout="@layout/fragment_splash">
         <action
@@ -31,7 +31,7 @@
     <!-- Language Screen -->
     <fragment
         android:id="@+id/languageFragment"
-        android:name="com.example.phortart_video_990.ui.screen.language.LanguageFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.language.LanguageFragment"
         android:label="LanguageFragment"
         tools:layout="@layout/fragment_language">
         <action
@@ -49,7 +49,7 @@
     <!-- Intro (1, 2, 3, 4) Screen -->
     <fragment
         android:id="@+id/introFragment"
-        android:name="com.example.phortart_video_990.ui.screen.intro.IntroFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.intro.IntroFragment"
         android:label="IntroFragment"
         tools:layout="@layout/fragment_intro">
         <action
@@ -62,7 +62,7 @@
     <!-- Main Screen (BottomNav: Home, History, Setting) -->
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.phortart_video_990.ui.screen.main.MainFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.main.MainFragment"
         android:label="MainFragment"
         tools:layout="@layout/fragment_main">
         <action
@@ -94,7 +94,7 @@
     <!-- 5 Feature Screens -->
     <fragment
         android:id="@+id/memoriesFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.memories.MemoriesFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.memories.MemoriesFragment"
         android:label="MemoriesFragment"
         tools:layout="@layout/fragment_memories">
         <action
@@ -107,7 +107,7 @@
 
     <fragment
         android:id="@+id/videoResultFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.memories.VideoResultFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.memories.VideoResultFragment"
         android:label="VideoResultFragment"
         tools:layout="@layout/fragment_video_result">
         <action
@@ -117,7 +117,7 @@
 
     <fragment
         android:id="@+id/restoreFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.restore.RestoreFragment"
         android:label="RestoreFragment"
         tools:layout="@layout/fragment_restore">
         <action
@@ -127,7 +127,7 @@
 
     <fragment
         android:id="@+id/restorePickPhotoFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestorePickPhotoFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.restore.RestorePickPhotoFragment"
         android:label="RestorePickPhotoFragment"
         tools:layout="@layout/fragment_restore_pick_photo">
         <action
@@ -137,7 +137,7 @@
 
     <fragment
         android:id="@+id/restoreLoadingFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreLoadingFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.restore.RestoreLoadingFragment"
         android:label="RestoreLoadingFragment"
         tools:layout="@layout/fragment_restore_loading">
         <action
@@ -149,13 +149,13 @@
 
     <fragment
         android:id="@+id/restoreResultFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.restore.RestoreResultFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.restore.RestoreResultFragment"
         android:label="RestoreResultFragment"
         tools:layout="@layout/fragment_restore_result" />
 
     <fragment
         android:id="@+id/enhanceFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.enhance.EnhanceFragment"
         android:label="EnhanceFragment"
         tools:layout="@layout/fragment_enhance">
         <action
@@ -165,7 +165,7 @@
 
     <fragment
         android:id="@+id/enhanceLoadingFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceLoadingFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.enhance.EnhanceLoadingFragment"
         android:label="EnhanceLoadingFragment"
         tools:layout="@layout/fragment_enhance_loading">
         <action
@@ -177,13 +177,13 @@
 
     <fragment
         android:id="@+id/enhanceResultFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.enhance.EnhanceResultFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.enhance.EnhanceResultFragment"
         android:label="EnhanceResultFragment"
         tools:layout="@layout/fragment_enhance_result" />
 
     <fragment
         android:id="@+id/musicFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.music.MusicFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.music.MusicFragment"
         android:label="MusicFragment"
         tools:layout="@layout/fragment_music">
         <action
@@ -193,13 +193,13 @@
 
     <fragment
         android:id="@+id/upscaleFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.upscale.UpscaleFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.upscale.UpscaleFragment"
         android:label="UpscaleFragment"
         tools:layout="@layout/fragment_upscale" />
 
     <fragment
         android:id="@+id/createTemplateVideoFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.createtemplate.CreateTemplateVideoFragment"
         android:label="CreateTemplateVideoFragment"
         tools:layout="@layout/fragment_create_template_video">
         <action
@@ -212,7 +212,7 @@
 
     <fragment
         android:id="@+id/templateVideoResultFragment"
-        android:name="com.example.phortart_video_990.ui.screen.feature.createtemplate.TemplateVideoResultFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.feature.createtemplate.TemplateVideoResultFragment"
         android:label="TemplateVideoResultFragment"
         tools:layout="@layout/fragment_template_video_result">
         <action
@@ -223,7 +223,7 @@
     <!-- History Detail Screen -->
     <fragment
         android:id="@+id/historyDetailFragment"
-        android:name="com.example.phortart_video_990.ui.screen.history.HistoryDetailFragment"
+        android:name="com.aiart.photo.beauti.editor.ui.screen.history.HistoryDetailFragment"
         android:label="HistoryDetailFragment"
         tools:layout="@layout/fragment_history_detail">
         <action

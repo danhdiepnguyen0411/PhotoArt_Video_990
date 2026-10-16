@@ -72,7 +72,7 @@
         </LinearLayout>
 
         <!-- Audio Waveform Visualizer (Appears when audio is playing) -->
-        <com.example.phortart_video_990.ui.screen.feature.music.AudioWaveformView
+        <com.aiart.photo.beauti.editor.ui.screen.feature.music.AudioWaveformView
             android:id="@+id/waveView"
             android:layout_width="54dp"
             android:layout_height="18dp"

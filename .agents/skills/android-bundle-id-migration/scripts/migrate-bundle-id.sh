@@ -58,8 +58,8 @@ NEW_DIR="${NEW_PKG//.//}"
 echo "--> Cập nhật namespace trong app/build.gradle.kts..."
 sed -i '' "s/namespace = \"$OLD_PKG\"/namespace = \"$NEW_PKG\"/g" app/build.gradle.kts
 
-# 4. Di dời các thư mục mã nguồn qua git mv (main, debug, test)
-for SOURCE_SET in "main" "debug" "test"; do
+# 4. Di dời các thư mục mã nguồn qua git mv (main, debug, test, androidTest)
+for SOURCE_SET in "main" "debug" "test" "androidTest"; do
     SRC_DIR="app/src/$SOURCE_SET/java"
     if [ -d "$SRC_DIR/$OLD_DIR" ]; then
         echo "--> Di dời $SRC_DIR/$OLD_DIR -> $SRC_DIR/$NEW_DIR..."
@@ -67,12 +67,8 @@ for SOURCE_SET in "main" "debug" "test"; do
         mkdir -p "$NEW_PARENT"
         git mv "$SRC_DIR/$OLD_DIR" "$SRC_DIR/$NEW_DIR"
         
-        # Xóa các thư mục rỗng cũ
-        OLD_FIRST="$(echo "$OLD_DIR" | cut -d'/' -f1)"
-        if [ -d "$SRC_DIR/$OLD_FIRST" ]; then
-            find "$SRC_DIR/$OLD_FIRST" -type d -empty -delete 2>/dev/null || true
-            rm -rf "$SRC_DIR/$OLD_FIRST" 2>/dev/null || true
-        fi
+        # Chỉ xóa các thư mục thực sự rỗng
+        find "$SRC_DIR" -type d -empty -delete 2>/dev/null || true
     fi
 done
 
@@ -114,9 +110,17 @@ for root, _, files in os.walk('app/src/main/res/layout'):
 print(f'    Đã cập nhật {count} file XML Layout.')
 "
 
-# 7. Thay thế trong shortcuts.xml và debug manifest
+# 7. Thay thế trong shortcuts.xml, nav_graph.xml, và manifests
 if [ -f "app/src/main/res/xml/shortcuts.xml" ]; then
     sed -i '' "s/$OLD_PKG/$NEW_PKG/g" app/src/main/res/xml/shortcuts.xml
+fi
+if [ -f "app/src/main/res/navigation/nav_graph.xml" ]; then
+    echo "--> Cập nhật app/src/main/res/navigation/nav_graph.xml..."
+    sed -i '' "s/$OLD_PKG/$NEW_PKG/g" app/src/main/res/navigation/nav_graph.xml
+fi
+if [ -f "app/src/main/AndroidManifest.xml" ]; then
+    echo "--> Cập nhật app/src/main/AndroidManifest.xml..."
+    sed -i '' "s/$OLD_PKG/$NEW_PKG/g" app/src/main/AndroidManifest.xml
 fi
 if [ -f "app/src/debug/AndroidManifest.xml" ]; then
     sed -i '' "s/$OLD_PKG/$NEW_PKG/g" app/src/debug/AndroidManifest.xml

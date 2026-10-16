@@ -15,11 +15,11 @@ val artAppId = localProperties.getProperty("art.app.id") ?: ""
 val artSecretKey = localProperties.getProperty("art.secret.key") ?: ""
 
 android {
-    namespace = "com.example.phortart_video_990"
+    namespace = "com.aiart.photo.beauti.editor"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.phortart_video_990"
+        applicationId = "com.aiart.photo.beauti.editor"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

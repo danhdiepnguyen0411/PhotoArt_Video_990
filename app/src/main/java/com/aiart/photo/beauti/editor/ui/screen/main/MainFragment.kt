@@ -1,0 +1,127 @@
+package com.aiart.photo.beauti.editor.ui.screen.main
+
+import android.view.animation.DecelerateInterpolator
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.findNavController
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.core.base.BaseFragment
+import com.aiart.photo.beauti.editor.core.utils.navigateSafe
+import com.aiart.photo.beauti.editor.databinding.FragmentMainBinding
+
+class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::inflate) {
+
+    override fun initView() {
+        // Prevent BottomNavigationView from adding internal bottom padding that squashes icons and text
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigationView) { _, insets ->
+            insets
+        }
+
+
+        val adapter = MainPagerAdapter(this)
+        binding.vpMainTabs.adapter = adapter
+        binding.vpMainTabs.isUserInputEnabled = false
+        binding.vpMainTabs.offscreenPageLimit = 3
+
+        binding.bottomNavigationView.post {
+            updateIndicator(binding.vpMainTabs.currentItem, animate = false)
+        }
+        binding.bottomNavigationView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateIndicator(binding.vpMainTabs.currentItem, animate = false)
+        }
+
+        val target = activity?.intent?.getStringExtra("target_screen")
+        if (target != null) {
+            activity?.intent?.removeExtra("target_screen")
+            when (target) {
+                "discover" -> selectTab(1)
+                "home" -> selectTab(0)
+                "memories" -> {
+                    binding.root.post {
+                        findNavController().navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun initListener() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.vpMainTabs.currentItem != 0) {
+                    selectTab(0)
+                } else {
+                    com.aiart.photo.beauti.editor.core.dialog.ExitAppDialogFragment.newInstance {
+                        requireActivity().finish()
+                    }.show(parentFragmentManager, "exit_app")
+                }
+            }
+        })
+
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            val position = when (item.itemId) {
+                R.id.nav_home -> 0
+                R.id.nav_template -> 1
+                R.id.nav_history -> 2
+                R.id.nav_setting -> 3
+                else -> -1
+            }
+            if (position != -1) {
+                binding.vpMainTabs.setCurrentItem(position, false)
+                updateIndicator(position, animate = true)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    var pendingTemplateCategory: String? = null
+
+    fun selectTab(index: Int, targetCategory: String? = null) {
+        val itemId = when (index) {
+            0 -> R.id.nav_home
+            1 -> R.id.nav_template
+            2 -> R.id.nav_history
+            3 -> R.id.nav_setting
+            else -> R.id.nav_home
+        }
+        binding.bottomNavigationView.selectedItemId = itemId
+        updateIndicator(index, animate = true)
+
+        if (index == 1) {
+            val cat = targetCategory ?: "ALL"
+            pendingTemplateCategory = cat
+            findTemplateFragment()?.selectCategory(cat)
+        }
+    }
+
+    fun findTemplateFragment(): com.aiart.photo.beauti.editor.ui.screen.template.TemplateFragment? {
+        return childFragmentManager.fragments.filterIsInstance<com.aiart.photo.beauti.editor.ui.screen.template.TemplateFragment>().firstOrNull()
+            ?: (childFragmentManager.findFragmentByTag("f1") as? com.aiart.photo.beauti.editor.ui.screen.template.TemplateFragment)
+    }
+
+    private fun updateIndicator(position: Int, animate: Boolean) {
+        val totalWidth = binding.bottomNavigationView.width
+        if (totalWidth <= 0) return
+        val tabWidth = totalWidth / 4f
+        val indicatorWidth = if (binding.navIndicator.width > 0) {
+            binding.navIndicator.width.toFloat()
+        } else {
+            resources.displayMetrics.density * 24f
+        }
+        val isRtl = binding.root.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL
+        val effectivePosition = if (isRtl) (3 - position) else position
+        val targetX = effectivePosition * tabWidth + (tabWidth - indicatorWidth) / 2f
+
+        if (animate) {
+            binding.navIndicator.animate()
+                .translationX(targetX)
+                .setDuration(200)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        } else {
+            binding.navIndicator.translationX = targetX
+        }
+    }
+}

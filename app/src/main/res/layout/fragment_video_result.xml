@@ -7,7 +7,7 @@
     android:background="@color/screen_bg">
 
     <!-- Top Bar: Common Header with Back Button and Title -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

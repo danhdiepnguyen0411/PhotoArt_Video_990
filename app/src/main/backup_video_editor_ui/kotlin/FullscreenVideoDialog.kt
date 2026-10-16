@@ -1,4 +1,4 @@
-package com.example.phortart_video_990.ui.screen.feature.memories
+package com.aiart.photo.beauti.editor.ui.screen.feature.memories
 
 import android.animation.ValueAnimator
 import android.app.Dialog
@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnEnd
 import coil.load
-import com.example.phortart_video_990.R
-import com.example.phortart_video_990.databinding.DialogFullscreenVideoBinding
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.databinding.DialogFullscreenVideoBinding
 import java.util.Locale
 
 class FullscreenVideoDialog(

@@ -51,7 +51,7 @@
             android:theme="@style/Theme.PhortArt_Video_990"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="com.example.phortart_video_990.ACTION_UNINSTALL" />
+                <action android:name="com.aiart.photo.beauti.editor.ACTION_UNINSTALL" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -71,7 +71,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.example.phortart_video_990.ACTION_TRIGGER_INACTIVITY_NOTIFICATION" />
+                <action android:name="com.aiart.photo.beauti.editor.ACTION_TRIGGER_INACTIVITY_NOTIFICATION" />
             </intent-filter>
         </receiver>
     </application>

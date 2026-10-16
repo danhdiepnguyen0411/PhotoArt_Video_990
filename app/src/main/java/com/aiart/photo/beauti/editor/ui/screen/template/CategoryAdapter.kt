@@ -1,0 +1,85 @@
+package com.aiart.photo.beauti.editor.ui.screen.template
+
+import android.graphics.Color
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.aiart.photo.beauti.editor.R
+import com.aiart.photo.beauti.editor.data.model.CategoryModel
+import com.aiart.photo.beauti.editor.databinding.ItemTemplateCategoryChipBinding
+
+class CategoryAdapter(
+    private var categories: List<CategoryModel>,
+    private var selectedCategoryCode: String,
+    private val onCategoryClick: (CategoryModel) -> Unit
+) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
+        val binding = ItemTemplateCategoryChipBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return CategoryViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+        holder.bind(categories[position])
+    }
+
+    override fun getItemCount(): Int = categories.size
+
+    fun submitList(newList: List<CategoryModel>) {
+        categories = newList
+        notifyDataSetChanged()
+    }
+
+    fun setSelected(catCode: String) {
+        val prevCode = selectedCategoryCode
+        selectedCategoryCode = catCode
+        val prevIndex = categories.indexOfFirst { it.code.equals(prevCode, ignoreCase = true) }
+        val nextIndex = categories.indexOfFirst { it.code.equals(catCode, ignoreCase = true) }
+
+        if (prevIndex != -1) notifyItemChanged(prevIndex)
+        if (nextIndex != -1) notifyItemChanged(nextIndex)
+        if (prevIndex == -1) notifyDataSetChanged()
+    }
+
+    inner class CategoryViewHolder(private val binding: ItemTemplateCategoryChipBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(category: CategoryModel) {
+            val displayName = getLocalizedCategoryName(binding.root.context, category)
+            binding.tvCategoryName.text = displayName
+            val isSelected = category.code.equals(selectedCategoryCode, ignoreCase = true) ||
+                    (selectedCategoryCode == "ALL" && (category.code.equals("ALL", ignoreCase = true) || category.code.isBlank()))
+
+            if (isSelected) {
+                binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_selected)
+                binding.tvCategoryName.setTextColor(Color.WHITE)
+            } else {
+                binding.tvCategoryName.setBackgroundResource(R.drawable.bg_category_chip_unselected)
+                binding.tvCategoryName.setTextColor(Color.parseColor("#596579"))
+            }
+
+            binding.root.setOnClickListener {
+                if (!category.code.equals(selectedCategoryCode, ignoreCase = true)) {
+                    setSelected(category.code)
+                    onCategoryClick(category)
+                }
+            }
+        }
+    }
+
+    companion object {
+        fun getLocalizedCategoryName(context: android.content.Context, category: CategoryModel): String {
+            val code = category.code.trim().uppercase()
+            val name = category.name.trim().uppercase()
+            if (code == "ALL" || name == "TẤT CẢ" || name == "ALL" || code.isBlank()) {
+                return context.getString(R.string.template_cat_all)
+            }
+            if (category.name.isNotBlank()) {
+                return category.name
+            }
+            return category.displayName
+        }
+    }
+}

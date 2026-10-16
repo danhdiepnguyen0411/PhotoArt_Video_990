@@ -7,7 +7,7 @@
     android:background="@color/white">
 
     <!-- Top Header -->
-    <com.example.phortart_video_990.core.view.CommonTabHeaderView
+    <com.aiart.photo.beauti.editor.core.view.CommonTabHeaderView
         android:id="@+id/headerHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
