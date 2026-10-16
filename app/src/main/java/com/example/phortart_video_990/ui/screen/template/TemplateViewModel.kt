@@ -106,6 +106,15 @@ class TemplateViewModel(
         }
     }
 
+    fun selectCategoryByCode(categoryCode: String = "ALL") {
+        val targetCat = _categories.value.find {
+            it.code.equals(categoryCode, ignoreCase = true) ||
+                    (categoryCode.equals("ALL", ignoreCase = true) && (it.code.equals("ALL", ignoreCase = true) || it.name.equals("Tất cả", ignoreCase = true)))
+        } ?: CategoryModel.ALL
+        _selectedCategoryCode.value = targetCat.code
+        _templates.value = filterTemplates(allDancingList, targetCat.code, targetCat.name)
+    }
+
     private fun filterTemplates(
         list: List<TemplateModel>,
         categoryCode: String,

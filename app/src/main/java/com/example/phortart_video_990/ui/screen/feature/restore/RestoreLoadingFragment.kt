@@ -227,18 +227,29 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
                     val isOutputPortrait = outH > outW
 
                     if (isInputPortrait != isOutputPortrait && inputBounds.outWidth > 0 && inputBounds.outHeight > 0) {
-                        val outBitmap = com.example.phortart_video_990.core.utils.MediaSaveUtils.drawableToBitmap(outResult.drawable)
-                        val matrix = android.graphics.Matrix().apply { postRotate(90f) }
-                        val rotatedBmp = android.graphics.Bitmap.createBitmap(outBitmap, 0, 0, outBitmap.width, outBitmap.height, matrix, true)
-                        val fixedFile = File(ctx.cacheDir, "restore_aligned_${System.currentTimeMillis()}.jpg")
-                        java.io.FileOutputStream(fixedFile).use { fos ->
-                            rotatedBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, fos)
+                        var outBitmap: android.graphics.Bitmap? = null
+                        var rotatedBmp: android.graphics.Bitmap? = null
+                        try {
+                            outBitmap = com.example.phortart_video_990.core.utils.MediaSaveUtils.drawableToBitmap(outResult.drawable)
+                            val matrix = android.graphics.Matrix().apply { postRotate(90f) }
+                            rotatedBmp = android.graphics.Bitmap.createBitmap(outBitmap, 0, 0, outBitmap.width, outBitmap.height, matrix, true)
+                            val fixedFile = File(ctx.cacheDir, "restore_aligned_${System.currentTimeMillis()}.jpg")
+                            java.io.FileOutputStream(fixedFile).use { fos ->
+                                rotatedBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, fos)
+                            }
+                            fixedOutputUrl = fixedFile.absolutePath
+                        } catch (t: Throwable) {
+                            android.util.Log.e("RestoreLoading", "Không thể xoay lại ảnh output: ${t.message}")
+                        } finally {
+                            try {
+                                if (rotatedBmp != null && rotatedBmp != outBitmap && !rotatedBmp.isRecycled) {
+                                    rotatedBmp.recycle()
+                                }
+                                if (outBitmap != null && !outBitmap.isRecycled) {
+                                    outBitmap.recycle()
+                                }
+                            } catch (_: Throwable) {}
                         }
-                        fixedOutputUrl = fixedFile.absolutePath
-                        if (rotatedBmp != outBitmap) {
-                            rotatedBmp.recycle()
-                        }
-                        outBitmap.recycle()
                     }
                 }
             }
@@ -249,8 +260,8 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
                     .build()
                 imageLoader.execute(inRequest)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (t: Throwable) {
+            android.util.Log.e("RestoreLoading", "Lỗi trong processPostRestore: ${t.message}")
         }
 
         // Tự động lưu vào lịch sử

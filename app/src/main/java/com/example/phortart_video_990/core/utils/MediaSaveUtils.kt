@@ -29,20 +29,39 @@ object MediaSaveUtils {
 
     /**
      * Chuyển đổi bất kỳ Drawable nào (kể cả CrossfadeDrawable, TransitionDrawable) thành Bitmap phần mềm (software bitmap).
+     * Tự động giới hạn kích thước tối đa 2048px và bắt Throwable để không bao giờ gây OutOfMemory crash.
      */
     fun drawableToBitmap(drawable: Drawable): Bitmap {
         if (drawable is BitmapDrawable && drawable.bitmap != null) {
             val b = drawable.bitmap
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && b.config == Bitmap.Config.HARDWARE) {
-                b.copy(Bitmap.Config.ARGB_8888, false)
+                try {
+                    b.copy(Bitmap.Config.ARGB_8888, false)
+                } catch (t: Throwable) {
+                    b
+                }
             } else {
                 b
             }
         }
 
-        val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 1080
-        val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 1080
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val rawW = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 1080
+        val rawH = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 1080
+        val maxDim = maxOf(rawW, rawH)
+        val scale = if (maxDim > 2048) 2048f / maxDim else 1f
+        val width = (rawW * scale).toInt().coerceAtLeast(1)
+        val height = (rawH * scale).toInt().coerceAtLeast(1)
+
+        val bitmap = try {
+            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        } catch (t: Throwable) {
+            System.gc()
+            try {
+                Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            } catch (t2: Throwable) {
+                Bitmap.createBitmap(width / 2, height / 2, Bitmap.Config.RGB_565)
+            }
+        }
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
@@ -64,8 +83,8 @@ object MediaSaveUtils {
                 if (bmp.width > 0 && bmp.height > 0) {
                     return@withContext bmp
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Lỗi lấy bitmap từ fallbackDrawable: ${e.message}")
+            } catch (t: Throwable) {
+                Log.e(TAG, "Lỗi lấy bitmap từ fallbackDrawable: ${t.message}")
             }
         }
 
@@ -76,10 +95,21 @@ object MediaSaveUtils {
             try {
                 val cleanBase64 = if (imageSource.contains(",")) imageSource.substringAfter(",") else imageSource
                 val bytes = Base64.decode(cleanBase64, Base64.DEFAULT)
-                val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+                var sampleSize = 1
+                val maxDim = maxOf(bounds.outWidth, bounds.outHeight)
+                while (maxDim / sampleSize > 2048) {
+                    sampleSize *= 2
+                }
+                val opts = BitmapFactory.Options().apply {
+                    inSampleSize = sampleSize
+                    inPreferredConfig = Bitmap.Config.RGB_565
+                }
+                val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
                 if (bmp != null) return@withContext bmp
-            } catch (e: Exception) {
-                Log.e(TAG, "Lỗi giải mã base64: ${e.message}")
+            } catch (t: Throwable) {
+                Log.e(TAG, "Lỗi giải mã base64: ${t.message}")
             }
         }
 
@@ -87,12 +117,25 @@ object MediaSaveUtils {
         if (imageSource.startsWith("content://")) {
             try {
                 val uri = Uri.parse(imageSource)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                 context.contentResolver.openInputStream(uri)?.use { input ->
-                    val bmp = BitmapFactory.decodeStream(input)
+                    BitmapFactory.decodeStream(input, null, bounds)
+                }
+                var sampleSize = 1
+                val maxDim = maxOf(bounds.outWidth, bounds.outHeight)
+                while (maxDim / sampleSize > 2048) {
+                    sampleSize *= 2
+                }
+                val opts = BitmapFactory.Options().apply {
+                    inSampleSize = sampleSize
+                    inPreferredConfig = Bitmap.Config.RGB_565
+                }
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    val bmp = BitmapFactory.decodeStream(input, null, opts)
                     if (bmp != null) return@withContext bmp
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Lỗi đọc content uri: ${e.message}")
+            } catch (t: Throwable) {
+                Log.e(TAG, "Lỗi đọc content uri: ${t.message}")
             }
         }
 
@@ -102,11 +145,22 @@ object MediaSaveUtils {
                 val path = imageSource.removePrefix("file://")
                 val f = File(path)
                 if (f.exists() && f.length() > 0) {
-                    val bmp = BitmapFactory.decodeFile(f.absolutePath)
+                    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeFile(f.absolutePath, bounds)
+                    var sampleSize = 1
+                    val maxDim = maxOf(bounds.outWidth, bounds.outHeight)
+                    while (maxDim / sampleSize > 2048) {
+                        sampleSize *= 2
+                    }
+                    val opts = BitmapFactory.Options().apply {
+                        inSampleSize = sampleSize
+                        inPreferredConfig = Bitmap.Config.RGB_565
+                    }
+                    val bmp = BitmapFactory.decodeFile(f.absolutePath, opts)
                     if (bmp != null) return@withContext bmp
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Lỗi đọc file nội bộ: ${e.message}")
+            } catch (t: Throwable) {
+                Log.e(TAG, "Lỗi đọc file nội bộ: ${t.message}")
             }
         }
 
@@ -122,8 +176,8 @@ object MediaSaveUtils {
             if (result is SuccessResult) {
                 return@withContext drawableToBitmap(result.drawable)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Lỗi tải ảnh qua Coil: ${e.message}")
+        } catch (t: Throwable) {
+            Log.e(TAG, "Lỗi tải ảnh qua Coil: ${t.message}")
         }
 
         null

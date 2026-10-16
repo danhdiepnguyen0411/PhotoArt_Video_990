@@ -54,13 +54,20 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
                 stopAudio()
                 com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
                     .recordSelectedCategory(selectedTemplate.category)
+                val activeCat = if (viewModel.selectedCategoryCode.value.isNotBlank() &&
+                    !viewModel.selectedCategoryCode.value.equals("ALL", ignoreCase = true)
+                ) {
+                    viewModel.selectedCategoryCode.value
+                } else {
+                    selectedTemplate.category
+                }
                 val bundle = Bundle().apply {
                     putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, selectedTemplate.id)
                     putString("template_code", selectedTemplate.id)
                     putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, selectedTemplate.title)
                     putString("template_title", selectedTemplate.title)
-                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, selectedTemplate.category)
-                    putString("template_category", selectedTemplate.category)
+                    putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, activeCat)
+                    putString("template_category", activeCat)
                     putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, selectedTemplate.safeImageUrl)
                     putString("template_thumb", selectedTemplate.safeImageUrl)
                     putString(com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment.ARG_TEMPLATE_TYPE, selectedTemplate.templateType)
@@ -146,8 +153,25 @@ class TemplateFragment : BaseFragment<FragmentTemplateBinding>(FragmentTemplateB
     }
 
 
+    fun selectCategory(categoryCode: String = "ALL") {
+        context?.let { ctx ->
+            com.example.phortart_video_990.data.local.PreferencesManager.getInstance(ctx)
+                .recordSelectedCategory(categoryCode)
+        }
+        viewModel.selectCategoryByCode(categoryCode)
+        if (::categoryAdapter.isInitialized) {
+            categoryAdapter.setSelected(categoryCode)
+            binding.rvTemplateCategories.scrollToPosition(0)
+        }
+        scrollToTop()
+    }
+
     override fun onResume() {
         super.onResume()
+        (parentFragment as? MainFragment)?.pendingTemplateCategory?.let { pendingCat ->
+            (parentFragment as? MainFragment)?.pendingTemplateCategory = null
+            selectCategory(pendingCat)
+        }
         if (::templateAdapter.isInitialized && templateAdapter.itemCount > 0) {
             templateAdapter.notifyDataSetChanged()
         } else if (isAdded && context != null && com.example.phortart_video_990.core.utils.NetworkMonitor.isOnline(requireContext())) {

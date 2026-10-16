@@ -33,12 +33,14 @@ class CategoryAdapter(
     }
 
     fun setSelected(catCode: String) {
-        val prevIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
+        val prevCode = selectedCategoryCode
         selectedCategoryCode = catCode
-        val nextIndex = categories.indexOfFirst { it.code.equals(selectedCategoryCode, ignoreCase = true) }
+        val prevIndex = categories.indexOfFirst { it.code.equals(prevCode, ignoreCase = true) }
+        val nextIndex = categories.indexOfFirst { it.code.equals(catCode, ignoreCase = true) }
 
         if (prevIndex != -1) notifyItemChanged(prevIndex)
         if (nextIndex != -1) notifyItemChanged(nextIndex)
+        if (prevIndex == -1) notifyDataSetChanged()
     }
 
     inner class CategoryViewHolder(private val binding: ItemTemplateCategoryChipBinding) :

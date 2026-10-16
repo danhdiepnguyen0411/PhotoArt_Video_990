@@ -142,7 +142,9 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     type = "Gom ảnh",
                     title = videoTitle,
                     date = currentDate,
-                    imageUri = savedDoc.absolutePath
+                    imageUri = savedDoc.absolutePath,
+                    duration = formatTime(videoDurationSec),
+                    photoCount = photoUris.size.toString()
                 )
                 historyRepository.addHistoryItem(historyItem)
                 hasAutoSavedHistory = true
