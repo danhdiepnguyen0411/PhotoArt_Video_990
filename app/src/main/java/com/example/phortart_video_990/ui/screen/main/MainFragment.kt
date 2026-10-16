@@ -60,7 +60,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
         }
     }
 
-    fun selectTab(index: Int) {
+    var pendingTemplateCategory: String? = null
+
+    fun selectTab(index: Int, targetCategory: String? = null) {
         val itemId = when (index) {
             0 -> R.id.nav_home
             1 -> R.id.nav_template
@@ -70,6 +72,17 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
         }
         binding.bottomNavigationView.selectedItemId = itemId
         updateIndicator(index, animate = true)
+
+        if (index == 1) {
+            val cat = targetCategory ?: "ALL"
+            pendingTemplateCategory = cat
+            findTemplateFragment()?.selectCategory(cat)
+        }
+    }
+
+    fun findTemplateFragment(): com.example.phortart_video_990.ui.screen.template.TemplateFragment? {
+        return childFragmentManager.fragments.filterIsInstance<com.example.phortart_video_990.ui.screen.template.TemplateFragment>().firstOrNull()
+            ?: (childFragmentManager.findFragmentByTag("f1") as? com.example.phortart_video_990.ui.screen.template.TemplateFragment)
     }
 
     private fun updateIndicator(position: Int, animate: Boolean) {

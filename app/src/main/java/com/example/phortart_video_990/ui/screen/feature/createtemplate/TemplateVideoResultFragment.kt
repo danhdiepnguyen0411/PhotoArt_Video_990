@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
@@ -47,6 +48,8 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
     private var musicImageUrl: String? = null
     private var templateTitle: String? = null
     private var templateThumbUrl: String? = null
+    private var templateCode: String? = null
+    private var templateCategory: String? = null
 
     private var appDocumentVideoFile: File? = null
     private var tempShareCacheFile: File? = null
@@ -73,6 +76,14 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         musicImageUrl = args?.getString(ARG_MUSIC_IMAGE_URL)
         templateTitle = args?.getString(ARG_TEMPLATE_TITLE)
         templateThumbUrl = args?.getString(ARG_TEMPLATE_THUMB)
+        templateCode = args?.getString(ARG_TEMPLATE_CODE)
+        templateCategory = args?.getString(ARG_TEMPLATE_CATEGORY)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackNavigation()
+            }
+        })
 
         binding.cardMusicInfo.isClickable = false
         binding.cardMusicInfo.isFocusable = false
@@ -351,7 +362,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
 
     override fun initListener() {
         binding.header.setOnBackClickListener {
-            findNavController().popBackStack()
+            handleBackNavigation()
         }
 
         binding.cardVideoStage.setOnClickListener {
@@ -506,6 +517,16 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         updatePlayStateUi(false)
     }
 
+    private fun handleBackNavigation() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.apply {
+            set(ARG_TEMPLATE_CODE, templateCode)
+            set(ARG_TEMPLATE_CATEGORY, templateCategory)
+            set(ARG_TEMPLATE_TITLE, templateTitle)
+            set(ARG_TEMPLATE_THUMB, templateThumbUrl)
+        }
+        findNavController().popBackStack()
+    }
+
     override fun onDestroyView() {
         progressPollingJob?.cancel()
         progressPollingJob = null
@@ -528,5 +549,7 @@ class TemplateVideoResultFragment : BaseFragment<FragmentTemplateVideoResultBind
         const val ARG_MUSIC_IMAGE_URL = "arg_music_image_url"
         const val ARG_TEMPLATE_TITLE = "template_title"
         const val ARG_TEMPLATE_THUMB = "template_thumb"
+        const val ARG_TEMPLATE_CODE = "arg_template_code"
+        const val ARG_TEMPLATE_CATEGORY = "arg_template_category"
     }
 }

@@ -234,14 +234,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
         binding.btnSeeAllSuggestions.setOnClickListener {
             stopAudio()
-            (parentFragment as? MainFragment)?.selectTab(1)
-                ?: (parentFragment?.parentFragment as? MainFragment)?.selectTab(1)
+            val main = (parentFragment as? MainFragment)
+                ?: (parentFragment?.parentFragment as? MainFragment)
+            main?.selectTab(1, "ALL")
         }
 
         binding.btnSeeAllTemplates.setOnClickListener {
             stopAudio()
-            (parentFragment as? MainFragment)?.selectTab(1)
-                ?: (parentFragment?.parentFragment as? MainFragment)?.selectTab(1)
+            val main = (parentFragment as? MainFragment)
+                ?: (parentFragment?.parentFragment as? MainFragment)
+            main?.selectTab(1, "ALL")
         }
 
         binding.swipeRefreshLayout.setColorSchemeColors(
@@ -426,13 +428,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         com.example.phortart_video_990.data.local.PreferencesManager.getInstance(requireContext())
             .recordSelectedCategory(template.category)
 
+        val activeCat = if (selectedCategoryCode.isNotBlank() &&
+            !selectedCategoryCode.equals("ALL", ignoreCase = true)
+        ) {
+            selectedCategoryCode
+        } else {
+            template.category
+        }
+
         val bundle = android.os.Bundle().apply {
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CODE, template.id)
             putString("template_code", template.id)
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, template.title)
             putString("template_title", template.title)
-            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, template.category)
-            putString("template_category", template.category)
+            putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, activeCat)
+            putString("template_category", activeCat)
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, template.safeImageUrl)
             putString("template_thumb", template.safeImageUrl)
             putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TYPE, template.templateType)

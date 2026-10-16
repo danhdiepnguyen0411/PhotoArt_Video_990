@@ -136,36 +136,77 @@ class CommonTabHeaderView @JvmOverloads constructor(
         }
     }
 
+    val hasRightAction: Boolean
+        get() = (flRightAction.visibility == View.VISIBLE && flRightAction.childCount > 0) || btnPro.visibility == View.VISIBLE
+
     fun setTitleCentered(centered: Boolean) {
         userSpecifiedCenterTitle = centered
         updateTitleConstraints()
     }
 
+    fun enableTitleMarquee(enable: Boolean = true) {
+        tvTitle.isSingleLine = true
+        tvTitle.ellipsize = if (enable) android.text.TextUtils.TruncateAt.MARQUEE else android.text.TextUtils.TruncateAt.END
+        tvTitle.marqueeRepeatLimit = -1
+        tvTitle.isFocusable = enable
+        tvTitle.isFocusableInTouchMode = enable
+        tvTitle.isSelected = enable
+    }
+
     fun updateTitleConstraints() {
         val lp = llTitleGroup.layoutParams as? LayoutParams ?: return
         val density = resources.displayMetrics.density
+        val hasBack = btnBack.visibility == View.VISIBLE
+        val hasRight = hasRightAction
+
         if (isTitleCentered) {
-            lp.startToStart = LayoutParams.PARENT_ID
-            lp.endToEnd = LayoutParams.PARENT_ID
-            lp.startToEnd = LayoutParams.UNSET
-            lp.endToStart = LayoutParams.UNSET
-            lp.horizontalBias = 0.5f
-            lp.marginStart = (48 * density).toInt()
-            lp.marginEnd = (48 * density).toInt()
+            if (hasBack && hasRight) {
+                lp.startToEnd = R.id.btnBack
+                lp.endToStart = R.id.flHeaderRightAction
+                lp.startToStart = LayoutParams.UNSET
+                lp.endToEnd = LayoutParams.UNSET
+                lp.horizontalBias = 0.5f
+                lp.marginStart = (8 * density).toInt()
+                lp.marginEnd = (8 * density).toInt()
+            } else if (hasBack) {
+                lp.startToEnd = R.id.btnBack
+                lp.endToEnd = LayoutParams.PARENT_ID
+                lp.startToStart = LayoutParams.UNSET
+                lp.endToStart = LayoutParams.UNSET
+                lp.horizontalBias = 0.5f
+                lp.marginStart = (8 * density).toInt()
+                lp.marginEnd = (48 * density).toInt()
+            } else if (hasRight) {
+                lp.startToStart = LayoutParams.PARENT_ID
+                lp.endToStart = R.id.flHeaderRightAction
+                lp.startToEnd = LayoutParams.UNSET
+                lp.endToEnd = LayoutParams.UNSET
+                lp.horizontalBias = 0.5f
+                lp.marginStart = (48 * density).toInt()
+                lp.marginEnd = (8 * density).toInt()
+            } else {
+                lp.startToStart = LayoutParams.PARENT_ID
+                lp.endToEnd = LayoutParams.PARENT_ID
+                lp.startToEnd = LayoutParams.UNSET
+                lp.endToStart = LayoutParams.UNSET
+                lp.horizontalBias = 0.5f
+                lp.marginStart = (16 * density).toInt()
+                lp.marginEnd = (16 * density).toInt()
+            }
         } else {
-            if (btnBack.visibility == View.VISIBLE) {
+            if (hasBack) {
                 lp.startToStart = LayoutParams.UNSET
                 lp.startToEnd = R.id.btnBack
-                lp.endToEnd = LayoutParams.UNSET
-                lp.endToStart = R.id.flHeaderRightAction
+                lp.endToEnd = if (hasRight) LayoutParams.UNSET else LayoutParams.PARENT_ID
+                lp.endToStart = if (hasRight) R.id.flHeaderRightAction else LayoutParams.UNSET
                 lp.horizontalBias = 0.0f
                 lp.marginStart = (12 * density).toInt()
                 lp.marginEnd = (12 * density).toInt()
             } else {
                 lp.startToStart = LayoutParams.PARENT_ID
                 lp.startToEnd = LayoutParams.UNSET
-                lp.endToEnd = LayoutParams.UNSET
-                lp.endToStart = R.id.flHeaderRightAction
+                lp.endToEnd = if (hasRight) LayoutParams.UNSET else LayoutParams.PARENT_ID
+                lp.endToStart = if (hasRight) R.id.flHeaderRightAction else LayoutParams.UNSET
                 lp.horizontalBias = 0.0f
                 lp.marginStart = 0
                 lp.marginEnd = (12 * density).toInt()
@@ -227,11 +268,13 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     fun setTitle(title: CharSequence?) {
         tvTitle.text = title
+        tvTitle.isSelected = true
         applyTitleGradient()
     }
 
     fun setTitleRes(@StringRes resId: Int) {
         tvTitle.setText(resId)
+        tvTitle.isSelected = true
         applyTitleGradient()
     }
 
@@ -241,12 +284,19 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     fun setProButtonVisible(visible: Boolean) {
         btnPro.visibility = if (visible) View.VISIBLE else View.GONE
+        updateTitleConstraints()
     }
 
     fun setRightCustomView(view: View) {
         btnPro.visibility = View.GONE
         flRightAction.removeAllViews()
         flRightAction.addView(view)
+        flRightAction.visibility = View.VISIBLE
+        updateTitleConstraints()
+        post {
+            updateTitleConstraints()
+            applyTitleGradient()
+        }
     }
 
     fun setOnProClickListener(listener: () -> Unit) {
@@ -266,6 +316,7 @@ class CommonTabHeaderView @JvmOverloads constructor(
                     Shader.TileMode.CLAMP
                 )
                 tvTitle.paint.shader = textShader
+                tvTitle.isSelected = true
                 tvTitle.invalidate()
             }
         }
@@ -290,10 +341,19 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        enableTitleMarquee(true)
         updateTitleConstraints()
         applyTitleGradient()
+        tvTitle.isSelected = true
         if (llBrand.visibility == View.VISIBLE) {
             applyBrandAiGradient()
+        }
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (hasWindowFocus) {
+            tvTitle.isSelected = true
         }
     }
 }

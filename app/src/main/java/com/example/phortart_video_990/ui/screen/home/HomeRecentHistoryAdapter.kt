@@ -52,7 +52,13 @@ class HomeRecentHistoryAdapter(
                 error(R.drawable.bg_card_white)
             }
 
-            binding.llDurationPill.visibility = View.GONE
+            val dur = item.displayDuration
+            if (item.isVideo && dur.isNotBlank()) {
+                binding.llDurationPill.visibility = View.VISIBLE
+                binding.tvDuration.text = dur
+            } else {
+                binding.llDurationPill.visibility = View.GONE
+            }
             binding.llPhotoCountPill.visibility = View.GONE
             binding.llPhotoOnlyPill.visibility = View.GONE
 

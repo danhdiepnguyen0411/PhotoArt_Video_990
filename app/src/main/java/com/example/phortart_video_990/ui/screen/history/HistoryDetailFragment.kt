@@ -31,11 +31,14 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import com.example.phortart_video_990.core.utils.MediaSaveUtils
+import com.example.phortart_video_990.data.repository.TemplateRepository
+import com.example.phortart_video_990.ui.screen.feature.createtemplate.CreateTemplateVideoFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Locale
 
 class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(FragmentHistoryDetailBinding::inflate) {
 
@@ -44,6 +47,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
     }
 
     private val historyRepository by lazy { HistoryRepository(requireContext()) }
+    private val templateRepository by lazy { TemplateRepository() }
     private var historyItem: HistoryItemModel? = null
     private var lastShareClickTime = 0L
 
@@ -85,6 +89,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
     private fun bindItemData(item: HistoryItemModel) {
         val localizedTitle = item.getLocalizedTitle(requireContext())
         binding.tvDetailTitle.text = localizedTitle.ifBlank { getString(R.string.detail_default_title) }
+        binding.tvDetailTitle.isSelected = true
         binding.tvDetailDate.text = item.date.ifBlank { getString(R.string.detail_recently_created) }
 
         val type = item.type.lowercase()
@@ -95,6 +100,11 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.header.setTitle(getString(R.string.detail_header_restore))
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_restore)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_after)
+
+                binding.tvDetailTitle.visibility = View.VISIBLE
+                binding.layoutDetailDate.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = (6 * resources.displayMetrics.density).toInt()
+                }
 
                 binding.sliderView.visibility = View.VISIBLE
                 binding.ivDetailMedia.visibility = View.GONE
@@ -145,6 +155,12 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_prompt)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge_capsule)
 
+                // Ẩn đoạn prompt trên (tvDetailTitle) vì đã có thẻ Prompt chi tiết bên dưới
+                binding.tvDetailTitle.visibility = View.GONE
+                binding.layoutDetailDate.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = (14 * resources.displayMetrics.density).toInt()
+                }
+
                 binding.sliderView.visibility = View.GONE
                 binding.ivDetailMedia.visibility = View.VISIBLE
                 binding.videoViewDetail.visibility = View.GONE
@@ -183,12 +199,17 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_memories)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_media_badge)
 
+                binding.tvDetailTitle.visibility = View.VISIBLE
+                binding.layoutDetailDate.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = (6 * resources.displayMetrics.density).toInt()
+                }
+
                 binding.sliderView.visibility = View.GONE
                 binding.ivDetailMedia.visibility = View.VISIBLE
                 binding.videoViewDetail.visibility = View.GONE
                 binding.flPlayOverlay.visibility = View.VISIBLE
                 binding.tvVideoDuration.visibility = View.VISIBLE
-                binding.tvVideoDuration.text = "00:15"
+                updateVideoDurationUi(item)
 
                 loadMediaImage(item)
 
@@ -217,18 +238,44 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 }
             }
 
-            // 4. TEMPLATE / WAACKING
+            // 4. TEMPLATE / WAACKING / DANCE
             else -> {
                 binding.header.setTitle(getString(R.string.detail_header_template))
-                binding.tvMediaTypeBadge.text = getString(R.string.detail_badge_template)
                 binding.tvMediaTypeBadge.setBackgroundResource(R.drawable.bg_badge_hot)
+
+                binding.tvDetailTitle.visibility = View.VISIBLE
+                binding.layoutDetailDate.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = (6 * resources.displayMetrics.density).toInt()
+                }
+
+                val initialBadge = formatCategoryBadge(item.styleName)
+                binding.tvMediaTypeBadge.text = initialBadge
+
+                if (item.styleName.isNullOrBlank()) {
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            val dancingTemplates = templateRepository.getDancingTemplates()
+                            val matched = dancingTemplates.firstOrNull {
+                                it.title.equals(item.title, ignoreCase = true) ||
+                                        item.title.contains(it.title, ignoreCase = true) ||
+                                        it.title.contains(item.title, ignoreCase = true)
+                            }
+                            if (matched != null && matched.category.isNotBlank()) {
+                                val resolvedBadge = formatCategoryBadge(matched.category)
+                                withContext(Dispatchers.Main) {
+                                    binding.tvMediaTypeBadge.text = resolvedBadge
+                                }
+                            }
+                        } catch (_: Exception) {}
+                    }
+                }
 
                 binding.sliderView.visibility = View.GONE
                 binding.ivDetailMedia.visibility = View.VISIBLE
                 binding.videoViewDetail.visibility = View.GONE
                 binding.flPlayOverlay.visibility = View.VISIBLE
                 binding.tvVideoDuration.visibility = View.VISIBLE
-                binding.tvVideoDuration.text = "00:15"
+                updateVideoDurationUi(item)
 
                 loadMediaImage(item)
 
@@ -239,7 +286,13 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
 
                 binding.btnRecreate.text = getString(R.string.detail_btn_use_template)
                 binding.btnRecreate.setOnClickListener {
-                    findNavController().navigateSafe(R.id.action_historyDetailFragment_to_createTemplateVideoFragment)
+                    val templateTitleOnly = if (item.title.contains("•")) item.title.substringBefore("•").trim() else item.title
+                    val bundle = Bundle().apply {
+                        putString(CreateTemplateVideoFragment.ARG_TEMPLATE_TITLE, templateTitleOnly)
+                        putString(CreateTemplateVideoFragment.ARG_TEMPLATE_CATEGORY, item.styleName)
+                        putString(CreateTemplateVideoFragment.ARG_TEMPLATE_THUMB, item.imageUrl)
+                    }
+                    findNavController().navigateSafe(R.id.action_historyDetailFragment_to_createTemplateVideoFragment, bundle)
                 }
 
                 binding.flPlayOverlay.setOnClickListener {
@@ -247,6 +300,88 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
                 }
                 binding.cardMediaContainer.setOnClickListener {
                     playVideoOrPreview(item)
+                }
+            }
+        }
+    }
+
+    private fun updateVideoDurationUi(item: HistoryItemModel) {
+        val savedDuration = item.duration?.takeIf { it.isNotBlank() }
+        if (!savedDuration.isNullOrBlank()) {
+            binding.tvVideoDuration.text = savedDuration
+            return
+        }
+
+        val initialDur = item.displayDuration
+        if (initialDur.isNotBlank() && initialDur != "00:16" && initialDur != "00:15") {
+            binding.tvVideoDuration.text = initialDur
+            return
+        }
+
+        val pathOrUrl = item.imageUri ?: item.imageUrl
+        if (!pathOrUrl.isNullOrBlank()) {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val cleanPath = if (pathOrUrl.startsWith("file://")) pathOrUrl.removePrefix("file://") else pathOrUrl
+                    val file = File(cleanPath)
+                    if (file.exists()) {
+                        val retriever = android.media.MediaMetadataRetriever()
+                        retriever.setDataSource(file.absolutePath)
+                        val timeMs = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+                        retriever.release()
+                        if (timeMs > 0) {
+                            val totalSec = (timeMs / 1000).toInt()
+                            val m = totalSec / 60
+                            val s = totalSec % 60
+                            val formatted = String.format(Locale.US, "%02d:%02d", m, s)
+                            withContext(Dispatchers.Main) {
+                                binding.tvVideoDuration.text = formatted
+                            }
+                            return@launch
+                        }
+                    }
+                } catch (_: Exception) {}
+
+                try {
+                    val dancingTemplates = templateRepository.getDancingTemplates()
+                    val matched = dancingTemplates.firstOrNull {
+                        it.title.equals(item.title, ignoreCase = true) ||
+                                item.title.contains(it.title, ignoreCase = true) ||
+                                it.title.contains(item.title, ignoreCase = true)
+                    }
+                    val fallbackDur = matched?.displayDuration
+                    if (!fallbackDur.isNullOrBlank()) {
+                        withContext(Dispatchers.Main) {
+                            binding.tvVideoDuration.text = fallbackDur
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    private fun formatCategoryBadge(category: String?): String {
+        if (category.isNullOrBlank()) return getString(R.string.detail_badge_template)
+        val raw = category.trim()
+        val upper = raw.uppercase().replace("-", "_").replace(" ", "_")
+        return when (upper) {
+            "ALL" -> getString(R.string.detail_badge_template)
+            "HOT_DANCE", "HOT" -> "Hot Trend"
+            "FUNNY" -> "Funny"
+            "STREET_DANCE" -> "Street Dance"
+            "TRENDING" -> "Trending"
+            "WAACKING" -> "Waacking"
+            "KPOP", "K_POP" -> "K-Pop"
+            "ANIME" -> "Anime"
+            "CHILL" -> "Chill"
+            "CUTE" -> "Cute"
+            else -> {
+                if (raw.contains("_")) {
+                    raw.split("_").joinToString(" ") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+                } else if (raw.length > 3 && raw.all { it.isUpperCase() }) {
+                    raw.lowercase().replaceFirstChar { it.uppercase() }
+                } else {
+                    raw
                 }
             }
         }
@@ -531,6 +666,13 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
             mp.isLooping = true
             binding.ivDetailMedia.visibility = View.GONE
             binding.flPlayOverlay.visibility = View.GONE
+            val durMs = mp.duration
+            if (durMs > 0) {
+                val totalSec = durMs / 1000
+                val m = totalSec / 60
+                val s = totalSec % 60
+                binding.tvVideoDuration.text = String.format(Locale.US, "%02d:%02d", m, s)
+            }
             mp.start()
         }
 

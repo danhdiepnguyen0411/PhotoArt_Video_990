@@ -57,12 +57,12 @@ class RestoreRepository(private val context: Context) {
                 fileToProcess = rawFile
             }
 
-            // Chuẩn hoá hướng xoay (EXIF rotation) và nén ảnh hợp lý (2048px, max 2MB)
+            // Chuẩn hoá hướng xoay (EXIF rotation) và nén ảnh tối ưu cho AI Restore (1280px, max 1MB)
             val normalizedFile = com.example.phortart_video_990.core.utils.ImageCompressor.compressIfNeeded(
                 context = context,
                 srcFile = fileToProcess,
-                maxSizeBytes = 2 * 1024 * 1024L,
-                maxDimension = 2048
+                maxSizeBytes = 1024 * 1024L,
+                maxDimension = 1280
             )
 
             if (rawFileExists(fileToProcess) && fileToProcess.absolutePath != normalizedFile.absolutePath && fileToProcess.name.startsWith("restore_raw_")) {
@@ -130,10 +130,10 @@ class RestoreRepository(private val context: Context) {
                             continuation.resume(Result.failure(Exception("Kết quả trả về rỗng")))
                         }
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "🔥 Exception: ${e.message}", e)
+                } catch (t: Throwable) {
+                    Log.e(TAG, "🔥 Throwable: ${t.message}", t)
                     if (continuation.isActive) {
-                        continuation.resume(Result.failure(e))
+                        continuation.resume(Result.failure(t))
                     }
                 }
             }

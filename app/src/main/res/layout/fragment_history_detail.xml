@@ -142,9 +142,17 @@
                 android:textColor="#1B286F"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:freezesText="true"
                 tools:text="Lâu đài kỳ ảo bay giữa bầu trời thần tiên" />
 
             <LinearLayout
+                android:id="@+id/layoutDetailDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"

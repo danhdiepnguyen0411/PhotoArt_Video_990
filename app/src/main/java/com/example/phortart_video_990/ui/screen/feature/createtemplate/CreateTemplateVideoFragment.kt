@@ -61,6 +61,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
     private var templateThumbnailUrl: String = ""
     private var templateType: String = ""
     private var userChangedMusic: Boolean = false
+    private var isInitialArgumentsConsumed: Boolean = false
 
     // Selected music
     private var selectedMusicTrackId: String? = null
@@ -165,20 +166,37 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
         savedInstanceState?.getString("saved_template_code")?.let {
             if (it.isNotBlank()) templateCode = it
         }
+        savedInstanceState?.getString("saved_template_title")?.let {
+            if (it.isNotBlank()) templateTitle = it
+        }
+        savedInstanceState?.getString("saved_template_category")?.let {
+            if (it.isNotBlank()) {
+                templateCategory = it
+                selectedTemplateCatCode = it
+            }
+        }
+        savedInstanceState?.getString("saved_template_thumb")?.let {
+            if (it.isNotBlank()) templateThumbnailUrl = it
+        }
         savedInstanceState?.getString("saved_template_type")?.let {
             if (it.isNotBlank()) templateType = it
         }
         savedInstanceState?.getString("saved_music_id")?.let {
             if (it.isNotBlank()) selectedMusicTrackId = it
         }
+        isInitialArgumentsConsumed = savedInstanceState?.getBoolean("saved_args_consumed", false) ?: false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         selectedPhotoUri?.let { outState.putString("saved_photo_uri", it.toString()) }
         if (templateCode.isNotBlank()) outState.putString("saved_template_code", templateCode)
+        if (templateTitle.isNotBlank()) outState.putString("saved_template_title", templateTitle)
+        if (templateCategory.isNotBlank()) outState.putString("saved_template_category", templateCategory)
+        if (templateThumbnailUrl.isNotBlank()) outState.putString("saved_template_thumb", templateThumbnailUrl)
         if (templateType.isNotBlank()) outState.putString("saved_template_type", templateType)
         selectedMusicTrackId?.let { outState.putString("saved_music_id", it) }
+        outState.putBoolean("saved_args_consumed", isInitialArgumentsConsumed)
     }
 
     override fun onResume() {
@@ -214,52 +232,90 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             insets
         }
 
-        val args = arguments
-        val initialTemplateCode = args?.getString(ARG_TEMPLATE_CODE)?.takeIf { it.isNotBlank() }
-            ?: args?.getString("template_code").orEmpty()
-        if (initialTemplateCode.isNotBlank()) templateCode = initialTemplateCode
+        // 1. Check if returning from Result screen with savedStateHandle
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val returnedTemplateCode = savedStateHandle?.remove<String>(ARG_TEMPLATE_CODE)
+        val returnedTemplateCategory = savedStateHandle?.remove<String>(ARG_TEMPLATE_CATEGORY)
+        val returnedTemplateTitle = savedStateHandle?.remove<String>(ARG_TEMPLATE_TITLE)
+        val returnedTemplateThumb = savedStateHandle?.remove<String>(ARG_TEMPLATE_THUMB)
 
-        val initialTemplateTitle = args?.getString(ARG_TEMPLATE_TITLE)?.takeIf { it.isNotBlank() }
-            ?: args?.getString("template_title").orEmpty()
-        if (initialTemplateTitle.isNotBlank()) templateTitle = initialTemplateTitle
+        if (!returnedTemplateCode.isNullOrBlank()) {
+            templateCode = returnedTemplateCode
+        }
+        if (!returnedTemplateCategory.isNullOrBlank()) {
+            templateCategory = returnedTemplateCategory
+            selectedTemplateCatCode = returnedTemplateCategory
+        }
+        if (!returnedTemplateTitle.isNullOrBlank()) {
+            templateTitle = returnedTemplateTitle
+        }
+        if (!returnedTemplateThumb.isNullOrBlank()) {
+            templateThumbnailUrl = returnedTemplateThumb
+        }
 
-        val initialTemplateCat = args?.getString(ARG_TEMPLATE_CATEGORY)?.takeIf { it.isNotBlank() }
-            ?: args?.getString("template_category").orEmpty()
-        if (initialTemplateCat.isNotBlank()) templateCategory = initialTemplateCat
+        // 2. Initial arguments parsed only on first launch (not when returning or recreating)
+        if (!isInitialArgumentsConsumed) {
+            val args = arguments
+            val initialTemplateCode = args?.getString(ARG_TEMPLATE_CODE)?.takeIf { it.isNotBlank() }
+                ?: args?.getString("template_code").orEmpty()
+            if (initialTemplateCode.isNotBlank()) templateCode = initialTemplateCode
 
-        val initialTemplateThumb = args?.getString(ARG_TEMPLATE_THUMB)?.takeIf { it.isNotBlank() }
-            ?: args?.getString("template_thumb").orEmpty()
-        if (initialTemplateThumb.isNotBlank()) templateThumbnailUrl = initialTemplateThumb
+            val initialTemplateTitle = args?.getString(ARG_TEMPLATE_TITLE)?.takeIf { it.isNotBlank() }
+                ?: args?.getString("template_title").orEmpty()
+            if (initialTemplateTitle.isNotBlank()) templateTitle = initialTemplateTitle
 
-        val initialTemplateType = args?.getString(ARG_TEMPLATE_TYPE)?.takeIf { it.isNotBlank() }
-            ?: args?.getString("template_type").orEmpty()
-        if (initialTemplateType.isNotBlank()) templateType = initialTemplateType
-
-        // Initial Music from arguments
-        val initialMusicId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
-        if (!initialMusicId.isNullOrBlank()) selectedMusicTrackId = initialMusicId
-
-        val initialMusicTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
-        if (!initialMusicTitle.isNullOrBlank()) selectedMusicTitle = initialMusicTitle
-
-        val initialMusicAudio = args?.getString("selected_music_audio_url")
-            ?: args?.getString("template_audio_url")
-        if (!initialMusicAudio.isNullOrBlank()) selectedMusicAudioUrl = initialMusicAudio
-
-        val initialMusicThumb = args?.getString("selected_music_image_url")
-        val initialImage = args?.getString(ARG_INITIAL_IMAGE)
-            ?: args?.getString("extra_initial_image_1")
-            ?: args?.getString("initial_image_uri")
-            ?: args?.getString("selected_photo_uri")
-            ?: args?.getString("photo_uri")
-            ?: args?.getString("image_uri")
-        if (!initialImage.isNullOrBlank() && selectedPhotoUri == null) {
-            val uri = if (initialImage.startsWith("content://") || initialImage.startsWith("file://")) {
-                Uri.parse(initialImage)
-            } else {
-                Uri.fromFile(File(initialImage))
+            val initialTemplateCat = args?.getString(ARG_TEMPLATE_CATEGORY)?.takeIf { it.isNotBlank() }
+                ?: args?.getString("template_category").orEmpty()
+            if (initialTemplateCat.isNotBlank()) {
+                templateCategory = initialTemplateCat
+                selectedTemplateCatCode = initialTemplateCat
             }
-            selectedPhotoUri = copyUriToAppCache(uri)
+
+            val initialTemplateThumb = args?.getString(ARG_TEMPLATE_THUMB)?.takeIf { it.isNotBlank() }
+                ?: args?.getString("template_thumb").orEmpty()
+            if (initialTemplateThumb.isNotBlank()) templateThumbnailUrl = initialTemplateThumb
+
+            val initialTemplateType = args?.getString(ARG_TEMPLATE_TYPE)?.takeIf { it.isNotBlank() }
+                ?: args?.getString("template_type").orEmpty()
+            if (initialTemplateType.isNotBlank()) templateType = initialTemplateType
+
+            // Initial Music from arguments
+            val initialMusicId = args?.getString("selected_track_id")?.takeIf { it.isNotBlank() }
+            if (!initialMusicId.isNullOrBlank()) selectedMusicTrackId = initialMusicId
+
+            val initialMusicTitle = args?.getString("selected_music_title")?.takeIf { it.isNotBlank() }
+            if (!initialMusicTitle.isNullOrBlank()) selectedMusicTitle = initialMusicTitle
+
+            val initialMusicAudio = args?.getString("selected_music_audio_url")
+                ?: args?.getString("template_audio_url")
+            if (!initialMusicAudio.isNullOrBlank()) selectedMusicAudioUrl = initialMusicAudio
+
+            val initialMusicThumb = args?.getString("selected_music_image_url")
+            val initialImage = args?.getString(ARG_INITIAL_IMAGE)
+                ?: args?.getString("extra_initial_image_1")
+                ?: args?.getString("initial_image_uri")
+                ?: args?.getString("selected_photo_uri")
+                ?: args?.getString("photo_uri")
+                ?: args?.getString("image_uri")
+            if (!initialImage.isNullOrBlank() && selectedPhotoUri == null) {
+                val uri = if (initialImage.startsWith("content://") || initialImage.startsWith("file://")) {
+                    Uri.parse(initialImage)
+                } else {
+                    Uri.fromFile(File(initialImage))
+                }
+                selectedPhotoUri = copyUriToAppCache(uri)
+            }
+
+            isInitialArgumentsConsumed = true
+        }
+
+        // Keep arguments bundle updated in sync
+        arguments?.let {
+            if (templateCode.isNotBlank()) it.putString(ARG_TEMPLATE_CODE, templateCode)
+            if (templateCategory.isNotBlank()) it.putString(ARG_TEMPLATE_CATEGORY, templateCategory)
+            if (templateTitle.isNotBlank()) it.putString(ARG_TEMPLATE_TITLE, templateTitle)
+            if (templateThumbnailUrl.isNotBlank()) it.putString(ARG_TEMPLATE_THUMB, templateThumbnailUrl)
+            if (templateType.isNotBlank()) it.putString(ARG_TEMPLATE_TYPE, templateType)
         }
 
         setupHeader()
@@ -327,6 +383,7 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             selectedCategoryCode = selectedTemplateCatCode
         ) { category ->
             selectedTemplateCatCode = category.code
+            arguments?.putString(ARG_TEMPLATE_CATEGORY, category.code)
             filterTemplatesByCategory(category)
         }
         binding.rvTemplateCategories.layoutManager =
@@ -342,6 +399,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             templateCategory = template.category
             templateThumbnailUrl = template.safeImageUrl.orEmpty()
             templateType = template.templateType.orEmpty()
+
+            arguments?.let {
+                it.putString(ARG_TEMPLATE_CODE, templateCode)
+                it.putString(ARG_TEMPLATE_CATEGORY, templateCategory)
+                it.putString(ARG_TEMPLATE_TITLE, templateTitle)
+                it.putString(ARG_TEMPLATE_THUMB, templateThumbnailUrl)
+                it.putString(ARG_TEMPLATE_TYPE, templateType)
+            }
 
             // If music hasn't been explicitly changed, sync template audio as well
             if (selectedMusicTrackId == null && !template.safeAudioUrl.isNullOrBlank()) {
@@ -419,13 +484,26 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             try {
                 // 1. Fetch dancing templates first
                 val dancingTemplates = templateRepository.getDancingTemplates()
-                cachedDancingTemplates = dancingTemplates
+                val allTemplates = if (templateCode.isNotBlank() && dancingTemplates.none { it.id == templateCode }) {
+                    val passedTemplate = TemplateModel(
+                        id = templateCode,
+                        title = templateTitle,
+                        category = templateCategory,
+                        imageUrl = templateThumbnailUrl,
+                        templateType = templateType,
+                        audioUrl = selectedMusicAudioUrl
+                    )
+                    listOf(passedTemplate) + dancingTemplates
+                } else {
+                    dancingTemplates
+                }
+                cachedDancingTemplates = allTemplates
 
                 // 2. Extract categories dynamically from the template list (lấy chuẩn từ danh sách, không fix cứng)
                 val dynamicCategories = mutableListOf(CategoryModel.ALL)
                 val seenCategoryCodes = mutableSetOf("all", "tất cả")
 
-                dancingTemplates.forEach { template ->
+                allTemplates.forEach { template ->
                     val rawCat = template.category.trim()
                     if (rawCat.isNotBlank() && !rawCat.startsWith("MUSIC_", ignoreCase = true)) {
                         val key = rawCat.lowercase()
@@ -445,29 +523,96 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                     }
                 }
 
-                if (dynamicCategories.size > 1) {
-                    templateCategoryAdapter.submitList(dynamicCategories)
+                val finalCategories = if (dynamicCategories.size > 1) {
+                    dynamicCategories
                 } else {
-                    val dancingCats = templateRepository.getDancingCategories()
-                    templateCategoryAdapter.submitList(dancingCats)
+                    templateRepository.getDancingCategories()
                 }
+                templateCategoryAdapter.submitList(finalCategories)
 
-                if (dancingTemplates.isNotEmpty()) {
-                    danceTemplateAdapter.submitList(dancingTemplates)
+                if (allTemplates.isNotEmpty()) {
+                    val matchingTemplate = allTemplates.firstOrNull { it.id == templateCode } ?: allTemplates.first()
                     if (templateCode.isBlank()) {
-                        val first = dancingTemplates.first()
-                        templateCode = first.id
-                        templateTitle = first.title
-                        templateCategory = first.category
-                        templateThumbnailUrl = first.safeImageUrl.orEmpty()
-                        templateType = first.templateType.orEmpty()
-                        danceTemplateAdapter.setSelectedId(first.id)
+                        templateCode = matchingTemplate.id
+                        templateTitle = matchingTemplate.title
+                        templateCategory = matchingTemplate.category
+                        templateThumbnailUrl = matchingTemplate.safeImageUrl.orEmpty()
+                        templateType = matchingTemplate.templateType.orEmpty()
                     } else {
-                        val matching = dancingTemplates.firstOrNull { it.id == templateCode }
-                        if (matching != null && templateType.isBlank()) {
-                            templateType = matching.templateType.orEmpty()
+                        if (templateType.isBlank()) {
+                            templateType = matchingTemplate.templateType.orEmpty()
                         }
-                        danceTemplateAdapter.setSelectedId(templateCode)
+                        if (templateCategory.isBlank()) {
+                            templateCategory = matchingTemplate.category
+                        }
+                        if (templateTitle.isBlank()) {
+                            templateTitle = matchingTemplate.title
+                        }
+                        if (templateThumbnailUrl.isBlank()) {
+                            templateThumbnailUrl = matchingTemplate.safeImageUrl.orEmpty()
+                        }
+                    }
+
+                    // Find matching category in finalCategories for the selected template
+                    val targetCategoryStr = if (selectedTemplateCatCode.isNotBlank() && !selectedTemplateCatCode.equals("ALL", ignoreCase = true)) {
+                        selectedTemplateCatCode
+                    } else if (templateCategory.isNotBlank()) {
+                        templateCategory
+                    } else {
+                        matchingTemplate.category
+                    }
+                    val matchingCat = finalCategories.firstOrNull { cat ->
+                        !cat.code.equals("ALL", ignoreCase = true) && (
+                            cat.code.equals(targetCategoryStr, ignoreCase = true) ||
+                            cat.name.equals(targetCategoryStr, ignoreCase = true) ||
+                            cat.displayName.equals(targetCategoryStr, ignoreCase = true) ||
+                            cat.code.replace("_", "").equals(targetCategoryStr.replace("_", ""), ignoreCase = true)
+                        )
+                    } ?: finalCategories.firstOrNull { cat ->
+                        !cat.code.equals("ALL", ignoreCase = true) && targetCategoryStr.isNotBlank() && (
+                            cat.code.contains(targetCategoryStr, ignoreCase = true) ||
+                            targetCategoryStr.contains(cat.code, ignoreCase = true)
+                        )
+                    } ?: finalCategories.firstOrNull()
+
+                    val activeCat = if (selectedTemplateCatCode.equals("ALL", ignoreCase = true) && matchingCat == null) {
+                        CategoryModel.ALL
+                    } else {
+                        matchingCat ?: CategoryModel.ALL
+                    }
+                    selectedTemplateCatCode = activeCat.code
+                    templateCategoryAdapter.setSelected(activeCat.code)
+
+                    // Scroll category chip into view
+                    val catIndex = finalCategories.indexOfFirst { it.code.equals(activeCat.code, ignoreCase = true) }
+                    if (catIndex != -1) {
+                        scrollCategoryToPosition(catIndex)
+                    }
+
+                    // Filter template list by active category
+                    val isAllCat = activeCat.code.isBlank() ||
+                            activeCat.code.equals("ALL", ignoreCase = true) ||
+                            activeCat.code.equals("Tất cả", ignoreCase = true)
+
+                    val listToSubmit = if (isAllCat) {
+                        allTemplates
+                    } else {
+                        val target = activeCat.code.trim().lowercase()
+                        val targetName = activeCat.name.trim().lowercase()
+                        val filtered = allTemplates.filter { item ->
+                            val itemCat = item.category.trim().lowercase()
+                            itemCat == target || itemCat == targetName || itemCat.contains(target) || itemCat.contains(targetName)
+                        }
+                        if (filtered.any { it.id == templateCode }) filtered else allTemplates
+                    }
+
+                    danceTemplateAdapter.submitList(listToSubmit)
+                    danceTemplateAdapter.setSelectedId(templateCode)
+
+                    // Scroll template item into view
+                    val templateIndex = listToSubmit.indexOfFirst { it.id == templateCode }
+                    if (templateIndex != -1) {
+                        scrollTemplateToPosition(templateIndex)
                     }
                 }
 
@@ -535,8 +680,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 category.code.equals("ALL", ignoreCase = true) ||
                 category.code.equals("Tất cả", ignoreCase = true)
 
-        if (isAll) {
-            danceTemplateAdapter.submitList(pool)
+        val listToSubmit = if (isAll) {
+            pool
         } else {
             val target = category.code.trim().lowercase()
             val targetName = category.name.trim().lowercase()
@@ -544,13 +689,56 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 val itemCat = item.category.trim().lowercase()
                 itemCat == target || itemCat == targetName || itemCat.contains(target) || itemCat.contains(targetName)
             }
-            danceTemplateAdapter.submitList(if (filtered.isNotEmpty()) filtered else pool)
+            if (filtered.isNotEmpty()) filtered else pool
         }
 
-        (binding.rvTemplates.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
-        binding.rvTemplates.post {
-            (binding.rvTemplates.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        danceTemplateAdapter.submitList(listToSubmit)
+
+        val existingIndex = listToSubmit.indexOfFirst { it.id == templateCode }
+        if (existingIndex != -1) {
+            danceTemplateAdapter.setSelectedId(templateCode)
+            scrollTemplateToPosition(existingIndex)
+        } else if (listToSubmit.isNotEmpty()) {
+            val first = listToSubmit[0]
+            templateCode = first.id
+            templateTitle = first.title
+            templateCategory = first.category
+            templateThumbnailUrl = first.safeImageUrl.orEmpty()
+            templateType = first.templateType.orEmpty()
+            danceTemplateAdapter.setSelectedId(first.id)
+            if (selectedMusicTrackId == null && !first.safeAudioUrl.isNullOrBlank()) {
+                selectedMusicAudioUrl = first.safeAudioUrl
+                selectedMusicTitle = first.title
+                selectedMusicImageUrl = first.safeImageUrl
+            }
+            scrollTemplateToPosition(0)
         }
+    }
+
+    private fun scrollCategoryToPosition(position: Int) {
+        if (position < 0) return
+        val b = bindingOrNull ?: return
+        val lm = b.rvTemplateCategories.layoutManager as? LinearLayoutManager ?: return
+        lm.scrollToPositionWithOffset(position, 0)
+        b.rvTemplateCategories.post {
+            (bindingOrNull?.rvTemplateCategories?.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+        }
+        b.rvTemplateCategories.postDelayed({
+            (bindingOrNull?.rvTemplateCategories?.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+        }, 100L)
+    }
+
+    private fun scrollTemplateToPosition(position: Int) {
+        if (position < 0) return
+        val b = bindingOrNull ?: return
+        val lm = b.rvTemplates.layoutManager as? LinearLayoutManager ?: return
+        lm.scrollToPositionWithOffset(position, 0)
+        b.rvTemplates.post {
+            (bindingOrNull?.rvTemplates?.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+        }
+        b.rvTemplates.postDelayed({
+            (bindingOrNull?.rvTemplates?.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+        }, 100L)
     }
 
     private fun filterMusicByCategory(category: CategoryModel) {
@@ -656,7 +844,14 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             templateCode = chosenTemplate.id
             templateTitle = chosenTemplate.title
             templateCategory = chosenTemplate.category
+            selectedTemplateCatCode = chosenTemplate.category
             templateThumbnailUrl = chosenTemplate.safeImageUrl.orEmpty()
+            arguments?.let {
+                it.putString(ARG_TEMPLATE_CODE, templateCode)
+                it.putString(ARG_TEMPLATE_CATEGORY, templateCategory)
+                it.putString(ARG_TEMPLATE_TITLE, templateTitle)
+                it.putString(ARG_TEMPLATE_THUMB, templateThumbnailUrl)
+            }
         }
 
         val chosenMusic = danceMusicAdapter.getSelectedTrack()
@@ -922,6 +1117,15 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             putString(TemplateVideoResultFragment.ARG_VIDEO_URL, videoUrl)
             putString(TemplateVideoResultFragment.ARG_TEMPLATE_TITLE, templateTitle)
             putString(TemplateVideoResultFragment.ARG_TEMPLATE_THUMB, templateThumbnailUrl)
+            putString(TemplateVideoResultFragment.ARG_TEMPLATE_CODE, templateCode)
+            putString(
+                TemplateVideoResultFragment.ARG_TEMPLATE_CATEGORY,
+                if (selectedTemplateCatCode.isNotBlank() && !selectedTemplateCatCode.equals("ALL", ignoreCase = true)) {
+                    selectedTemplateCatCode
+                } else {
+                    templateCategory
+                }
+            )
             if (!selectedMusicTrackId.isNullOrBlank()) {
                 putString(TemplateVideoResultFragment.ARG_MUSIC_TRACK_ID, selectedMusicTrackId)
                 putString(TemplateVideoResultFragment.ARG_MUSIC_TITLE, selectedMusicTitle.orEmpty())
@@ -954,12 +1158,45 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
             } else {
                 templateTitle.ifBlank { getString(R.string.dance_video_title) }
             }
+
+            var durationStr: String? = null
+            try {
+                val cleanPath = if (localVideoPath.startsWith("file://")) localVideoPath.removePrefix("file://") else localVideoPath
+                val file = File(cleanPath)
+                if (file.exists()) {
+                    val retriever = android.media.MediaMetadataRetriever()
+                    retriever.setDataSource(file.absolutePath)
+                    val timeMs = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+                    retriever.release()
+                    if (timeMs > 0) {
+                        val totalSec = (timeMs / 1000).toInt()
+                        val m = totalSec / 60
+                        val s = totalSec % 60
+                        durationStr = String.format(Locale.US, "%02d:%02d", m, s)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to retrieve duration from $localVideoPath: ${e.message}")
+            }
+
+            if (durationStr.isNullOrBlank()) {
+                durationStr = danceTemplateAdapter.getSelectedTemplate()?.displayDuration
+            }
+
+            val effectiveCategory = if (templateCategory.isNotBlank()) {
+                templateCategory
+            } else {
+                danceTemplateAdapter.getSelectedTemplate()?.category.orEmpty()
+            }
+
             val item = HistoryItemModel(
                 title = title,
                 date = dateStr,
                 type = "Dance",
                 imageUrl = templateThumbnailUrl.ifBlank { photoUri },
-                imageUri = localVideoPath
+                imageUri = localVideoPath,
+                duration = durationStr,
+                styleName = effectiveCategory
             )
             historyRepository.addHistoryItem(item)
         } catch (e: Exception) {

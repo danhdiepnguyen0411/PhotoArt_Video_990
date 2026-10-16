@@ -35,7 +35,6 @@ class TemplateViewModel(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
     private val _isError = MutableStateFlow(false)
     val isError: StateFlow<Boolean> = _isError.asStateFlow()
 
@@ -105,6 +104,15 @@ class TemplateViewModel(
             _selectedCategoryCode.value = category.code
             _templates.value = filterTemplates(allDancingList, category.code, category.name)
         }
+    }
+
+    fun selectCategoryByCode(categoryCode: String = "ALL") {
+        val targetCat = _categories.value.find {
+            it.code.equals(categoryCode, ignoreCase = true) ||
+                    (categoryCode.equals("ALL", ignoreCase = true) && (it.code.equals("ALL", ignoreCase = true) || it.name.equals("Tất cả", ignoreCase = true)))
+        } ?: CategoryModel.ALL
+        _selectedCategoryCode.value = targetCat.code
+        _templates.value = filterTemplates(allDancingList, targetCat.code, targetCat.name)
     }
 
     private fun filterTemplates(

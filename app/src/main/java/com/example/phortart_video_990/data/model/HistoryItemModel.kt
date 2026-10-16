@@ -24,6 +24,7 @@ data class HistoryItemModel(
             return t.contains("video") ||
                     t.contains("gom") ||
                     t.contains("template") ||
+                    t.contains("dance") ||
                     tit.contains("video") ||
                     uri.endsWith(".mp4") ||
                     uri.contains("photoartvideos") ||
@@ -37,7 +38,8 @@ data class HistoryItemModel(
                 val path = imageUri ?: imageUrl
                 if (!path.isNullOrBlank()) {
                     try {
-                        val file = java.io.File(path)
+                        val cleanPath = if (path.startsWith("file://")) path.removePrefix("file://") else path
+                        val file = java.io.File(cleanPath)
                         if (file.exists()) {
                             val retriever = android.media.MediaMetadataRetriever()
                             retriever.setDataSource(file.absolutePath)
@@ -52,7 +54,6 @@ data class HistoryItemModel(
                         }
                     } catch (_: Exception) {}
                 }
-                return "00:16"
             }
             return ""
         }

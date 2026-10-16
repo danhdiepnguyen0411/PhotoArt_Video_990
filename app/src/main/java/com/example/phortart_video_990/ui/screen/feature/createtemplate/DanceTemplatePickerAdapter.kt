@@ -33,20 +33,22 @@ class DanceTemplatePickerAdapter(
 
     fun submitList(newList: List<TemplateModel>) {
         items = newList
-        if (selectedTemplateId == null && newList.isNotEmpty()) {
-            selectedTemplateId = newList[0].id
+        if (selectedTemplateId == null || newList.none { it.id == selectedTemplateId }) {
+            if (newList.isNotEmpty()) {
+                selectedTemplateId = newList[0].id
+            }
         }
         notifyDataSetChanged()
     }
 
     fun setSelectedId(id: String?) {
-        if (selectedTemplateId == id) return
         val oldIndex = items.indexOfFirst { it.id == selectedTemplateId }
         selectedTemplateId = id
         val newIndex = items.indexOfFirst { it.id == selectedTemplateId }
 
         if (oldIndex != -1) notifyItemChanged(oldIndex)
         if (newIndex != -1) notifyItemChanged(newIndex)
+        if (oldIndex == -1) notifyDataSetChanged()
     }
 
     fun getSelectedTemplate(): TemplateModel? {
