@@ -1,9 +1,11 @@
 package com.example.phortart_video_990.data.repository
 
+import android.content.Context
 import android.util.Log
 import com.code12.art.ArtMagicClient
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.sdk.ArtSdkManager
+import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.CategoryModel
 import com.example.phortart_video_990.data.model.TemplateModel
 import com.google.gson.Gson
@@ -704,4 +706,151 @@ class TemplateRepository(
             emptyList()
         }
     }
+
+    private fun parseSingleTemplate(jsonElement: JsonElement): TemplateModel? {
+        return try {
+            if (jsonElement.isJsonObject) {
+                val obj = jsonElement.asJsonObject
+                val data = obj.get("data")
+                if (data != null && data.isJsonObject) {
+                    return gson.fromJson(data, TemplateModel::class.java)
+                }
+            }
+            null
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing single template json: ${e.message}")
+            null
+        }
+    }
+
+    /**
+     * Fetch a specific template detail by its code (calls client.getDetailTemplate).
+     */
+    suspend fun getTemplate(templateCode: String): TemplateModel? = withContext(Dispatchers.IO) {
+        val client = getClient() ?: return@withContext null
+        suspendCancellableCoroutine { continuation ->
+            client.getDetailTemplate(templateCode) { jsonElement, throwable ->
+                if (!continuation.isActive) return@getDetailTemplate
+                if (throwable != null || jsonElement == null) {
+                    Log.w(TAG, "getDetailTemplate failed for code='$templateCode': ${throwable?.message}")
+                    continuation.resume(null)
+                } else {
+                    try {
+                        val parsed = parseSingleTemplate(jsonElement)
+                        continuation.resume(parsed)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error parsing detail template for '$templateCode': ${e.message}", e)
+                        continuation.resume(null)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper to extract a web URL from string sources (e.g., description, name, title).
+     */
+    fun extractUrlFromText(vararg sources: String?): String? {
+        val urlRegex = Regex("""https?://[^\s"'<>]+""")
+        for (src in sources) {
+            if (!src.isNullOrBlank()) {
+                val trimmed = src.trim()
+                if (trimmed.startsWith("http://", ignoreCase = true) || trimmed.startsWith("https://", ignoreCase = true)) {
+                    return trimmed
+                }
+                val match = urlRegex.find(trimmed)
+                if (match != null) {
+                    return match.value
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * Fetches legal links (Privacy Policy & Terms of Service) from CMS category APP_LEGAL_LINKS
+     * using template codes APP_POLICIES_LINK and APP_TERMS_LINK.
+     */
+    suspend fun getLegalLinks(context: Context? = null): LegalLinks = withContext(Dispatchers.IO) {
+        val client = getClient()
+        var policyUrl: String? = null
+        var termsUrl: String? = null
+
+        // 1. Fetch templates in category APP_LEGAL_LINKS
+        val legalTemplates: List<TemplateModel> = suspendCancellableCoroutine { continuation ->
+            if (client == null) {
+                continuation.resume(emptyList())
+                return@suspendCancellableCoroutine
+            }
+            client.getTemplateApps(page = 0, size = 50, category = "APP_LEGAL_LINKS") { jsonElement, throwable ->
+                if (!continuation.isActive) return@getTemplateApps
+                if (throwable != null || jsonElement == null) {
+                    Log.w(TAG, "Failed to fetch APP_LEGAL_LINKS: ${throwable?.message}")
+                    continuation.resume(emptyList())
+                } else {
+                    try {
+                        val templates = parseTemplates(jsonElement)
+                        continuation.resume(templates)
+                    } catch (e: Exception) {
+                        continuation.resume(emptyList())
+                    }
+                }
+            }
+        }
+
+        val policyItem = legalTemplates.find { it.id.equals("APP_POLICIES_LINK", ignoreCase = true) }
+        val termsItem = legalTemplates.find { it.id.equals("APP_TERMS_LINK", ignoreCase = true) }
+
+        policyUrl = extractUrlFromText(policyItem?.description, policyItem?.title, policyItem?.imageUrl, policyItem?.videoUrl)
+        termsUrl = extractUrlFromText(termsItem?.description, termsItem?.title, termsItem?.imageUrl, termsItem?.videoUrl)
+
+        // 2. If policyUrl wasn't in template list, try getDetailTemplate
+        if (policyUrl.isNullOrBlank()) {
+            val detail = getTemplate("APP_POLICIES_LINK")
+            policyUrl = extractUrlFromText(detail?.description, detail?.title, detail?.imageUrl, detail?.videoUrl)
+        }
+
+        // 3. If termsUrl wasn't in template list, try getDetailTemplate
+        if (termsUrl.isNullOrBlank()) {
+            val detail = getTemplate("APP_TERMS_LINK")
+            termsUrl = extractUrlFromText(detail?.description, detail?.title, detail?.imageUrl, detail?.videoUrl)
+        }
+
+        // 4. Fallback check: If policyUrl is still null, but termsItem has a policy URL (e.g. policies.html)
+        if (policyUrl.isNullOrBlank() && termsUrl != null && (termsUrl.contains("policy", ignoreCase = true) || termsUrl.contains("policies", ignoreCase = true))) {
+            policyUrl = termsUrl
+        }
+
+        Log.i(TAG, "getLegalLinks: resolved policyUrl='$policyUrl', termsUrl='$termsUrl'")
+
+        // Save to preferences if context provided
+        if (context != null) {
+            val prefs = PreferencesManager.getInstance(context)
+            if (!policyUrl.isNullOrBlank()) {
+                prefs.legalPolicyUrl = policyUrl
+            }
+            if (!termsUrl.isNullOrBlank()) {
+                prefs.legalTermsUrl = termsUrl
+            }
+        }
+
+        val fallbackPrefs = context?.let { PreferencesManager.getInstance(it) }
+        val finalPolicy = policyUrl ?: fallbackPrefs?.legalPolicyUrl ?: PreferencesManager.DEFAULT_POLICY_URL
+        val finalTerms = termsUrl ?: fallbackPrefs?.legalTermsUrl ?: PreferencesManager.DEFAULT_TERMS_URL
+
+        LegalLinks(policyUrl = finalPolicy, termsUrl = finalTerms)
+    }
+
+    suspend fun getPrivacyPolicyUrl(context: Context? = null): String {
+        return getLegalLinks(context).policyUrl
+    }
+
+    suspend fun getTermsOfServiceUrl(context: Context? = null): String {
+        return getLegalLinks(context).termsUrl
+    }
 }
+
+data class LegalLinks(
+    val policyUrl: String,
+    val termsUrl: String
+)

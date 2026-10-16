@@ -15,6 +15,11 @@ class PreferencesManager(context: Context) {
         private const val KEY_LANGUAGE_NAME = "language_name"
         private const val KEY_HAS_RATED_APP = "has_rated_app"
 
+        const val DEFAULT_POLICY_URL = "https://photogenertatorai.vercel.app/policies.html"
+        const val DEFAULT_TERMS_URL = "https://ai.code12.cloud/"
+        private const val KEY_LEGAL_POLICY_URL = "key_legal_policy_url"
+        private const val KEY_LEGAL_TERMS_URL = "key_legal_terms_url"
+
         @Volatile
         private var INSTANCE: PreferencesManager? = null
 
@@ -25,6 +30,14 @@ class PreferencesManager(context: Context) {
             }
         }
     }
+
+    var legalPolicyUrl: String
+        get() = prefs.getString(KEY_LEGAL_POLICY_URL, null)?.ifBlank { null } ?: DEFAULT_POLICY_URL
+        set(value) = prefs.edit().putString(KEY_LEGAL_POLICY_URL, value).apply()
+
+    var legalTermsUrl: String
+        get() = prefs.getString(KEY_LEGAL_TERMS_URL, null)?.ifBlank { null } ?: DEFAULT_TERMS_URL
+        set(value) = prefs.edit().putString(KEY_LEGAL_TERMS_URL, value).apply()
 
     var hasRatedApp: Boolean
         get() = prefs.getBoolean(KEY_HAS_RATED_APP, false)
