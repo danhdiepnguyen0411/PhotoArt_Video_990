@@ -45,6 +45,23 @@ data class TemplateModel(
     val isDancingTemplate: Boolean
         get() = !isMusic && !isStaticVideo
 
+    val isLegalLinkTemplate: Boolean
+        get() = category.contains("LEGAL_LINK", ignoreCase = true) ||
+                category.contains("APP_LEGAL", ignoreCase = true) ||
+                id.contains("APP_POLICIES_LINK", ignoreCase = true) ||
+                id.contains("APP_TERMS_LINK", ignoreCase = true) ||
+                id.startsWith("APP_LEGAL", ignoreCase = true) ||
+                title.contains("APP_POLICIES", ignoreCase = true) ||
+                title.contains("APP_TERMS", ignoreCase = true) ||
+                title.contains("APP_LEGAL", ignoreCase = true)
+
+    val isAnimeTemplate: Boolean
+        get() = category.equals("ANIME", ignoreCase = true) ||
+                category.contains("ANIME", ignoreCase = true) ||
+                category.equals("MANGA", ignoreCase = true) ||
+                category.contains("MANGA", ignoreCase = true) ||
+                templateType?.contains("ANIME", ignoreCase = true) == true
+
     val categoryDisplayName: String
         get() {
             var raw = category.trim()

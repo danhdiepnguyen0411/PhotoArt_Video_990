@@ -82,4 +82,29 @@ class CmsLegalLinksTest {
         assert(prefs.legalPolicyUrl.isNotBlank())
         assert(prefs.legalTermsUrl.isNotBlank())
     }
+
+    @Test
+    fun testCategoriesAndTemplatesExcludesAnimeAndLegalLinks() = runBlocking {
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        ArtSdkManager.init(appContext)
+        val client = ArtSdkManager.getClient()
+        val repo = com.aiart.photo.beauti.editor.data.repository.TemplateRepository()
+
+        val dancingTemplates = repo.getDancingTemplates()
+        Log.i(TAG, "=== DANCING TEMPLATES (${dancingTemplates.size}) ===")
+        dancingTemplates.forEach {
+            Log.i(TAG, "Template: id='${it.id}', title='${it.title}', category='${it.category}', type='${it.templateType}'")
+        }
+        assert(dancingTemplates.none { it.isAnimeTemplate }) { "Dancing templates must NOT contain any ANIME templates" }
+        assert(dancingTemplates.none { it.isLegalLinkTemplate }) { "Dancing templates must NOT contain any APP_LEGAL_LINKS templates" }
+
+        val allCategories = repo.getCategories()
+        Log.i(TAG, "=== ALL CATEGORIES (${allCategories.size}) ===")
+        allCategories.forEach {
+            Log.i(TAG, "Category: code='${it.code}', name='${it.name}', group='${it.groupCode}'")
+        }
+        assert(allCategories.none { it.isAnimeCategory }) { "Categories must NOT contain any ANIME category" }
+        assert(allCategories.none { it.isLegalLinkCategory }) { "Categories must NOT contain any APP_LEGAL_LINKS category" }
+    }
 }
+

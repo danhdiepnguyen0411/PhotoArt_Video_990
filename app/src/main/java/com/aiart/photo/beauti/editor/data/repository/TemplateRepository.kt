@@ -114,8 +114,9 @@ class TemplateRepository(
                 } else {
                     try {
                         val categories = parseCategories(jsonElement)
-                        val activeCategories = categories.filter { it.active && it.name.isNotBlank() && !it.isAiTool }
-                            .sortedBy { it.orderPosition }
+                        val activeCategories = categories.filter { 
+                            it.active && it.name.isNotBlank() && !it.isAiTool && !it.isAnimeCategory && !it.isLegalLinkCategory 
+                        }.sortedBy { it.orderPosition }
 
                         val resultList = mutableListOf(CategoryModel.ALL)
                         resultList.addAll(activeCategories)
@@ -144,8 +145,9 @@ class TemplateRepository(
                 } else {
                     try {
                         val categories = parseCategories(jsonElement)
-                        val activeCategories = categories.filter { it.active && it.name.isNotBlank() && !it.isAiTool }
-                            .sortedBy { it.orderPosition }
+                        val activeCategories = categories.filter { 
+                            it.active && it.name.isNotBlank() && !it.isAiTool && !it.isAnimeCategory && !it.isLegalLinkCategory 
+                        }.sortedBy { it.orderPosition }
                         continuation.resume(activeCategories)
                     } catch (e: Exception) {
                         continuation.resume(emptyList())
@@ -173,26 +175,28 @@ class TemplateRepository(
         if (dancingCats.isEmpty()) {
             // 3. Fallback: filter general categories from API
             val allApi = getCategories().filter { it.code != "ALL" }
-            val byDance = allApi.filter { it.isDanceCategory }
-            dancingCats = if (byDance.isNotEmpty()) byDance else allApi.filter { !it.isMusicCategory && !it.isAiTool }
+            val byDance = allApi.filter { it.isDanceCategory && !it.isAnimeCategory && !it.isLegalLinkCategory }
+            dancingCats = if (byDance.isNotEmpty()) byDance else allApi.filter { 
+                !it.isMusicCategory && !it.isAiTool && !it.isAnimeCategory && !it.isLegalLinkCategory 
+            }
         }
 
         val resultList = mutableListOf(CategoryModel.ALL)
         if (dancingCats.isNotEmpty()) {
             val existingCodes = mutableSetOf("all")
             dancingCats.forEach { cat ->
-                if (existingCodes.add(cat.code.lowercase())) {
+                if (!cat.isAnimeCategory && !cat.isLegalLinkCategory && existingCodes.add(cat.code.lowercase())) {
                     resultList.add(cat)
                 }
             }
         } else {
-            resultList.addAll(getDefaultDancingCategories().filter { it.code != "ALL" })
+            resultList.addAll(getDefaultDancingCategories().filter { it.code != "ALL" && !it.isAnimeCategory && !it.isLegalLinkCategory })
         }
         resultList
     }
 
     /**
-     * Fetch dancing templates from API. Excludes pure music items.
+     * Fetch dancing templates from API. Excludes pure music, anime, and legal links.
      */
     suspend fun getDancingTemplates(
         categoryCode: String? = null,
@@ -218,8 +222,12 @@ class TemplateRepository(
                 } else {
                     try {
                         val allTemplates = parseTemplates(jsonElement)
-                        val visualTemplates = allTemplates.filter { !it.isMusic }
-                        val pool = if (visualTemplates.isNotEmpty()) visualTemplates else allTemplates.filter { it.isDancingTemplate }
+                        val visualTemplates = allTemplates.filter { 
+                            !it.isMusic && !it.isAnimeTemplate && !it.isLegalLinkTemplate 
+                        }
+                        val pool = if (visualTemplates.isNotEmpty()) visualTemplates else allTemplates.filter { 
+                            it.isDancingTemplate && !it.isAnimeTemplate && !it.isLegalLinkTemplate 
+                        }
 
                         if (pool.isEmpty()) {
                             continuation.resume(emptyList())
@@ -251,12 +259,14 @@ class TemplateRepository(
     }
 
     /**
-     * Fetch ONLY template categories (excludes MUSIC and AI TOOL categories).
+     * Fetch ONLY template categories (excludes MUSIC, AI TOOL, ANIME, and APP_LEGAL_LINKS categories).
      */
     suspend fun getTemplateCategories(): List<CategoryModel> {
         val all = getCategories()
         val templateCats = mutableListOf<CategoryModel>()
-        val fromApi = all.filter { it.code != "ALL" && !it.isMusicCategory && !it.isAiTool }
+        val fromApi = all.filter { 
+            it.code != "ALL" && !it.isMusicCategory && !it.isAiTool && !it.isAnimeCategory && !it.isLegalLinkCategory 
+        }
         templateCats.add(CategoryModel.ALL)
         templateCats.addAll(fromApi)
         return templateCats
@@ -334,7 +344,9 @@ class TemplateRepository(
                 } else {
                     try {
                         val allTemplates = parseTemplates(jsonElement)
-                        val visualTemplates = allTemplates.filter { !it.isMusic }
+                        val visualTemplates = allTemplates.filter { 
+                            !it.isMusic && !it.isAnimeTemplate && !it.isLegalLinkTemplate 
+                        }
 
                         if (visualTemplates.isEmpty()) {
                             continuation.resume(emptyList())

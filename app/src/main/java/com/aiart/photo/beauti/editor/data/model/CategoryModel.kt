@@ -35,6 +35,30 @@ data class CategoryModel(
                 name.contains("NHẢY", ignoreCase = true) ||
                 name.contains("VŨ ĐIỆU", ignoreCase = true)
 
+    val isLegalLinkCategory: Boolean
+        get() = code.contains("LEGAL_LINK", ignoreCase = true) ||
+                name.contains("LEGAL_LINK", ignoreCase = true) ||
+                code.contains("APP_LEGAL", ignoreCase = true) ||
+                name.contains("APP_LEGAL", ignoreCase = true) ||
+                groupCode?.contains("LEGAL_LINK", ignoreCase = true) == true ||
+                groupName?.contains("LEGAL_LINK", ignoreCase = true) == true ||
+                groupCode?.contains("APP_LEGAL", ignoreCase = true) == true ||
+                groupName?.contains("APP_LEGAL", ignoreCase = true) == true
+
+    val isAnimeCategory: Boolean
+        get() = code.equals("ANIME", ignoreCase = true) ||
+                name.equals("ANIME", ignoreCase = true) ||
+                code.contains("ANIME", ignoreCase = true) ||
+                name.contains("ANIME", ignoreCase = true) ||
+                code.equals("MANGA", ignoreCase = true) ||
+                name.equals("MANGA", ignoreCase = true) ||
+                code.contains("MANGA", ignoreCase = true) ||
+                name.contains("MANGA", ignoreCase = true) ||
+                groupCode?.contains("ANIME", ignoreCase = true) == true ||
+                groupName?.contains("ANIME", ignoreCase = true) == true ||
+                groupCode?.contains("MANGA", ignoreCase = true) == true ||
+                groupName?.contains("MANGA", ignoreCase = true) == true
+
     val displayName: String
         get() {
             val raw = name.ifBlank { code }.trim()

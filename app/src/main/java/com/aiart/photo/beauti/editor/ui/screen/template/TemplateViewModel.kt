@@ -50,8 +50,9 @@ class TemplateViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Fetch real dancing templates from API
+                // 1. Fetch real dancing templates from API (exclude ANIME and APP_LEGAL_LINKS)
                 val realDancingTemplates = repository.getDancingTemplates()
+                    .filter { !it.isAnimeTemplate && !it.isLegalLinkTemplate }
                 allDancingList = realDancingTemplates
 
                 // 2. Extract categories directly from templates list (lấy chuẩn từ danh sách, không fix cứng)
@@ -59,13 +60,17 @@ class TemplateViewModel(
                 val existingCodes = mutableSetOf("all", "tất cả")
 
                 realDancingTemplates.forEach { item ->
+                    if (item.isAnimeTemplate || item.isLegalLinkTemplate) return@forEach
                     val cat = item.category.trim()
                     if (cat.isNotBlank() && !cat.startsWith("MUSIC_", ignoreCase = true)) {
                         val cleanCat = item.categoryDisplayName.ifBlank {
                             cat.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
                         }
-                        if (existingCodes.add(cat.lowercase())) {
-                            categoriesList.add(CategoryModel(code = cat, name = cleanCat, active = true))
+                        val catModel = CategoryModel(code = cat, name = cleanCat, active = true)
+                        if (!catModel.isAnimeCategory && !catModel.isLegalLinkCategory) {
+                            if (existingCodes.add(cat.lowercase())) {
+                                categoriesList.add(catModel)
+                            }
                         }
                     }
                 }
@@ -76,7 +81,9 @@ class TemplateViewModel(
                         it.active && it.name.isNotBlank() &&
                                 !it.code.equals("ALL", ignoreCase = true) &&
                                 !it.name.equals("ALL", ignoreCase = true) &&
-                                !it.name.equals("Tất cả", ignoreCase = true)
+                                !it.name.equals("Tất cả", ignoreCase = true) &&
+                                !it.isAnimeCategory &&
+                                !it.isLegalLinkCategory
                     }
                     categoriesList.addAll(validDancingCategories)
                 }
@@ -92,7 +99,7 @@ class TemplateViewModel(
                 _isError.value = true
                 allDancingList = emptyList()
                 _templates.value = emptyList()
-                _categories.value = repository.getDefaultDancingCategories()
+                _categories.value = repository.getDefaultDancingCategories().filter { !it.isAnimeCategory && !it.isLegalLinkCategory }
             } finally {
                 _isLoading.value = false
             }
@@ -120,15 +127,16 @@ class TemplateViewModel(
         categoryCode: String,
         categoryName: String?
     ): List<TemplateModel> {
+        val visibleList = list.filter { !it.isAnimeTemplate && !it.isLegalLinkTemplate }
         val isAll = categoryCode.isBlank() ||
                 categoryCode.equals("ALL", ignoreCase = true) ||
                 categoryCode.equals("Tất cả", ignoreCase = true)
-        if (isAll) return list
+        if (isAll) return visibleList
 
         val target = categoryCode.trim().lowercase()
         val cleanTarget = target.replace("_", " ")
 
-        return list.filter { item ->
+        return visibleList.filter { item ->
             val itemCat = item.category.trim().lowercase()
             val cleanItemCat = itemCat.replace("_", " ")
             cleanItemCat == cleanTarget ||

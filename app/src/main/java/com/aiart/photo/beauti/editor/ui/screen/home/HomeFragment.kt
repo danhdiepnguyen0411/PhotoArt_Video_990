@@ -569,25 +569,33 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         // Fetch dancing templates from API in background (NO hardcoded fake templates)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 1. Fetch dancing categories
+                // 1. Fetch dancing categories (exclude ANIME and APP_LEGAL_LINKS)
                 val apiCategories = templateRepository.getDancingCategories()
                 val categoriesList = mutableListOf(CategoryModel.ALL)
-                categoriesList.addAll(apiCategories.filter { !it.code.equals("ALL", ignoreCase = true) })
+                categoriesList.addAll(apiCategories.filter { 
+                    !it.code.equals("ALL", ignoreCase = true) && !it.isAnimeCategory && !it.isLegalLinkCategory 
+                })
 
-                // 2. Fetch dancing templates
+                // 2. Fetch dancing templates (exclude ANIME and APP_LEGAL_LINKS)
                 var apiTracks = templateRepository.getDancingTemplates()
+                    .filter { !it.isAnimeTemplate && !it.isLegalLinkTemplate }
                 if (apiTracks.isEmpty()) {
-                    apiTracks = templateRepository.getAllTemplateApps().filter { !it.isMusic }
+                    apiTracks = templateRepository.getAllTemplateApps()
+                        .filter { !it.isMusic && !it.isAnimeTemplate && !it.isLegalLinkTemplate }
                 }
 
                 // 3. Dynamically discover categories from dancing templates
                 val existingCodes = categoriesList.map { it.code.lowercase() }.toMutableSet()
                 apiTracks.forEach { item ->
+                    if (item.isAnimeTemplate || item.isLegalLinkTemplate) return@forEach
                     val cat = item.category.trim()
                     if (cat.isNotBlank() && !cat.startsWith("MUSIC_", ignoreCase = true)) {
                         val cleanCat = cat.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
-                        if (existingCodes.add(cat.lowercase())) {
-                            categoriesList.add(CategoryModel(code = cat, name = cleanCat, active = true))
+                        val catModel = CategoryModel(code = cat, name = cleanCat, active = true)
+                        if (!catModel.isAnimeCategory && !catModel.isLegalLinkCategory) {
+                            if (existingCodes.add(cat.lowercase())) {
+                                categoriesList.add(catModel)
+                            }
                         }
                     }
                 }
