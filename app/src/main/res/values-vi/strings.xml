@@ -31,7 +31,7 @@
     <string name="home_hot_templates">Hot</string>
     <string name="feature_dance_title">Tạo video</string>
     <string name="feature_prompt_title">Tạo ảnh AI</string>
-    <string name="feature_restore_title">Phục hồi ảnh</string>
+    <string name="feature_restore_title">Khôi phục ảnh</string>
     <string name="feature_video_title">Gom kỷ niệm</string>
     <string name="dance_video_title">Tạo video</string>
     <string name="dance_upload_title">Tải ảnh lên từ thư viện</string>
@@ -43,7 +43,7 @@
     <string name="btn_create_dance_video">Tạo video</string>
     <string name="toast_please_select_photo">Vui lòng chọn ảnh từ thư viện để tạo video</string>
     <string name="func_01_memories">Gom ảnh tạo video</string>
-    <string name="func_02_restore">Hồi sinh ảnh cũ</string>
+    <string name="func_02_restore">Khôi phục ảnh</string>
     <string name="func_03_enhance">Tạo ảnh prompt AI</string>
     <string name="func_04_music">Chọn nhạc</string>
     <string name="search_music_hint">Tìm kiếm bài hát, nghệ sĩ...</string>
@@ -316,7 +316,7 @@ tốt hơn.</string>
     <string name="detail_recently_created">Vừa tạo gần đây</string>
     <string name="detail_header_restore">Chi tiết Khôi phục</string>
     <string name="detail_badge_restore">Khôi phục 4K</string>
-    <string name="detail_btn_restore_another">Phục hồi ảnh khác</string>
+    <string name="detail_btn_restore_another">Khôi phục ảnh khác</string>
     <string name="detail_header_prompt">Chi tiết Prompt AI</string>
     <string name="detail_badge_prompt">Prompt AI Art</string>
     <string name="detail_btn_reuse_prompt">Dùng lại Prompt này</string>

@@ -96,18 +96,14 @@ object NotificationPermissionManager {
     }
 
     fun getDeniedCount(context: Context): Int {
-        val appDenied = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context).notificationDeniedCount
-        if (appDenied > 0) return appDenied
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        return prefs.getInt(KEY_DENIED_COUNT, 0)
+        return com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context).notificationDeniedCount
     }
 
     fun incrementDeniedCount(context: Context) {
         val appPrefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(context)
         appPrefs.notificationDeniedCount++
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val current = prefs.getInt(KEY_DENIED_COUNT, 0)
-        prefs.edit().putInt(KEY_DENIED_COUNT, current + 1).apply()
+        prefs.edit().putInt(KEY_DENIED_COUNT, appPrefs.notificationDeniedCount).apply()
     }
 
     fun resetDeniedCount(context: Context) {
@@ -120,8 +116,9 @@ object NotificationPermissionManager {
         if (suppressNotificationDialog) return false
         if (isNotificationPermissionGranted(context)) return false
         if (hasShownNotificationDialogThisSession) return false
-        if (isUserRevoked(context)) return true
         if (systemPermissionRequestedThisSession) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+        if (isUserRevoked(context)) return true
         return getDeniedCount(context) >= 2
     }
 

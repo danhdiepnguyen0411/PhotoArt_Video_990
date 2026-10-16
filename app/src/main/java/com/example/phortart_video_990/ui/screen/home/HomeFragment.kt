@@ -18,6 +18,7 @@ import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
 import com.example.phortart_video_990.core.utils.AudioCacheManager
+import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.BannerItemModel
@@ -180,18 +181,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun checkCustomNotificationPermission() {
-        if (!MainActivity.shouldCheckNotificationOnResume) return
-        MainActivity.shouldCheckNotificationOnResume = false
-
         val ctx = context ?: return
-        if (!NotificationDialogHelper.isNotificationGranted(ctx)) {
-            val prefs = PreferencesManager.getInstance(ctx)
-            if (prefs.shouldShowNotiDialogOnHome) {
-                prefs.shouldShowNotiDialogOnHome = false
-                binding.root.post {
-                    if (isAdded) {
-                        NotificationDialogHelper.showNotificationDialog(requireActivity())
-                    }
+        if (NotificationDialogHelper.isNotificationGranted(ctx)) {
+            MainActivity.shouldCheckNotificationOnResume = false
+            return
+        }
+
+        val prefs = PreferencesManager.getInstance(ctx)
+        val shouldShowFromSplash = prefs.shouldShowNotiDialogOnHome
+        val shouldShowFromManager = NotificationPermissionManager.shouldShowNotificationDialog(ctx)
+
+        if (shouldShowFromSplash || shouldShowFromManager) {
+            prefs.shouldShowNotiDialogOnHome = false
+            MainActivity.shouldCheckNotificationOnResume = false
+            binding.root.post {
+                if (isAdded) {
+                    NotificationDialogHelper.showNotificationDialog(requireActivity())
                 }
             }
         }

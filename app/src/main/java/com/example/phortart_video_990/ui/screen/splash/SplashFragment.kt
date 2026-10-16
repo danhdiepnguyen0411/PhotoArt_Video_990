@@ -191,7 +191,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
         }
 
         // Request POST_NOTIFICATIONS up to 2 times at Splash (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && prefs.notificationDeniedCount < 2) {
+        val isUserRevoked = NotificationPermissionManager.isUserRevoked(ctx)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && prefs.notificationDeniedCount < 2 && !isUserRevoked) {
             if (!hasRequestedPermission) {
                 hasRequestedPermission = true
                 isWaitingForPermission = true

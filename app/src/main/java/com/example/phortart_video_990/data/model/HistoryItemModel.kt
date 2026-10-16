@@ -260,7 +260,7 @@ data class HistoryItemModel(
         // 1. Restore item
         if (t.contains("khôi phục") || t.contains("restore") || t.contains("phục") || t.contains("hồi sinh") ||
             tit in listOf(
-                "Restore Old Photos", "老照片高清修复", "Hồi sinh ảnh cũ",
+                "Restore Old Photos", "老照片高清修复", "Hồi sinh ảnh cũ", "Khôi phục ảnh", "Khôi phục ảnh cũ",
                 "Реставрация старых фото", "Pulihkan Foto Lama", "Restaurar fotos antigas",
                 "오래된 사진 복원", "古い写真の復元", "Ripristina vecchie foto",
                 "Restaurer anciennes photos", "पुरानी फ़ोटो बहाली", "Restaurar fotos viejas",
