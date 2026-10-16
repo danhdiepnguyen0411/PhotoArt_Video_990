@@ -174,15 +174,17 @@ class EnhanceLoadingFragment : BaseFragment<FragmentEnhanceLoadingBinding>(Fragm
                     }
 
                     try {
+                        val currentTime = System.currentTimeMillis()
                         val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-                        val currentDate = dateFormat.format(Date())
+                        val currentDate = dateFormat.format(Date(currentTime))
                         val historyItem = HistoryItemModel(
                             type = "Prompt AI",
                             title = userPrompt.ifBlank { getString(R.string.func_03_enhance) },
                             date = currentDate,
                             imageUri = outputUrl,
                             imageUrl = outputUrl,
-                            styleName = styleName
+                            styleName = styleName,
+                            timestamp = currentTime
                         )
                         historyRepository.addHistoryItem(historyItem)
                     } catch (e: Exception) {

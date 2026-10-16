@@ -174,6 +174,8 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="btn_upgrade_now_arrow">今すぐアップグレード →</string>
     <string name="settings_group_options">オプション</string>
     <string name="setting_language">言語</string>
+    <string name="setting_permission">権限</string>
+    <string name="setting_permission_desc">アプリのアクセス権限を管理する</string>
     <string name="setting_notification">通知</string>
     <string name="setting_notification_desc">通知の設定を管理</string>
     <string name="settings_group_support">サポート</string>

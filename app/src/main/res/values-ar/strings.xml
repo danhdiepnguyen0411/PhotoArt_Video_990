@@ -160,6 +160,8 @@
     <string name="btn_upgrade_now_arrow">ترقية الآن ←</string>
     <string name="settings_group_options">الخيارات</string>
     <string name="setting_language">اللغة</string>
+    <string name="setting_permission">الأذونات</string>
+    <string name="setting_permission_desc">إدارة أذونات الوصول للتطبيق</string>
     <string name="setting_notification">الإشعارات</string>
     <string name="setting_notification_desc">إدارة تفضيلات الإشعارات</string>
     <string name="settings_group_support">الدعم</string>

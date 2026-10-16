@@ -44,6 +44,10 @@ class BannerAdapter(
             binding.tvBannerDesc.text = item.description
             binding.btnBannerAction.text = item.buttonText
 
+            val isRtl = com.example.phortart_video_990.core.utils.LocaleHelper.isRtl(binding.root.context) ||
+                    binding.root.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+            binding.ivBannerBg.scaleX = if (isRtl) -1f else 1f
+
             binding.ivBannerBg.scaleType = android.widget.ImageView.ScaleType.MATRIX
             val updateImageMatrix = {
                 val d = binding.ivBannerBg.drawable
@@ -53,10 +57,13 @@ class BannerAdapter(
                     val vw = binding.ivBannerBg.width.toFloat()
                     val vh = binding.ivBannerBg.height.toFloat()
                     if (dw > 0f && dh > 0f && vw > 0f && vh > 0f) {
+                        binding.ivBannerBg.pivotX = vw / 2f
+                        binding.ivBannerBg.pivotY = vh / 2f
+
                         val scale = maxOf(vw / dw, vh / dh)
                         val scaledW = dw * scale
                         val scaledH = dh * scale
-                        val dx = vw - scaledW // right align
+                        val dx = vw - scaledW // right align in LTR; when scaleX = -1f this is mirrored to left
                         val dy = (vh - scaledH) / 2f
 
                         val matrix = android.graphics.Matrix()
@@ -80,15 +87,30 @@ class BannerAdapter(
                     binding.tvBannerHighlight.paint.measureText(line)
                 } ?: binding.tvBannerHighlight.width.toFloat()
 
-                val shader = LinearGradient(
-                    0f, 0f, maxWidth.coerceAtLeast(1f), 0f,
-                    intArrayOf(
-                        Color.parseColor("#4A7BFE"),
-                        Color.parseColor("#9153EE")
-                    ),
-                    null,
-                    Shader.TileMode.CLAMP
-                )
+                val viewWidth = binding.tvBannerHighlight.width.toFloat()
+                val shader = if (isRtl && viewWidth > maxWidth) {
+                    val textStartX = viewWidth
+                    val textEndX = (viewWidth - maxWidth).coerceAtLeast(0f)
+                    LinearGradient(
+                        textStartX, 0f, textEndX, 0f,
+                        intArrayOf(
+                            Color.parseColor("#4A7BFE"),
+                            Color.parseColor("#9153EE")
+                        ),
+                        null,
+                        Shader.TileMode.CLAMP
+                    )
+                } else {
+                    LinearGradient(
+                        0f, 0f, maxWidth.coerceAtLeast(1f), 0f,
+                        intArrayOf(
+                            Color.parseColor("#4A7BFE"),
+                            Color.parseColor("#9153EE")
+                        ),
+                        null,
+                        Shader.TileMode.CLAMP
+                    )
+                }
                 binding.tvBannerHighlight.paint.shader = shader
                 binding.tvBannerHighlight.invalidate()
             }

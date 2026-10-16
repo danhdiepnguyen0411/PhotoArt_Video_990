@@ -180,6 +180,8 @@ pengalaman terbaik.</string>
     <string name="btn_upgrade_now_arrow">Tingkatkan Sekarang →</string>
     <string name="settings_group_options">Opsi</string>
     <string name="setting_language">Bahasa</string>
+    <string name="setting_permission">Izin</string>
+    <string name="setting_permission_desc">Kelola izin akses aplikasi</string>
     <string name="setting_notification">Notifikasi</string>
     <string name="setting_notification_desc">Kelola notifikasi Anda</string>
     <string name="settings_group_support">Dukungan</string>

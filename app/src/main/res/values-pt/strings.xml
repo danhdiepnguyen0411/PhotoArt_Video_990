@@ -161,6 +161,8 @@ uma experiência premium.</string>
     <string name="btn_upgrade_now_arrow">Assinar agora →</string>
     <string name="settings_group_options">Opções</string>
     <string name="setting_language">Idioma</string>
+    <string name="setting_permission">Permissões</string>
+    <string name="setting_permission_desc">Gerenciar permissões de acesso do aplicativo</string>
     <string name="setting_notification">Notificações</string>
     <string name="setting_notification_desc">Gerencie suas notificações</string>
     <string name="settings_group_support">Suporte</string>

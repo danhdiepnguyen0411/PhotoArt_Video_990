@@ -161,6 +161,8 @@ d\'une expérience premium.</string>
     <string name="btn_upgrade_now_arrow">Passer à Premium →</string>
     <string name="settings_group_options">Options</string>
     <string name="setting_language">Langue</string>
+    <string name="setting_permission">Autorisations</string>
+    <string name="setting_permission_desc">Gérer les autorisations d\'accès de l\'application</string>
     <string name="setting_notification">Notifications</string>
     <string name="setting_notification_desc">Gérer vos notifications</string>
     <string name="settings_group_support">Assistance</string>

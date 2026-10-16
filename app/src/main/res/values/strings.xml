@@ -212,7 +212,7 @@ tốt hơn.</string>
     <string name="setting_notification">Thông báo</string>
     <string name="setting_notification_desc">Quản lý thông báo của bạn</string>
     <string name="setting_permission">Permission</string>
-    <string name="setting_permission_desc">Quản lý quyền truy cập của ứng dụng</string>
+    <string name="setting_permission_desc">Manage app access permissions</string>
     <string name="settings_group_support">Hỗ trợ</string>
     <string name="setting_rate">Đánh giá ứng dụng</string>
     <string name="setting_rate_desc">Chia sẻ cảm nhận của bạn</string>
@@ -389,7 +389,7 @@ tốt hơn.</string>
     <string name="loading_preparing_image_data">Đang chuẩn bị dữ liệu hình ảnh...</string>
     <string name="loading_preparing_bg_music">Đang chuẩn bị nhạc nền...</string>
     <string name="btn_change_photo">Đổi ảnh</string>
-    <string name="history_badge_photo">Ảnh</string>
+    <string name="history_badge_photo">Photo</string>
     <string name="music_tap_to_select">Chạm để chọn</string>
     <string name="btn_preview">Xem trước</string>
 

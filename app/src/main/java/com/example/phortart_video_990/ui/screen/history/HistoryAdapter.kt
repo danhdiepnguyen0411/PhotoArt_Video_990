@@ -80,7 +80,7 @@ class HistoryAdapter(
                 binding.ivHistoryThumb.setImageResource(R.drawable.bg_card_white)
             }
 
-            binding.tvHistoryDate.text = item.gridDisplayDate
+            binding.tvHistoryDate.text = item.getLocalizedGridDate(binding.root.context)
             binding.root.setOnClickListener { onItemClick(item) }
         }
     }
@@ -107,7 +107,7 @@ class HistoryAdapter(
             }
 
             binding.tvHistoryTitle.text = item.getLocalizedTitle(binding.root.context)
-            binding.tvHistoryDate.text = item.date
+            binding.tvHistoryDate.text = item.getLocalizedFullDate(binding.root.context)
             binding.root.setOnClickListener { onItemClick(item) }
         }
     }

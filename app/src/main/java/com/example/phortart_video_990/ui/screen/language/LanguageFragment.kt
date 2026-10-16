@@ -177,6 +177,15 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         binding.tvLanguageDesc.text = localizedCtx.getString(R.string.language_choose_desc)
         binding.tvConfirmText.text = localizedCtx.getString(R.string.btn_confirm)
 
+        val isRtl = supportedLang.lowercase() == "ar"
+        val dir = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+        binding.rootView.layoutDirection = dir
+        binding.btnConfirm.layoutDirection = dir
+        binding.btnBack.drawable?.isAutoMirrored = false
+        binding.ivConfirmArrow.drawable?.isAutoMirrored = false
+        binding.btnBack.scaleX = if (isRtl) -1f else 1f
+        binding.ivConfirmArrow.scaleX = if (isRtl) -1f else 1f
+
         // Re-apply gradient sau khi text thay đổi
         applyTitleGradient()
     }
@@ -284,11 +293,14 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         val endX = (arrowLoc[0] - rootLoc[0] + arrowView.width / 2f - binding.ivHandGif.width / 2f)
         val endY = (arrowLoc[1] - rootLoc[1] + arrowView.height / 2f - binding.ivHandGif.height / 2f + 2 * density)
 
+        val isRtl = previewLangCode.lowercase() == "ar"
+        val handRotation = if (isRtl) -15f else 15f
+
         if (animate) {
             binding.ivHandGif.animate()
                 .x(endX)
                 .y(endY)
-                .rotation(15f)
+                .rotation(handRotation)
                 .setDuration(600)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .withEndAction {
@@ -298,7 +310,7 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         } else {
             binding.ivHandGif.x = endX
             binding.ivHandGif.y = endY
-            binding.ivHandGif.rotation = 15f
+            binding.ivHandGif.rotation = handRotation
         }
     }
 
@@ -338,9 +350,13 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
         binding.llHeader.layoutDirection = dir
         binding.clNavHeader.layoutDirection = dir
         binding.rvLanguages.layoutDirection = dir
+        binding.btnConfirm.layoutDirection = dir
         act.window.decorView.layoutDirection = dir
 
+        binding.btnBack.drawable?.isAutoMirrored = false
+        binding.ivConfirmArrow.drawable?.isAutoMirrored = false
         binding.btnBack.scaleX = if (isRtl) -1f else 1f
+        binding.ivConfirmArrow.scaleX = if (isRtl) -1f else 1f
 
         val prefs = PreferencesManager.getInstance(act)
         val isFromSettings = prefs.hasCompletedIntro
@@ -380,6 +396,12 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
                 val isRtl = initialLangCode.lowercase() == "ar"
                 val dir = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
                 act.window.decorView.layoutDirection = dir
+                binding.rootView.layoutDirection = dir
+                binding.btnConfirm.layoutDirection = dir
+                binding.btnBack.drawable?.isAutoMirrored = false
+                binding.ivConfirmArrow.drawable?.isAutoMirrored = false
+                binding.btnBack.scaleX = if (isRtl) -1f else 1f
+                binding.ivConfirmArrow.scaleX = if (isRtl) -1f else 1f
             }
         }
         val popped = findNavController().popBackStack()

@@ -189,6 +189,8 @@
     <string name="btn_upgrade_now_arrow">Обновить сейчас →</string>
     <string name="settings_group_options">Параметры</string>
     <string name="setting_language">Язык</string>
+    <string name="setting_permission">Разрешения</string>
+    <string name="setting_permission_desc">Управление разрешениями приложения</string>
     <string name="setting_notification">Уведомления</string>
     <string name="setting_notification_desc">Управление уведомлениями</string>
     <string name="settings_group_support">Поддержка</string>

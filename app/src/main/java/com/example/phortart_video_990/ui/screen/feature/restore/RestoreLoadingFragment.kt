@@ -264,17 +264,18 @@ class RestoreLoadingFragment : BaseFragment<FragmentRestoreLoadingBinding>(Fragm
             android.util.Log.e("RestoreLoading", "Lỗi trong processPostRestore: ${t.message}")
         }
 
-        // Tự động lưu vào lịch sử
         try {
+            val currentTime = System.currentTimeMillis()
             val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
+            val currentDate = dateFormat.format(Date(currentTime))
             val historyItem = HistoryItemModel(
                 type = "Khôi phục",
                 title = getString(R.string.func_02_restore),
                 date = currentDate,
                 imageUri = fixedOutputUrl,
                 imageUrl = fixedOutputUrl,
-                beforeUri = inputUrl
+                beforeUri = inputUrl,
+                timestamp = currentTime
             )
             historyRepository.addHistoryItem(historyItem)
         } catch (e: Exception) {

@@ -90,7 +90,7 @@ class HistoryDetailFragment : BaseFragment<FragmentHistoryDetailBinding>(Fragmen
         val localizedTitle = item.getLocalizedTitle(requireContext())
         binding.tvDetailTitle.text = localizedTitle.ifBlank { getString(R.string.detail_default_title) }
         binding.tvDetailTitle.isSelected = true
-        binding.tvDetailDate.text = item.date.ifBlank { getString(R.string.detail_recently_created) }
+        binding.tvDetailDate.text = item.getLocalizedFullDate(requireContext()).ifBlank { getString(R.string.detail_recently_created) }
 
         val type = item.type.lowercase()
 

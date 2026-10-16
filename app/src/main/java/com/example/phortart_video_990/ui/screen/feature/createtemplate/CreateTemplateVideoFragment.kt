@@ -1151,8 +1151,9 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
 
     private fun saveToHistory(localVideoPath: String, photoUri: String) {
         try {
+            val currentTime = System.currentTimeMillis()
             val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-            val dateStr = dateFormat.format(Date())
+            val dateStr = dateFormat.format(Date(currentTime))
             val title = if (!selectedMusicTitle.isNullOrBlank()) {
                 "$templateTitle • ${getString(R.string.detail_music_label, selectedMusicTitle)}"
             } else {
@@ -1196,7 +1197,8 @@ class CreateTemplateVideoFragment : BaseFragment<FragmentCreateTemplateVideoBind
                 imageUrl = templateThumbnailUrl.ifBlank { photoUri },
                 imageUri = localVideoPath,
                 duration = durationStr,
-                styleName = effectiveCategory
+                styleName = effectiveCategory,
+                timestamp = currentTime
             )
             historyRepository.addHistoryItem(item)
         } catch (e: Exception) {

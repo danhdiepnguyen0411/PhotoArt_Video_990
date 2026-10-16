@@ -112,14 +112,34 @@ object LocaleHelper {
         }
     }
 
+    fun isRtlLanguage(language: String?): Boolean {
+        return language?.lowercase() == "ar"
+    }
+
     fun isRtl(context: Context): Boolean {
         val lang = getSavedLanguage(context)
-        return lang.lowercase() == "ar"
+        return isRtlLanguage(lang)
     }
 
     fun getDeviceLocalizedContext(context: Context): Context {
         val deviceLang = getDeviceLanguage()
         val locale = getLocale(deviceLang)
+        val config = Configuration(context.resources.configuration)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            config.setLocale(locale)
+            context.createConfigurationContext(config)
+        } else {
+            @Suppress("DEPRECATION")
+            config.locale = locale
+            @Suppress("DEPRECATION")
+            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+            context
+        }
+    }
+
+    fun getLocalizedContext(context: Context): Context {
+        val lang = getSavedLanguage(context)
+        val locale = getLocale(lang)
         val config = Configuration(context.resources.configuration)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             config.setLocale(locale)

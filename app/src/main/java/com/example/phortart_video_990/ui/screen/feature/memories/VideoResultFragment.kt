@@ -135,8 +135,9 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     getString(R.string.video_title_no_music, photoUris.size.coerceAtLeast(1))
                 }
 
+                val currentTime = System.currentTimeMillis()
                 val dateFormat = SimpleDateFormat("MMM d, yyyy • HH:mm", Locale.getDefault())
-                val currentDate = dateFormat.format(Date())
+                val currentDate = dateFormat.format(Date(currentTime))
 
                 val historyItem = HistoryItemModel(
                     type = "Gom ảnh",
@@ -144,7 +145,8 @@ class VideoResultFragment : BaseFragment<FragmentVideoResultBinding>(FragmentVid
                     date = currentDate,
                     imageUri = savedDoc.absolutePath,
                     duration = formatTime(videoDurationSec),
-                    photoCount = photoUris.size.toString()
+                    photoCount = photoUris.size.toString(),
+                    timestamp = currentTime
                 )
                 historyRepository.addHistoryItem(historyItem)
                 hasAutoSavedHistory = true

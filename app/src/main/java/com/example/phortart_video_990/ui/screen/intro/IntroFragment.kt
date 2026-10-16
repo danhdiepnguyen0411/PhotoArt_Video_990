@@ -7,6 +7,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.LocaleHelper
 import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.IntroPageModel
@@ -44,6 +45,10 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
     }
 
     override fun initView() {
+        val isRtl = LocaleHelper.isRtl(requireContext())
+        binding.ivBtnNextArrow.drawable?.isAutoMirrored = false
+        binding.ivBtnNextArrow.scaleX = if (isRtl) -1f else 1f
+
         val adapter = IntroAdapter(introPages)
         binding.vpIntro.adapter = adapter
 

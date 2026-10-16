@@ -181,6 +181,8 @@ AI가 그려내는</string>
     <string name="btn_upgrade_now_arrow">지금 업그레이드 →</string>
     <string name="settings_group_options">옵션</string>
     <string name="setting_language">언어</string>
+    <string name="setting_permission">권한</string>
+    <string name="setting_permission_desc">앱 접근 권한 관리</string>
     <string name="setting_notification">알림</string>
     <string name="setting_notification_desc">알림 설정을 관리하세요</string>
     <string name="settings_group_support">지원</string>

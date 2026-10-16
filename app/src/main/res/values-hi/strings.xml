@@ -159,6 +159,8 @@ AI बना देगा</string>
     <string name="btn_upgrade_now_arrow">अभी अपग्रेड करें →</string>
     <string name="settings_group_options">विकल्प</string>
     <string name="setting_language">भाषा</string>
+    <string name="setting_permission">अनुमतियाँ</string>
+    <string name="setting_permission_desc">ऐप एक्सेस अनुमतियाँ प्रबंधित करें</string>
     <string name="setting_notification">सूचनाएं</string>
     <string name="setting_notification_desc">अपनी सूचनाएं प्रबंधित करें</string>
     <string name="settings_group_support">सहायता</string>

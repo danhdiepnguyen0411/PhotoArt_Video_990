@@ -160,6 +160,8 @@ un\'esperienza superiore.</string>
     <string name="btn_upgrade_now_arrow">Passa ora →</string>
     <string name="settings_group_options">Opzioni</string>
     <string name="setting_language">Lingua</string>
+    <string name="setting_permission">Permessi</string>
+    <string name="setting_permission_desc">Gestisci i permessi di accesso dell\'app</string>
     <string name="setting_notification">Notifiche</string>
     <string name="setting_notification_desc">Gestisci le tue notifiche</string>
     <string name="settings_group_support">Supporto</string>

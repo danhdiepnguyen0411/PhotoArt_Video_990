@@ -1,5 +1,7 @@
 package com.example.phortart_video_990.ui.screen.setting
 
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
@@ -12,6 +14,10 @@ import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.databinding.FragmentSettingBinding
 
 class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBinding::inflate) {
+
+    companion object {
+        private const val PRIVACY_POLICY_URL = "https://photogenertatorai.vercel.app/policies.html"
+    }
 
     override fun initView() {
         val prefs = PreferencesManager.getInstance(requireContext())
@@ -63,12 +69,21 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
         // Privacy Policy
         binding.rowPrivacy.setOnClickListener {
-            Toast.makeText(requireContext(), getString(R.string.setting_privacy), Toast.LENGTH_SHORT).show()
+            openPrivacyPolicy()
         }
 
         // About App
         binding.rowAboutApp.setOnClickListener {
             Toast.makeText(requireContext(), getString(R.string.setting_about_version), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openPrivacyPolicy() {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+            startActivity(intent)
+        } catch (_: Exception) {
+            Toast.makeText(requireContext(), getString(R.string.setting_privacy), Toast.LENGTH_SHORT).show()
         }
     }
 

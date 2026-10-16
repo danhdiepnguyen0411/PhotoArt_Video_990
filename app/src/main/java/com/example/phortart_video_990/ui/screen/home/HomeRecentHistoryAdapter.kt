@@ -37,7 +37,7 @@ class HomeRecentHistoryAdapter(
 
         fun bind(item: HistoryItemModel) {
             binding.tvHistoryTitle.text = item.getLocalizedTitle(binding.root.context)
-            binding.tvHistoryDate.text = item.displayDate
+            binding.tvHistoryDate.text = item.getLocalizedGridDate(binding.root.context)
 
             val rawSource: Any? = item.imageUrl ?: item.imageUri ?: if (item.imageRes != 0) item.imageRes else null
             val source: Any? = when {
@@ -56,11 +56,14 @@ class HomeRecentHistoryAdapter(
             if (item.isVideo && dur.isNotBlank()) {
                 binding.llDurationPill.visibility = View.VISIBLE
                 binding.tvDuration.text = dur
+                binding.llPhotoOnlyPill.visibility = View.GONE
             } else {
                 binding.llDurationPill.visibility = View.GONE
+                binding.llPhotoOnlyPill.visibility = View.VISIBLE
+                val locCtx = com.example.phortart_video_990.core.utils.LocaleHelper.getLocalizedContext(binding.root.context)
+                binding.tvPhotoOnlyText.text = locCtx.getString(R.string.history_badge_photo)
             }
             binding.llPhotoCountPill.visibility = View.GONE
-            binding.llPhotoOnlyPill.visibility = View.GONE
 
             binding.root.setOnClickListener {
                 onItemClick(item)

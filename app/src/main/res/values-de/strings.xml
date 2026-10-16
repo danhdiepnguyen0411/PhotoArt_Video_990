@@ -160,6 +160,8 @@ ein erstklassiges Erlebnis.</string>
     <string name="btn_upgrade_now_arrow">Jetzt upgraden →</string>
     <string name="settings_group_options">Optionen</string>
     <string name="setting_language">Sprache</string>
+    <string name="setting_permission">Berechtigungen</string>
+    <string name="setting_permission_desc">App-Zugriffsberechtigungen verwalten</string>
     <string name="setting_notification">Benachrichtigungen</string>
     <string name="setting_notification_desc">Benachrichtigungen verwalten</string>
     <string name="settings_group_support">Hilfe &amp; Support</string>
