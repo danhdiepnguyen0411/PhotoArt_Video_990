@@ -41,15 +41,7 @@ object NotificationDialogHelper {
      * Checks if notification permission is currently granted and enabled.
      */
     fun isNotificationGranted(context: Context): Boolean {
-        val areNotificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
-        val isPostNotificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(
-                context, android.Manifest.permission.POST_NOTIFICATIONS
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
-        return areNotificationsEnabled && isPostNotificationGranted
+        return NotificationPermissionManager.isNotificationPermissionGranted(context)
     }
 
     /**
@@ -105,6 +97,7 @@ object NotificationDialogHelper {
 
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
+        setupDialogWindow(dialog, activity)
     }
 
     fun showCustomDialog(

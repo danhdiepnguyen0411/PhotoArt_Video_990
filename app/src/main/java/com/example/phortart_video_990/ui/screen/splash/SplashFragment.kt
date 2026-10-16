@@ -45,7 +45,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
                 NotificationPermissionManager.setUserRevoked(ctx, false)
                 NotificationPermissionManager.resetDeniedCount(ctx)
             } else {
-                prefs.notificationDeniedCount++
                 NotificationPermissionManager.incrementDeniedCount(ctx)
             }
             // Do not show custom noti dialog on Home in the same session where user just saw native popup
@@ -189,7 +188,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
         }
 
         // Request POST_NOTIFICATIONS up to 2 times at Splash (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && prefs.notificationDeniedCount < 2) {
+        val isUserRevoked = NotificationPermissionManager.isUserRevoked(ctx)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && prefs.notificationDeniedCount < 2 && !isUserRevoked) {
             if (!hasRequestedPermission) {
                 hasRequestedPermission = true
                 isWaitingForPermission = true
