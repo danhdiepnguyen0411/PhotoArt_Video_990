@@ -392,4 +392,14 @@ tốt hơn.</string>
     <string name="history_badge_photo">Ảnh</string>
     <string name="music_tap_to_select">Chạm để chọn</string>
     <string name="btn_preview">Xem trước</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">Mẫu template mới vừa cập bến 🔥</string>
+    <string name="noti_new_template_body">Khám phá các phong cách mới cho tác phẩm tiếp theo của bạn.</string>
+    <string name="noti_remind_create_title">Bạn sẽ sáng tạo điều gì tiếp theo? 🎨</string>
+    <string name="noti_remind_create_body">Biến ý tưởng thành ảnh và video độc đáo cùng AI.</string>
+    <string name="noti_suggest_template_title">Khoác diện mạo mới cho bức ảnh yêu thích ✨</string>
+    <string name="noti_suggest_template_body">Khám phá phong cách sáng tạo và tạo dấu ấn của riêng bạn.</string>
+    <string name="noti_suggest_memories_title">Kỷ niệm của bạn xứng đáng thành một thước phim 🎬</string>
+    <string name="noti_suggest_memories_body">Ghép những bức ảnh yêu thích hòa cùng giai điệu âm nhạc.</string>
 </resources>

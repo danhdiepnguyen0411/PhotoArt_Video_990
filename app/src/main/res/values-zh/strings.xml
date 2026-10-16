@@ -403,4 +403,14 @@ AI 即可描摹</string>
     <string name="history_badge_photo">照片</string>
     <string name="music_tap_to_select">点击选择</string>
     <string name="btn_preview">预览</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">全新模板已上线 🔥</string>
+    <string name="noti_new_template_body">为你的下一个创作探索全新风格。</string>
+    <string name="noti_remind_create_title">接下来想创作什么？ 🎨</string>
+    <string name="noti_remind_create_body">用 AI 将你的创意变为精彩照片与视频。</string>
+    <string name="noti_suggest_template_title">让最喜爱的照片焕然一新 ✨</string>
+    <string name="noti_suggest_template_body">探索创意风格，打造属于你的专属作品。</string>
+    <string name="noti_suggest_memories_title">你的回忆值得被拍成一部电影 🎬</string>
+    <string name="noti_suggest_memories_body">将喜欢的照片与音乐融合为精彩视频。</string>
 </resources>

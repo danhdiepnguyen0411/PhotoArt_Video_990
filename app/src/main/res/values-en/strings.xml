@@ -393,4 +393,14 @@ a premium experience.</string>
     <string name="history_badge_photo">Photo</string>
     <string name="music_tap_to_select">Tap to select</string>
     <string name="btn_preview">Preview</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">Fresh templates just arrived 🔥</string>
+    <string name="noti_new_template_body">Explore new styles for your next creation.</string>
+    <string name="noti_remind_create_title">What will you create next? 🎨</string>
+    <string name="noti_remind_create_body">Turn your ideas into photos and videos with AI.</string>
+    <string name="noti_suggest_template_title">Give your favorite photo a new look ✨</string>
+    <string name="noti_suggest_template_body">Explore a creative style and make it your own.</string>
+    <string name="noti_suggest_memories_title">Your memories deserve a movie 🎬</string>
+    <string name="noti_suggest_memories_body">Bring your favorite photos together with music.</string>
 </resources>

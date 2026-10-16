@@ -6,9 +6,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import com.example.phortart_video_990.core.base.BaseActivity
 import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
+import com.example.phortart_video_990.core.notification.NotificationScheduler
 import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.SystemBarInsetsHelper
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.databinding.ActivityMainBinding
+import com.example.phortart_video_990.ui.screen.main.MainFragment
 import com.example.phortart_video_990.ui.screen.uninstall.UninstallActivity
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
@@ -33,6 +36,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         setupNavigationGraph(intent)
         checkAndResumeUninstallIfActive(intent)
+        handleNotificationNavigation(intent)
 
         NotificationPermissionManager.resetSessionState()
     }
@@ -42,6 +46,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         setIntent(intent)
         setupNavigationGraph(intent)
         checkAndResumeUninstallIfActive(intent)
+        handleNotificationNavigation(intent)
     }
 
     private fun checkAndResumeUninstallIfActive(intent: Intent?): Boolean {
@@ -79,11 +84,54 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             return false
         }
 
+        val target = intent?.getStringExtra("target_screen")
+        val isNotificationTarget = target in listOf("home", "discover", "memories")
         val prefs = com.example.phortart_video_990.data.local.PreferencesManager.getInstance(this)
-        return intent?.getStringExtra("target_screen") == "home" ||
+        return isNotificationTarget ||
                 intent?.getBooleanExtra("skip_splash", false) == true ||
                 com.example.phortart_video_990.core.utils.UninstallSessionState.shouldSkipSplash ||
                 prefs.shouldSkipSplashOnce
+    }
+
+    private fun handleNotificationNavigation(intent: Intent?) {
+        val target = intent?.getStringExtra("target_screen") ?: return
+        intent.removeExtra("target_screen")
+
+        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                as? androidx.navigation.fragment.NavHostFragment ?: return
+        val navController = navHost.navController
+
+        if (navController.currentDestination?.id != R.id.mainFragment && navController.currentDestination?.id != R.id.splashFragment) {
+            navController.popBackStack(R.id.mainFragment, false)
+        }
+
+        fun dispatch(mainFrag: MainFragment) {
+            when (target) {
+                "discover" -> mainFrag.selectTab(1)
+                "home" -> mainFrag.selectTab(0)
+                "memories" -> {
+                    try {
+                        navController.navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
+                    } catch (_: Exception) {}
+                }
+            }
+        }
+
+        binding.root.post {
+            val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                    as? androidx.navigation.fragment.NavHostFragment
+            val primary = navHost?.childFragmentManager?.primaryNavigationFragment
+            if (primary is MainFragment) {
+                dispatch(primary)
+            } else {
+                binding.root.postDelayed({
+                    val retryFrag = navHost?.childFragmentManager?.primaryNavigationFragment
+                    if (retryFrag is MainFragment) {
+                        dispatch(retryFrag)
+                    }
+                }, 300L)
+            }
+        }
     }
 
     private fun consumeSkipSplashFlags() {
@@ -136,6 +184,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         if (NotificationDialogHelper.isNotificationGranted(this)) {
             NotificationDialogHelper.dismissNotificationDialog(this)
             NotificationDialogHelper.stopPolling()
+            NotificationScheduler.scheduleInactivityNotifications(this)
         }
     }
 

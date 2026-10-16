@@ -385,4 +385,14 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="history_badge_photo">写真</string>
     <string name="music_tap_to_select">タップして選択</string>
     <string name="btn_preview">プレビュー</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">新しいテンプレートが登場しました 🔥</string>
+    <string name="noti_new_template_body">次の作品に新しいスタイルを試してみましょう。</string>
+    <string name="noti_remind_create_title">次はどんな作品を作りますか？ 🎨</string>
+    <string name="noti_remind_create_body">AIであなたのアイデアを写真や動画に変えましょう。</string>
+    <string name="noti_suggest_template_title">お気に入りの写真を新しく変身 ✨</string>
+    <string name="noti_suggest_template_body">クリエイティブなスタイルを選んで自分だけの作品に。</string>
+    <string name="noti_suggest_memories_title">大切な思い出をショートムービーに 🎬</string>
+    <string name="noti_suggest_memories_body">お気に入りの写真を音楽と合わせて動画を作成。</string>
 </resources>

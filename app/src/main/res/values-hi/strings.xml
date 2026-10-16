@@ -371,4 +371,14 @@ AI बना देगा</string>
     <string name="history_badge_photo">फ़ोटो</string>
     <string name="music_tap_to_select">चुनने के लिए टैप करें</string>
     <string name="btn_preview">पूर्वावलोकन</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">नए टेम्प्लेट अभी आए हैं 🔥</string>
+    <string name="noti_new_template_body">अपनी अगली रचना के लिए नई शैलियों का अन्वेषण करें।</string>
+    <string name="noti_remind_create_title">आप आगे क्या बनाएंगे? 🎨</string>
+    <string name="noti_remind_create_body">AI के साथ अपने विचारों को फ़ोटो और वीडियो में बदलें।</string>
+    <string name="noti_suggest_template_title">अपनी पसंदीदा तस्वीर को एक नया रूप दें ✨</string>
+    <string name="noti_suggest_template_body">एक रचनात्मक शैली का अन्वेषण करें और इसे अपना बनाएं।</string>
+    <string name="noti_suggest_memories_title">आपकी यादें एक फ़िल्म की हक़दार हैं 🎬</string>
+    <string name="noti_suggest_memories_body">संगीत के साथ अपनी पसंदीदा फ़ोटो को एक साथ लाएं।</string>
 </resources>

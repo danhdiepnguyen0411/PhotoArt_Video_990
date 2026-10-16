@@ -186,7 +186,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         val ctx = context ?: return
         if (!NotificationDialogHelper.isNotificationGranted(ctx)) {
             val prefs = PreferencesManager.getInstance(ctx)
-            if (prefs.notificationDeniedCount >= 2 && prefs.shouldShowNotiDialogOnHome) {
+            if (prefs.shouldShowNotiDialogOnHome) {
                 prefs.shouldShowNotiDialogOnHome = false
                 binding.root.post {
                     if (isAdded) {
@@ -590,6 +590,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 if (apiTracks.isNotEmpty()) {
                     cachedDancingTemplates = apiTracks
+                    com.example.phortart_video_990.core.notification.NotificationScheduler.checkAndNotifyNewTemplates(requireContext(), apiTracks)
                     applyCategoryFilter(CategoryModel(code = selectedCategoryCode, name = selectedCategoryCode))
 
                     bindingOrNull?.layoutSkeletonSuggestions?.root?.visibility = View.GONE

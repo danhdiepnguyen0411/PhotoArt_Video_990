@@ -14,6 +14,7 @@ import android.view.WindowManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.phortart_video_990.R
+import com.example.phortart_video_990.core.notification.NotificationScheduler
 import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.PermissionReturnHelper
 import com.example.phortart_video_990.data.local.PreferencesManager
@@ -135,6 +136,7 @@ object NotificationDialogHelper {
                         NotificationPermissionManager.setPreviouslyGranted(context, true)
                         NotificationPermissionManager.setUserRevoked(context, false)
                         NotificationPermissionManager.resetDeniedCount(context)
+                        NotificationScheduler.scheduleInactivityNotifications(context)
 
                         PermissionReturnHelper.bringAppToFront(context)
                         onGranted?.invoke()

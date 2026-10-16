@@ -3,8 +3,10 @@ package com.example.phortart_video_990.ui.screen.main
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.findNavController
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.databinding.FragmentMainBinding
 
 class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::inflate) {
@@ -26,6 +28,20 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
         }
         binding.bottomNavigationView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateIndicator(binding.vpMainTabs.currentItem, animate = false)
+        }
+
+        val target = activity?.intent?.getStringExtra("target_screen")
+        if (target != null) {
+            activity?.intent?.removeExtra("target_screen")
+            when (target) {
+                "discover" -> selectTab(1)
+                "home" -> selectTab(0)
+                "memories" -> {
+                    binding.root.post {
+                        findNavController().navigateSafe(R.id.action_mainFragment_to_memoriesFragment)
+                    }
+                }
+            }
         }
     }
 

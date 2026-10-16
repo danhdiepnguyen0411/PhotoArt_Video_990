@@ -2,10 +2,12 @@ package com.example.phortart_video_990.ui.screen.intro
 
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.IntroPageModel
 import com.example.phortart_video_990.databinding.FragmentIntroBinding
@@ -62,6 +64,17 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
     }
 
     override fun initListener() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val current = binding.vpIntro.currentItem
+                if (current > 0) {
+                    binding.vpIntro.currentItem = current - 1
+                } else {
+                    requireActivity().finish()
+                }
+            }
+        })
+
         binding.btnNext.setOnClickListener {
             val current = binding.vpIntro.currentItem
             if (current < introPages.size - 1) {
@@ -117,6 +130,6 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
 
     private fun completeIntroAndNavigate() {
         PreferencesManager.getInstance(requireContext()).hasCompletedIntro = true
-        findNavController().navigate(R.id.action_introFragment_to_mainFragment)
+        findNavController().navigateSafe(R.id.action_introFragment_to_mainFragment)
     }
 }

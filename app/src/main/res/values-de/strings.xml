@@ -372,4 +372,14 @@ ein erstklassiges Erlebnis.</string>
     <string name="history_badge_photo">Foto</string>
     <string name="music_tap_to_select">Tippen zum Auswählen</string>
     <string name="btn_preview">Vorschau</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">Neue Vorlagen sind eingetroffen 🔥</string>
+    <string name="noti_new_template_body">Entdecke neue Stile für deine nächste Kreation.</string>
+    <string name="noti_remind_create_title">Was möchtest du als Nächstes erstellen? 🎨</string>
+    <string name="noti_remind_create_body">Verwandle deine Ideen mit KI in Fotos und Videos.</string>
+    <string name="noti_suggest_template_title">Verpasse deinem Lieblingsfoto einen neuen Look ✨</string>
+    <string name="noti_suggest_template_body">Entdecke einen kreativen Stil und mache ihn zu deinem eigenen.</string>
+    <string name="noti_suggest_memories_title">Deine Erinnerungen verdienen einen Film 🎬</string>
+    <string name="noti_suggest_memories_body">Bring deine Lieblingsfotos mit Musik zusammen.</string>
 </resources>

@@ -21,6 +21,7 @@ import coil.load
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.utils.LocaleHelper
+import com.example.phortart_video_990.core.utils.navigateSafe
 import com.example.phortart_video_990.data.local.PreferencesManager
 import com.example.phortart_video_990.data.model.LanguageModel
 import com.example.phortart_video_990.databinding.FragmentLanguageBinding
@@ -381,13 +382,23 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
                 act.window.decorView.layoutDirection = dir
             }
         }
-        findNavController().popBackStack()
+        val popped = findNavController().popBackStack()
+        if (!popped) {
+            activity?.finish()
+        }
     }
 
     override fun initListener() {
+        val prefs = PreferencesManager.getInstance(requireContext())
+        val isFromSettings = prefs.hasCompletedIntro
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                restoreInitialLanguageAndExit()
+                if (isFromSettings) {
+                    restoreInitialLanguageAndExit()
+                } else {
+                    activity?.finish()
+                }
             }
         })
 
@@ -402,7 +413,6 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
             val langCode = selected.code
             val langName = selected.name
 
-            val prefs = PreferencesManager.getInstance(requireContext())
             // Save ONLY when user explicitly presses the confirm / save button!
             prefs.saveLanguage(langCode, langName)
             LocaleHelper.setLocale(requireActivity(), langCode)
@@ -415,9 +425,9 @@ class LanguageFragment : BaseFragment<FragmentLanguageBinding>(FragmentLanguageB
             }
 
             if (!prefs.hasCompletedIntro) {
-                findNavController().navigate(R.id.action_languageFragment_to_introFragment)
+                findNavController().navigateSafe(R.id.action_languageFragment_to_introFragment)
             } else {
-                findNavController().navigate(R.id.action_languageFragment_to_mainFragment)
+                findNavController().navigateSafe(R.id.action_languageFragment_to_mainFragment)
             }
         }
     }

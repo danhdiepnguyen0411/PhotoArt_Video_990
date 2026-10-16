@@ -154,4 +154,16 @@ class PreferencesManager(context: Context) {
             .putBoolean(KEY_IS_FIRST_LANGUAGE_SELECTED, true)
             .apply()
     }
+
+    var lastActiveTime: Long
+        get() = prefs.getLong("last_active_time", 0L)
+        set(value) = prefs.edit().putLong("last_active_time", value).apply()
+
+    fun getKnownTemplateIds(): Set<String> {
+        return prefs.getStringSet("known_template_ids", emptySet())?.toSet() ?: emptySet()
+    }
+
+    fun saveKnownTemplateIds(ids: Set<String>) {
+        prefs.edit().putStringSet("known_template_ids", HashSet(ids)).apply()
+    }
 }

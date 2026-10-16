@@ -372,4 +372,14 @@
     <string name="history_badge_photo">صورة</string>
     <string name="music_tap_to_select">اضغط للاختيار</string>
     <string name="btn_preview">معاينة</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">قوالب جديدة وصلت للتو 🔥</string>
+    <string name="noti_new_template_body">استكشف أنماطًا جديدة لإبداعك القادم.</string>
+    <string name="noti_remind_create_title">ماذا ستصنع تاليًا؟ 🎨</string>
+    <string name="noti_remind_create_body">حوّل أفكارك إلى صور ومقاطع فيديو بالذكاء الاصطناعي.</string>
+    <string name="noti_suggest_template_title">امنح صورتك المفضلة مظهرًا جديدًا ✨</string>
+    <string name="noti_suggest_template_body">استكشف نمطًا إبداعيًا واجعله خاصًا بك.</string>
+    <string name="noti_suggest_memories_title">ذكرياتك تستحق أن تكون فيلمًا 🎬</string>
+    <string name="noti_suggest_memories_body">اجمع صورك المفضلة مع الموسيقى.</string>
 </resources>

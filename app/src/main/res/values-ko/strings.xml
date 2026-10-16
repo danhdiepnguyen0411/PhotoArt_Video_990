@@ -393,4 +393,14 @@ AI가 그려내는</string>
     <string name="history_badge_photo">사진</string>
     <string name="music_tap_to_select">탭하여 선택</string>
     <string name="btn_preview">미리보기</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">새로운 템플릿이 도착했습니다 🔥</string>
+    <string name="noti_new_template_body">다음 창작을 위한 새로운 스타일을 만나보세요.</string>
+    <string name="noti_remind_create_title">다음엔 무엇을 만들어 볼까요? 🎨</string>
+    <string name="noti_remind_create_body">AI로 아이디어를 사진과 동영상으로 실현해보세요.</string>
+    <string name="noti_suggest_template_title">좋아하는 사진에 새로운 스타일을 더해보세요 ✨</string>
+    <string name="noti_suggest_template_body">창의적인 스타일을 탐색하고 나만의 작품을 완성하세요.</string>
+    <string name="noti_suggest_memories_title">소중한 추억을 한 편의 영화로 🎬</string>
+    <string name="noti_suggest_memories_body">좋아하는 사진들을 음악과 함께 영상으로 엮어보세요.</string>
 </resources>

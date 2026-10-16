@@ -11,6 +11,7 @@ import com.example.phortart_video_990.MainActivity
 import com.example.phortart_video_990.R
 import com.example.phortart_video_990.core.base.BaseFragment
 import com.example.phortart_video_990.core.dialog.NotificationDialogHelper
+import com.example.phortart_video_990.core.notification.NotificationScheduler
 import com.example.phortart_video_990.core.utils.LocaleHelper
 import com.example.phortart_video_990.core.utils.NotificationPermissionManager
 import com.example.phortart_video_990.core.utils.SystemBarInsetsHelper
@@ -44,8 +45,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
                 NotificationPermissionManager.setPreviouslyGranted(ctx, true)
                 NotificationPermissionManager.setUserRevoked(ctx, false)
                 NotificationPermissionManager.resetDeniedCount(ctx)
+                NotificationScheduler.scheduleInactivityNotifications(ctx)
             } else {
-                prefs.notificationDeniedCount++
                 NotificationPermissionManager.incrementDeniedCount(ctx)
             }
             // Do not show custom noti dialog on Home in the same session where user just saw native popup
@@ -170,7 +171,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
             if (!hasNavigated && !isWaitingForPermission) {
                 isProgressComplete = true
                 binding.progressBar.progress = 100
-                navigateToNext()
+                handleSplashComplete()
             }
         }
     }
@@ -184,6 +185,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
         if (NotificationDialogHelper.isNotificationGranted(ctx)) {
             prefs.shouldShowNotiDialogOnHome = false
             MainActivity.shouldCheckNotificationOnResume = false
+            NotificationScheduler.scheduleInactivityNotifications(ctx)
             navigateToNext()
             return
         }

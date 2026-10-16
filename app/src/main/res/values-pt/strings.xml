@@ -372,4 +372,14 @@ uma experiência premium.</string>
     <string name="history_badge_photo">Foto</string>
     <string name="music_tap_to_select">Toque para escolher</string>
     <string name="btn_preview">Prévia</string>
+
+    <!-- Notification Scenarios -->
+    <string name="noti_new_template_title">Novos modelos acabaram de chegar 🔥</string>
+    <string name="noti_new_template_body">Explore novos estilos para a sua próxima criação.</string>
+    <string name="noti_remind_create_title">O que você vai criar a seguir? 🎨</string>
+    <string name="noti_remind_create_body">Transforme suas ideias em fotos e vídeos com IA.</string>
+    <string name="noti_suggest_template_title">Dê um novo visual à sua foto favorita ✨</string>
+    <string name="noti_suggest_template_body">Explore um estilo criativo e personalize-o.</string>
+    <string name="noti_suggest_memories_title">Suas memórias merecem um filme 🎬</string>
+    <string name="noti_suggest_memories_body">Junte suas fotos favoritas ao som da música.</string>
 </resources>
