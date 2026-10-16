@@ -137,7 +137,18 @@ class CommonTabHeaderView @JvmOverloads constructor(
     }
 
     val hasRightAction: Boolean
-        get() = (flRightAction.visibility == View.VISIBLE && flRightAction.childCount > 0) || btnPro.visibility == View.VISIBLE
+        get() {
+            if (btnPro.visibility == View.VISIBLE) return true
+            if (flRightAction.visibility == View.VISIBLE) {
+                for (i in 0 until flRightAction.childCount) {
+                    val child = flRightAction.getChildAt(i)
+                    if (child !== btnPro && child.visibility == View.VISIBLE) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
 
     fun setTitleCentered(centered: Boolean) {
         userSpecifiedCenterTitle = centered
@@ -160,39 +171,31 @@ class CommonTabHeaderView @JvmOverloads constructor(
         val hasRight = hasRightAction
 
         if (isTitleCentered) {
-            if (hasBack && hasRight) {
-                lp.startToEnd = R.id.btnBack
-                lp.endToStart = R.id.flHeaderRightAction
-                lp.startToStart = LayoutParams.UNSET
-                lp.endToEnd = LayoutParams.UNSET
-                lp.horizontalBias = 0.5f
-                lp.marginStart = (8 * density).toInt()
-                lp.marginEnd = (8 * density).toInt()
-            } else if (hasBack) {
-                lp.startToEnd = R.id.btnBack
-                lp.endToEnd = LayoutParams.PARENT_ID
-                lp.startToStart = LayoutParams.UNSET
-                lp.endToStart = LayoutParams.UNSET
-                lp.horizontalBias = 0.5f
-                lp.marginStart = (8 * density).toInt()
-                lp.marginEnd = (48 * density).toInt()
-            } else if (hasRight) {
-                lp.startToStart = LayoutParams.PARENT_ID
-                lp.endToStart = R.id.flHeaderRightAction
-                lp.startToEnd = LayoutParams.UNSET
-                lp.endToEnd = LayoutParams.UNSET
-                lp.horizontalBias = 0.5f
-                lp.marginStart = (48 * density).toInt()
-                lp.marginEnd = (8 * density).toInt()
-            } else {
-                lp.startToStart = LayoutParams.PARENT_ID
-                lp.endToEnd = LayoutParams.PARENT_ID
-                lp.startToEnd = LayoutParams.UNSET
-                lp.endToStart = LayoutParams.UNSET
-                lp.horizontalBias = 0.5f
-                lp.marginStart = (16 * density).toInt()
-                lp.marginEnd = (16 * density).toInt()
+            lp.startToStart = LayoutParams.PARENT_ID
+            lp.endToEnd = LayoutParams.PARENT_ID
+            lp.startToEnd = LayoutParams.UNSET
+            lp.endToStart = LayoutParams.UNSET
+            lp.horizontalBias = 0.5f
+
+            // Left clearance for back button (btnBack is 38dp wide)
+            val leftClearance = if (hasBack) (52 * density).toInt() else (16 * density).toInt()
+
+            // Right clearance for right actions (btnPro or custom right view)
+            val hasCustomRightChild = flRightAction.visibility == View.VISIBLE &&
+                (0 until flRightAction.childCount).any { i ->
+                    val child = flRightAction.getChildAt(i)
+                    child !== btnPro && child.visibility == View.VISIBLE
+                }
+            val rightClearance = when {
+                hasCustomRightChild -> (96 * density).toInt()
+                btnPro.visibility == View.VISIBLE -> (68 * density).toInt()
+                else -> (16 * density).toInt()
             }
+
+            // Margin MUST be symmetric on both sides to guarantee true horizontal centering across the screen
+            val symmetricMargin = maxOf(leftClearance, rightClearance)
+            lp.marginStart = symmetricMargin
+            lp.marginEnd = symmetricMargin
         } else {
             if (hasBack) {
                 lp.startToStart = LayoutParams.UNSET
@@ -284,6 +287,11 @@ class CommonTabHeaderView @JvmOverloads constructor(
 
     fun setProButtonVisible(visible: Boolean) {
         btnPro.visibility = if (visible) View.VISIBLE else View.GONE
+        val hasCustomRightChild = (0 until flRightAction.childCount).any { i ->
+            val child = flRightAction.getChildAt(i)
+            child !== btnPro && child.visibility == View.VISIBLE
+        }
+        flRightAction.visibility = if (visible || hasCustomRightChild) View.VISIBLE else View.GONE
         updateTitleConstraints()
     }
 
