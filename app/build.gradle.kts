@@ -16,7 +16,7 @@ val artSecretKey = localProperties.getProperty("art.secret.key") ?: ""
 
 android {
     namespace = "com.aiart.photo.beauti.editor"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.aiart.photo.beauti.editor"
