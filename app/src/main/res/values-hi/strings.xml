@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">अनइंस्टॉल करें</string>
-    <string name="shortcut_uninstall_desc">PHOTO ART &amp; VIDEO अनइंस्टॉल करें</string>
+    <string name="shortcut_uninstall_desc">AI Beauty Camera &amp; Editor अनइंस्टॉल करें</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">यादों को फिर से जीवंत बनाएं</string>
     <string name="splash_loading">लोड हो रहा है %1$d%%...</string>
@@ -26,7 +26,7 @@
     <string name="nav_template">टेम्पलेट</string>
     <string name="nav_history">इतिहास</string>
     <string name="nav_setting">सेटिंग्स</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">सभी देखें</string>
     <string name="home_recent_history">हाल का इतिहास</string>
     <string name="home_suggestions">आपके लिए</string>
@@ -196,7 +196,7 @@ AI बना देगा</string>
     <string name="exit_desc">क्या आप वाकई ऐप से बाहर निकलना चाहते हैं?</string>
     <string name="btn_exit">बाहर निकलें</string>
     <string name="rate_title">ऐप का मूल्यांकन करें</string>
-    <string name="rate_subtitle">PHOTO ART &amp; VIDEO के साथ फ़ोटो बनाने का आपका अनुभव कैसा रहा?</string>
+    <string name="rate_subtitle">AI Beauty Camera &amp; Editor के साथ फ़ोटो बनाने का आपका अनुभव कैसा रहा?</string>
     <string name="btn_rate_submit">मूल्यांकन भेजें</string>
     <string name="btn_rate_not_now">अभी नहीं</string>
     <string name="uninstall_step1_title">उपयोग के दौरान आपको किन समस्याओं का सामना करना पड़ा?</string>

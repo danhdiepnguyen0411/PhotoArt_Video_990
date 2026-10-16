@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">Uninstall</string>
-    <string name="shortcut_uninstall_desc">Uninstall PHOTO ART &amp; VIDEO</string>
+    <string name="shortcut_uninstall_desc">Uninstall AI Beauty Camera &amp; Editor</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Make memories live again</string>
     <string name="splash_loading">Loading %1$d%%...</string>
@@ -24,7 +24,7 @@
     <string name="nav_music">Music</string>
     <string name="nav_history">History</string>
     <string name="nav_setting">Settings</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">See all</string>
     <string name="home_recent_history">Recent History</string>
     <string name="home_suggestions">For You</string>
@@ -228,7 +228,7 @@ a premium experience.</string>
     <string name="exit_desc">Are you sure you want to exit the application?</string>
     <string name="btn_exit">Exit</string>
     <string name="rate_title">Rate the App</string>
-    <string name="rate_subtitle">How do you feel about creating photos with PHOTO ART &amp; VIDEO?</string>
+    <string name="rate_subtitle">How do you feel about creating photos with AI Beauty Camera &amp; Editor?</string>
     <string name="btn_rate_submit">Submit</string>
     <string name="btn_rate_not_now">Not now</string>
     <string name="rate_success">Thank you for rating our app!</string>

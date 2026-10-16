@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">Disinstalla</string>
-    <string name="shortcut_uninstall_desc">Disinstalla PHOTO ART &amp; VIDEO</string>
+    <string name="shortcut_uninstall_desc">Disinstalla AI Beauty Camera &amp; Editor</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Fai rivivere i ricordi</string>
     <string name="splash_loading">Caricamento %1$d%%...</string>
@@ -27,7 +27,7 @@ e conserva per sempre i tuoi ricordi.</string>
     <string name="nav_template">Modelli</string>
     <string name="nav_history">Cronologia</string>
     <string name="nav_setting">Impostazioni</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">Vedi tutto</string>
     <string name="home_recent_history">Cronologia recente</string>
     <string name="home_suggestions">Per te</string>
@@ -197,7 +197,7 @@ un\'esperienza superiore.</string>
     <string name="exit_desc">Sei sicuro di voler uscire dall\'applicazione?</string>
     <string name="btn_exit">Esci</string>
     <string name="rate_title">Valuta l\'applicazione</string>
-    <string name="rate_subtitle">Come valuti la tua esperienza di creazione foto con PHOTO ART &amp; VIDEO?</string>
+    <string name="rate_subtitle">Come valuti la tua esperienza di creazione foto con AI Beauty Camera &amp; Editor?</string>
     <string name="btn_rate_submit">Invia valutazione</string>
     <string name="btn_rate_not_now">Non ora</string>
     <string name="uninstall_step1_title">Quali problemi hai riscontrato durante l\'utilizzo?</string>

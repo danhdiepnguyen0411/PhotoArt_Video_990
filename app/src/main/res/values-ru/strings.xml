@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">Удалить</string>
-    <string name="shortcut_uninstall_desc">Удалить PHOTO ART &amp; VIDEO</string>
+    <string name="shortcut_uninstall_desc">Удалить AI Beauty Camera &amp; Editor</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Оживите ваши воспоминания</string>
     <string name="splash_loading">Загрузка %1$d%%...</string>
@@ -27,7 +27,7 @@
     <string name="nav_template">Шаблоны</string>
     <string name="nav_history">История</string>
     <string name="nav_setting">Настройки</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">Смотреть все</string>
     <string name="home_recent_history">Недавняя история</string>
     <string name="home_suggestions">Для вас</string>
@@ -226,7 +226,7 @@
     <string name="exit_desc">Вы действительно хотите выйти из приложения?</string>
     <string name="btn_exit">Выйти</string>
     <string name="rate_title">Оцените приложение</string>
-    <string name="rate_subtitle">Как вы оцениваете создание фото с PHOTO ART &amp; VIDEO?</string>
+    <string name="rate_subtitle">Как вы оцениваете создание фото с AI Beauty Camera &amp; Editor?</string>
     <string name="btn_rate_submit">Отправить</string>
     <string name="btn_rate_not_now">Не сейчас</string>
     <string name="uninstall_step1_title">С какими трудностями вы столкнулись при использовании?</string>

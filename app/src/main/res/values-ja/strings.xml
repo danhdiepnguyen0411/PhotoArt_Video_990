@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">アンインストール</string>
-    <string name="shortcut_uninstall_desc">PHOTO ART &amp; VIDEO をアンインストール</string>
+    <string name="shortcut_uninstall_desc">AI Beauty Camera &amp; Editor をアンインストール</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">思い出を再び鮮やかに</string>
     <string name="splash_loading">読み込み中 %1$d%%...</string>
@@ -27,7 +27,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="nav_template">テンプレート</string>
     <string name="nav_history">履歴</string>
     <string name="nav_setting">設定</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">すべて見る</string>
     <string name="home_recent_history">最近の履歴</string>
     <string name="home_suggestions">おすすめ</string>
@@ -211,7 +211,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="exit_desc">アプリを終了してもよろしいですか？</string>
     <string name="btn_exit">終了</string>
     <string name="rate_title">アプリを評価</string>
-    <string name="rate_subtitle">PHOTO ART &amp; VIDEO での創作体験はいかがでしたか？</string>
+    <string name="rate_subtitle">AI Beauty Camera &amp; Editor での創作体験はいかがでしたか？</string>
     <string name="btn_rate_submit">送信</string>
     <string name="btn_rate_not_now">後で</string>
     <string name="uninstall_step1_title">使用中にどのような問題が発生しましたか？</string>

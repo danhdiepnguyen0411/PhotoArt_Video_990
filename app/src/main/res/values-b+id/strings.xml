@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PHOTO ART &amp; VIDEO</string>
+    <string name="app_name">AI Beauty Camera &amp; Editor</string>
     <string name="shortcut_uninstall">Copot pemasangan</string>
-    <string name="shortcut_uninstall_desc">Copot pemasangan PHOTO ART &amp; VIDEO</string>
+    <string name="shortcut_uninstall_desc">Copot pemasangan AI Beauty Camera &amp; Editor</string>
     <string name="splash_title">Photo AI</string>
     <string name="splash_subtitle">Hidupkan kembali kenangan Anda</string>
     <string name="splash_loading">Memuat %1$d%%...</string>
@@ -27,7 +27,7 @@ serta jaga kenangan berharga selamanya.</string>
     <string name="nav_template">Templat</string>
     <string name="nav_history">Riwayat</string>
     <string name="nav_setting">Pengaturan</string>
-    <string name="home_brand_title">PHOTO ART &amp; VIDEO</string>
+    <string name="home_brand_title">AI Beauty Camera &amp; Editor</string>
     <string name="home_see_all">Lihat semua</string>
     <string name="home_recent_history">Riwayat Terkini</string>
     <string name="home_suggestions">Untuk Anda</string>
@@ -217,7 +217,7 @@ pengalaman terbaik.</string>
     <string name="exit_desc">Apakah Anda yakin ingin keluar dari aplikasi?</string>
     <string name="btn_exit">Keluar</string>
     <string name="rate_title">Beri Nilai Aplikasi</string>
-    <string name="rate_subtitle">Bagaimana perasaan Anda tentang pembuatan foto dengan PHOTO ART &amp; VIDEO?</string>
+    <string name="rate_subtitle">Bagaimana perasaan Anda tentang pembuatan foto dengan AI Beauty Camera &amp; Editor?</string>
     <string name="btn_rate_submit">Kirim Ulasan</string>
     <string name="btn_rate_not_now">Nanti saja</string>
     <string name="uninstall_step1_title">Masalah apa yang Anda temui selama penggunaan?</string>
