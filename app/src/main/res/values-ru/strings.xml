@@ -203,6 +203,7 @@
     <string name="setting_share">Поделиться с друзьями</string>
     <string name="setting_privacy">Конфиденциальность</string>
     <string name="setting_terms">Условия использования</string>
+    <string name="setting_terms_desc">Посмотреть условия использования</string>
     <string name="setting_app_version">Версия приложения</string>
     <string name="btn_back">Назад</string>
     <string name="placeholder_description">Эта функция находится в разработке.</string>

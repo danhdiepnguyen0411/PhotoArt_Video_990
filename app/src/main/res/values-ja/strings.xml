@@ -188,6 +188,7 @@ AIが素晴らしい作品に仕上げます。</string>
     <string name="setting_share">友達にシェア</string>
     <string name="setting_privacy">プライバシーポリシー</string>
     <string name="setting_terms">利用規約</string>
+    <string name="setting_terms_desc">利用規約を表示</string>
     <string name="setting_app_version">アプリバージョン</string>
     <string name="btn_back">戻る</string>
     <string name="placeholder_description">この機能は現在準備中です。</string>

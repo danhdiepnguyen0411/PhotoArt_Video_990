@@ -173,6 +173,7 @@ AI बना देगा</string>
     <string name="setting_share">दोस्तों के साथ साझा करें</string>
     <string name="setting_privacy">गोपनीयता</string>
     <string name="setting_terms">सेवा की शर्तें</string>
+    <string name="setting_terms_desc">सेवा की शर्तें देखें</string>
     <string name="setting_app_version">ऐप संस्करण</string>
     <string name="btn_back">वापस</string>
     <string name="placeholder_description">यह सुविधा जल्द ही उपलब्ध होगी।</string>

@@ -216,6 +216,7 @@ tốt hơn.</string>
     <string name="setting_share">Chia sẻ với bạn bè</string>
     <string name="setting_privacy">Chính sách bảo mật</string>
     <string name="setting_terms">Điều khoản sử dụng</string>
+    <string name="setting_terms_desc">Xem điều khoản sử dụng</string>
     <string name="setting_app_version">Phiên bản ứng dụng</string>
     <string name="btn_back">Quay lại</string>
     <string name="placeholder_description">Tính năng đang được hoàn thiện.</string>

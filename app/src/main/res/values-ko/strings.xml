@@ -195,6 +195,7 @@ AI가 그려내는</string>
     <string name="setting_share">친구에게 공유하기</string>
     <string name="setting_privacy">개인정보 보호</string>
     <string name="setting_terms">이용 약관</string>
+    <string name="setting_terms_desc">이용 약관 보기</string>
     <string name="setting_app_version">앱 버전</string>
     <string name="btn_back">뒤로 가기</string>
     <string name="placeholder_description">이 기능은 현재 준비 중입니다.</string>

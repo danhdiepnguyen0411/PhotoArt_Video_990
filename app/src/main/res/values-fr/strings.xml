@@ -175,6 +175,7 @@ d\'une expérience premium.</string>
     <string name="setting_share">Partager avec des amis</string>
     <string name="setting_privacy">Politique de confidentialité</string>
     <string name="setting_terms">Conditions d\'utilisation</string>
+    <string name="setting_terms_desc">Voir les conditions d\x27utilisation</string>
     <string name="setting_app_version">Version de l\'application</string>
     <string name="btn_back">Retour</string>
     <string name="placeholder_description">Fonctionnalité en cours de finalisation.</string>

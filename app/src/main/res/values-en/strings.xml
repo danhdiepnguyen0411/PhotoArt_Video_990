@@ -205,6 +205,7 @@ a premium experience.</string>
     <string name="setting_share">Share with Friends</string>
     <string name="setting_privacy">Privacy Policy</string>
     <string name="setting_terms">Terms of Service</string>
+    <string name="setting_terms_desc">View our terms of service</string>
     <string name="setting_app_version">App Version</string>
     <string name="btn_back">Back</string>
     <string name="placeholder_description">This feature is currently being finalized.</string>

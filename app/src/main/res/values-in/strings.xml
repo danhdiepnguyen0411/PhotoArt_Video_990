@@ -194,6 +194,7 @@ pengalaman terbaik.</string>
     <string name="setting_share">Bagikan ke Teman</string>
     <string name="setting_privacy">Kebijakan Privasi</string>
     <string name="setting_terms">Ketentuan Layanan</string>
+    <string name="setting_terms_desc">Lihat ketentuan layanan</string>
     <string name="setting_app_version">Versi Aplikasi</string>
     <string name="btn_back">Kembali</string>
     <string name="placeholder_description">Fitur ini sedang dalam tahap penyelesaian.</string>

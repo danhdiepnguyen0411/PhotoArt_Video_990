@@ -206,6 +206,7 @@ AI 即可描摹</string>
     <string name="setting_share">分享给好友</string>
     <string name="setting_privacy">隐私政策</string>
     <string name="setting_terms">服务条款</string>
+    <string name="setting_terms_desc">查看服务条款</string>
     <string name="setting_app_version">应用版本</string>
     <string name="btn_back">返回</string>
     <string name="placeholder_description">功能正在持续优化中。</string>

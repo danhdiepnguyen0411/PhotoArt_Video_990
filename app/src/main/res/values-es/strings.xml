@@ -175,6 +175,7 @@ de una experiencia superior.</string>
     <string name="setting_share">Compartir con amigos</string>
     <string name="setting_privacy">Política de privacidad</string>
     <string name="setting_terms">Términos de servicio</string>
+    <string name="setting_terms_desc">Ver términos de servicio</string>
     <string name="setting_app_version">Versión de la app</string>
     <string name="btn_back">Volver</string>
     <string name="placeholder_description">Función en proceso de finalización.</string>
