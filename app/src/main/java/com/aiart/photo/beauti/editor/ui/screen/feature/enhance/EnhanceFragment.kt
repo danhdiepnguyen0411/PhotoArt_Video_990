@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aiart.photo.beauti.editor.R
 import com.aiart.photo.beauti.editor.core.base.BaseFragment
@@ -117,15 +118,10 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
 
     override fun initView() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val navBarInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-
-            binding.btnGeneratePrompt.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                bottomMargin = navBarInset + (24 * resources.displayMetrics.density).toInt()
-            }
             insets
         }
 
-        // Setup horizontal styles list
+        // Setup vertical styles list (3 columns grid)
         styleAdapter = EnhanceStyleAdapter(
             items = stylesList,
             selectedIndex = selectedStyleIndex
@@ -136,11 +132,8 @@ class EnhanceFragment : BaseFragment<FragmentEnhanceBinding>(FragmentEnhanceBind
             binding.etPromptInput.setSelection(binding.etPromptInput.text.length)
         }
 
-        binding.rvStyles.layoutManager = LinearLayoutManager(
-            requireContext(),
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
+        binding.rvStyles.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.rvStyles.isNestedScrollingEnabled = false
         binding.rvStyles.adapter = styleAdapter
 
         binding.etPromptInput.filters = arrayOf(android.text.InputFilter.LengthFilter(500))

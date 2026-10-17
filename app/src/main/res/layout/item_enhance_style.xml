@@ -3,14 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardStyle"
-    android:layout_width="112dp"
-    android:layout_height="148dp"
-    android:layout_marginEnd="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="138dp"
+    android:layout_marginHorizontal="5dp"
+    android:layout_marginBottom="10dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     app:cardBackgroundColor="@color/transparent"
-    app:cardCornerRadius="18dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="false"
     app:strokeColor="@color/transparent"
@@ -39,14 +40,14 @@
         <LinearLayout
             android:id="@+id/layoutHotBadge"
             android:layout_width="wrap_content"
-            android:layout_height="22dp"
+            android:layout_height="20dp"
             android:layout_gravity="top|start"
-            android:layout_margin="8dp"
+            android:layout_margin="6dp"
             android:background="@drawable/bg_badge_hot"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="7dp"
-            android:paddingEnd="8dp">
+            android:paddingStart="6dp"
+            android:paddingEnd="7dp">
 
             <ImageView
                 android:layout_width="12dp"
@@ -71,12 +72,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
-            android:layout_margin="10dp"
+            android:layout_margin="8dp"
             android:ellipsize="end"
             android:fontFamily="@font/inter_bold"
             android:maxLines="2"
             android:textColor="@color/white"
-            android:textSize="12sp"
+            android:textSize="11.5sp"
             android:textStyle="bold"
             tools:text="Cyber Move" />
     </FrameLayout>

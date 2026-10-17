@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Scrollable Body Content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="20dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="14dp">
 
             <!-- Section 1: Nhập nội dung (Text) Card -->
             <com.google.android.material.card.MaterialCardView
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingHorizontal="16dp"
-                    android:paddingVertical="18dp">
+                    android:paddingVertical="14dp">
 
                     <!-- Section Title Row -->
                     <LinearLayout
@@ -83,8 +83,8 @@
                     <!-- Text input box with counter -->
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="140dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="10dp"
                         android:background="@drawable/bg_prompt_input">
 
                         <EditText
@@ -100,7 +100,7 @@
                             android:maxLength="500"
                             android:paddingHorizontal="14dp"
                             android:paddingTop="12dp"
-                            android:paddingBottom="28dp"
+                            android:paddingBottom="26dp"
                             android:textColor="#2B3990"
                             android:textColorHint="#A7B3E6"
                             android:textSize="13.5sp" />
@@ -111,7 +111,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom|end"
                             android:layout_marginEnd="14dp"
-                            android:layout_marginBottom="10dp"
+                            android:layout_marginBottom="8dp"
                             android:fontFamily="@font/inter_medium"
                             android:text="0/500"
                             android:textColor="#8A96C8"
@@ -125,7 +125,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -151,26 +151,29 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="4dp"
                 android:fontFamily="@font/inter_medium"
                 android:text="@string/prompt_style_subtitle"
                 android:textColor="#7A88B8"
                 android:textSize="12.5sp" />
 
-            <!-- Horizontal Style Cards RecyclerView -->
+            <!-- Vertical Style Cards RecyclerView (Grid 3 columns) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvStyles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="-5dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
+                android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
-                tools:itemCount="5"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="3"
+                tools:itemCount="9"
                 tools:listitem="@layout/item_enhance_style" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Action Button: Tạo ảnh -->
     <LinearLayout
@@ -178,7 +181,7 @@
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="14dp"
         android:alpha="0.5"
         android:background="@drawable/bg_btn_ai_create"
         android:clickable="false"
